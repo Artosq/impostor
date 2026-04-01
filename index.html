@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostor Game 🕵️‍♂️</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        :root { --primary: #3498db; --secondary: #2ecc71; --danger: #e74c3c; --dark: #2c3e50; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ecf0f1; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h1 { color: var(--dark); margin-bottom: 20px; }
+        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; }
+        .btn-create { background: var(--primary); color: white; }
+        .btn-join { background: var(--secondary); color: white; }
+        .btn-start { background: var(--secondary); color: white; font-size: 1.1em; }
+        .btn-end { background: var(--danger); color: white; }
+        .hidden { display: none; }
+        .player-tag { background: #eee; padding: 5px 10px; border-radius: 20px; display: inline-block; margin: 5px; font-size: 0.9em; }
+        #role-display { margin-top: 20px; padding: 20px; border-radius: 10px; color: white; }
+        .role-impostor { background: var(--danger); }
+        .role-citizen { background: var(--secondary); }
+        .player-tag { 
+        animation: fadeIn 0.3s ease-in; 
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>🕵️‍♂️ Impostor</h1>
+
+    <div id="screen-login">
+        <input type="text" id="input-name" placeholder="Twoje imię">
+        <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
+        <div style="margin: 15px 0; color: #999;">— LUB —</div>
+        <input type="text" id="input-code" placeholder="Kod pokoju">
+        <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
+    </div>
+
+    <div id="screen-lobby" class="hidden">
+        <h3>Kod pokoju: <span id="room-code-display" style="color: var(--primary);">----</span></h3>
+        <div id="players-list"></div>
+        
+        <div id="host-controls" class="hidden">
+            <hr>
+            <label>Kategoria:</label>
+            <select id="select-category">
+                <option value="Jedzenie">Jedzenie 🍕</option>
+                <option value="Miejsca">Miejsca 🌍</option>
+                <option value="Zawody">Zawody 👷</option>
+            </select>
+            <label>Liczba Impostorów:</label>
+            <select id="select-impostors">
+                <option value="1">1 Impostor</option>
+                <option value="2">2 Impostorów</option>
+            </select>
+            <button class="btn-start" onclick="startGame()">START GRY</button>
+        </div>
+        <p id="waiting-msg">Oczekiwanie na start przez hosta...</p>
+    </div>
+
+    <div id="screen-game" class="hidden">
+        <div id="role-display">
+            <p>Twoja rola:</p>
+            <h2 id="role-name">---</h2>
+            <hr>
+            <p>Twoja informacja:</p>
+            <h1 id="role-data">---</h1>
+        </div>
+        <div id="host-end-controls" class="hidden">
+            <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const socket = io();
+    let currentRoomCode = "";
+
+    // Funkcje pomocnicze do przełączania ekranów
+    function showScreen(screenId) {
+        ['screen-login', 'screen-lobby', 'screen-game'].forEach(id => {
+            document.getElementById(id).classList.add('hidden');
+        });
+        document.getElementById(screenId).classList.remove('hidden');
+    }
+
+    // KOMUNIKACJA Z SERWEREM
+    function createRoom() {
+        const name = document.getElementById('input-name').value;
+        if (!name) return alert("Podaj imię!");
+        socket.emit('create_room', { playerName: name });
+    }
+
+    function joinRoom() {
+        const name = document.getElementById('input-name').value;
+        const code = document.getElementById('input-code').value.toUpperCase();
+        if (!name || !code) return alert("Podaj imię i kod!");
+        socket.emit('join_room', { playerName: name, roomCode: code });
+    }
+
+    function startGame() {
+        const category = document.getElementById('select-category').value;
+        const impostors = document.getElementById('select-impostors').value;
+        socket.emit('start_game', { roomCode: currentRoomCode, category, impostorCount: parseInt(impostors) });
+    }
+
+    function endGame() {
+        if(confirm("Zakończyć grę?")) socket.emit('end_game', currentRoomCode);
+    }
+
+    // OBSŁUGA ZDARZEŃ SOCKET.IO
+    socket.on('room_created', (code) => {
+        currentRoomCode = code;
+        document.getElementById('room-code-display').innerText = code;
+        showScreen('screen-lobby');
+    });
+
+    socket.on('room_update', (room) => {
+        currentRoomCode = room.code; // upewnienie się dla dołączających
+        document.getElementById('room-code-display').innerText = room.code;
+        showScreen('screen-lobby');
+        
+        // Lista graczy
+        const list = document.getElementById('players-list');
+        list.innerHTML = room.players.map(p => `<span class="player-tag">${p.name}</span>`).join('');
+
+        // Czy jesteś hostem?
+        if (socket.id === room.host) {
+            document.getElementById('host-controls').classList.remove('hidden');
+            document.getElementById('waiting-msg').classList.add('hidden');
+        }
+    });
+
+    socket.on('game_start', (data) => {
+        showScreen('screen-game');
+        const display = document.getElementById('role-display');
+        display.className = data.role === 'IMPOSTOR' ? 'role-impostor' : 'role-citizen';
+        document.getElementById('role-name').innerText = data.role;
+        document.getElementById('role-data').innerText = data.data;
+
+        // Pokazujemy przycisk końca tylko hostowi (możesz to sprawdzić po socket.id)
+        socket.emit('check_host', currentRoomCode);
+    });
+
+    socket.on('is_host', (isHost) => {
+        if(isHost) document.getElementById('host-end-controls').classList.remove('hidden');
+    });
+
+    socket.on('game_over', (results) => {
+        alert(`KONIEC! \nImpostor: ${results.impostorNames.join(', ')} \nHasło: ${results.word}`);
+        location.reload(); 
+    });
+
+    socket.on('error', (msg) => alert(msg));
+</script>
+</body>
+</html>
