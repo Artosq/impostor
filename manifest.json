@@ -1,0 +1,30 @@
+{
+  "short_name": "Impostor",
+  "name": "Gra Impostor",
+  "description": "Towarzyska gra w zgadywanie haseł i wykrywanie oszusta.",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#1a1a1a",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#ff4757",
+  "shortcuts": [
+    {
+      "name": "Impostr gra",
+      "short_name": "Impostor",
+      "url": "/",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
