@@ -1,0 +1,14 @@
+{
+  "Jedzenie": [
+    { "word": "Pizza", "hints": ["Okrągłe danie", "Włoska kuchnia", "Ma sos pomidorowy"] },
+    { "word": "Sushi", "hints": ["Ryż i surowa ryba", "Japonia", "Używa się pałeczek"] }
+  ],
+  "Miejsca": [
+    { "word": "Paryż", "hints": ["Miasto miłości", "Wieża Eiffla", "Stolica Francji"] },
+    { "word": "Kino", "hints": ["Miejsce z dużym ekranem", "Popcorn", "Ogląda się tam filmy"] }
+  ],
+  "Zawody": [
+    { "word": "Strażak", "hints": ["Nosi czerwony kask", "Gasi pożary", "Jeździ dużym autem"] },
+    { "word": "Lekarz", "hints": ["Pracuje w szpitalu", "Nosi stetoskop", "Leczy ludzi"] }
+  ]
+}
