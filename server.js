@@ -1,42 +1,37 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+const fs = require('fs'); // Dodajemy moduł systemu plików
 
 const app = express();
 const server = http.createServer(app);
 
-// To sprawia, że Render wyświetli Twój index.html pod głównym adresem
 app.use(express.static(__dirname));
 
 const io = new Server(server, {
     cors: { origin: "*" } 
 });
 
-const rooms = {};
+// WCZYTYWANIE KATEGORII Z PLIKU
+let categories = {};
+try {
+    const data = fs.readFileSync('./categories.json', 'utf8');
+    categories = JSON.parse(data);
+    console.log("Kategorie wczytane pomyślnie!");
+} catch (err) {
+    console.error("Błąd podczas wczytywania categories.json:", err);
+}
 
-const categories = {
-    "Jedzenie": [
-        { word: "Pizza", hints: ["Okrągłe danie", "Włoska kuchnia", "Ma sos pomidorowy"] },
-        { word: "Sushi", hints: ["Ryż i surowa ryba", "Japonia", "Używa się pałeczek"] }
-    ],
-    "Miejsca": [
-        { word: "Paryż", hints: ["Miasto miłości", "Wieża Eiffla", "Stolica Francji"] },
-        { word: "Kino", hints: ["Miejsce z dużym ekranem", "Popcorn", "Ogląda się tam filmy"] }
-    ],
-    "Zawody": [
-        { word: "Strażak", hints: ["Nosi czerwony kask", "Gasi pożary", "Jeździ dużym autem"] },
-        { word: "Lekarz", hints: ["Pracuje w szpitalu", "Nosi stetoskop", "Leczy ludzi"] }
-    ]
-};
+const rooms = {};
 
 io.on('connection', (socket) => {
     console.log(`Połączono: ${socket.id}`);
 
     // Tworzenie pokoju
     socket.on('create_room', ({ playerName }) => {
-        const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+        const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
         rooms[roomCode] = {
-            code: roomCode, // To pole musi tu być!
+            code: roomCode,
             host: socket.id,
             players: [{ id: socket.id, name: playerName }],
             status: 'waiting'
@@ -58,7 +53,7 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Start gry z wyborem liczby impostorów i kategorii
+    // Start gry
     socket.on('start_game', ({ roomCode, category, impostorCount }) => {
         const room = rooms[roomCode];
         if (!room || room.host !== socket.id) return;
@@ -68,9 +63,10 @@ io.on('connection', (socket) => {
         }
 
         const catData = categories[category];
+        if (!catData) return socket.emit('error', 'Nie znaleziono wybranej kategorii!');
+
         const selected = catData[Math.floor(Math.random() * catData.length)];
         
-        // Tasowanie graczy i wybór impostorów
         let shuffled = [...room.players].sort(() => 0.5 - Math.random());
         let impostors = shuffled.slice(0, impostorCount);
         let impostorIds = impostors.map(i => i.id);
@@ -81,11 +77,9 @@ io.on('connection', (socket) => {
             word: selected.word 
         };
 
-        // Wysyłanie ról
         room.players.forEach((player) => {
             const isImpostor = impostorIds.includes(player.id);
             if (isImpostor) {
-                // Każdy impostor dostaje inną podpowiedź (jeśli jest ich wystarczająco dużo)
                 const hintIndex = impostorIds.indexOf(player.id) % selected.hints.length;
                 io.to(player.id).emit('game_start', { role: 'IMPOSTOR', data: selected.hints[hintIndex] });
             } else {
@@ -94,18 +88,16 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Sprawdzanie czy gracz jest hostem (do przycisku zakończenia)
     socket.on('check_host', (roomCode) => {
         const room = rooms[roomCode];
         if (room) socket.emit('is_host', room.host === socket.id);
     });
 
-    // Koniec gry
     socket.on('end_game', (roomCode) => {
         const room = rooms[roomCode];
         if (room && room.host === socket.id) {
             io.to(roomCode).emit('game_over', room.results);
-            delete rooms[roomCode]; // Usuwamy pokój po grze
+            delete rooms[roomCode];
         }
     });
 
@@ -115,7 +107,6 @@ io.on('connection', (socket) => {
 });
 
 const PORT = process.env.PORT || 10000;
-
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Serwer działa na porcie ${PORT}`);
 });
