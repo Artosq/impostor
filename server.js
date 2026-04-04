@@ -108,9 +108,47 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('disconnect', () => {
-        console.log('Gracz wyszedł');
-    });
+socket.on('disconnect', () => {
+    console.log(`🔌 Rozłączono: ${socket.id}`);
+
+    for (const code in rooms) {
+        const room = rooms[code];
+        const playerIndex = room.players.findIndex(p => p.id === socket.id);
+
+        if (playerIndex !== -1) {
+            const isHost = (room.host === socket.id);
+            const playerName = room.players[playerIndex].name;
+
+            // 1. Usuwamy gracza z tablicy
+            room.players.splice(playerIndex, 1);
+
+            console.log(`🏃 Gracz ${playerName} wyszedł z pokoju ${code}.`);
+
+            // 2. SPRAWDZENIE: Czy w pokoju ktokolwiek został?
+            if (room.players.length === 0) {
+                console.log(`🗑️ Pokój ${code} jest pusty - usuwam go.`);
+                delete rooms[code];
+            } 
+            // 3. SPRAWDZENIE: Czy wyszedł host?
+            else if (isHost) {
+                console.log(`👑 Host wyszedł z pokoju ${code}. Zamykam grę dla wszystkich.`);
+                // Informujemy pozostałych graczy, że host wyszedł i muszą przeładować stronę
+                io.to(code).emit('force_reload', 'Host opuścił pokój. Gra została zakończona.');
+                delete rooms[code]; // Usuwamy pokój, bo bez hosta gra nie ma sensu
+            } 
+            // 4. Jeśli wyszedł zwykły gracz i inni zostali
+            else {
+                io.to(code).emit('room_update', room);
+            }
+
+            // Aktualizacja globalnej listy pokojów dla osób w lobby
+            io.emit('room_list', rooms);
+            break; 
+        }
+    }
+});
+
+
 });
 
 const PORT = process.env.PORT || 10000;
