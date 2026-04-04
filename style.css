@@ -148,3 +148,6 @@ animation: fadeIn 0.3s ease-in;
         left: 150%; /* Szybkie przejście na prawą stronę i długie czekanie */
     }
 }
+#no-rooms{
+    color: white;
+}
