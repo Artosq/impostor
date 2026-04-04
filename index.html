@@ -106,8 +106,11 @@
     function joinRoom(listCode) {
         const name = document.getElementById('input-name').value;
 
-        const code = document.getElementById('input-code').value.toUpperCase();
-        if(listCode) code = listCode;
+        let code = document.getElementById('input-code').value.toUpperCase();
+
+        if (listCode && listCode !== "") {
+        code = listCode;
+        };
 
         if (!name || !code) return alert("Podaj imię i kod!");
         socket.emit('join_room', { playerName: name, roomCode: code });
