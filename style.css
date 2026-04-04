@@ -9,10 +9,10 @@ body {
     background: #161616; 
     display: flex; 
     justify-content: center; 
-    padding: 20px;
+    padding: 15px;
 }
 .card { 
-    background: rgb(27, 27, 27); 
+    background: rgb(31, 31, 31); 
     padding: 30px; 
     border-radius: 15px; 
     box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
