@@ -58,6 +58,7 @@ io.on('connection', (socket) => {
 
     // Start gry
     socket.on('start_game', ({ roomCode, category, impostorCount }) => {
+        socket.emit('room_list', rooms);
         const room = rooms[roomCode];
         if (!room || room.host !== socket.id) return;
 
@@ -97,6 +98,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('end_game', (roomCode) => {
+        socket.emit('room_list', rooms);
         const room = rooms[roomCode];
         if (room && room.host === socket.id) {
             io.to(roomCode).emit('game_over', room.results);
