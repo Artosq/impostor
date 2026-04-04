@@ -101,7 +101,9 @@ io.on('connection', (socket) => {
         socket.emit('room_list', rooms);
         const room = rooms[roomCode];
         if (room && room.host === socket.id) {
+            if(room.status === 'playing')
             io.to(roomCode).emit('game_over', room.results);
+        
             delete rooms[roomCode];
         }
     });
