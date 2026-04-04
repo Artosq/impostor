@@ -159,7 +159,7 @@
     if (roomsArray.length === 0) {
         html = "<p id='no-rooms'>Brak aktywnych pokojów. Stwórz własny!</p>";
     } else {
-        html = '<div style="margin: 15px 0; color: #999;">— LUB —</div>';
+        html = '<div style="margin: 15px 0; color: #999;">— LISTA POKOI —</div>';
         roomsArray.forEach(room => {
             // Wyświetlamy tylko pokoje, które jeszcze czekają na graczy
             if (room.status === 'waiting') {
