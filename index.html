@@ -8,35 +8,12 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#ff4757">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <style>
-        :root { --primary: #3498db; --secondary: #2ecc71; --danger: #e74c3c; --dark: #2c3e50; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ecf0f1; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { color: var(--dark); margin-bottom: 20px; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; }
-        .btn-create { background: var(--primary); color: white; }
-        .btn-join { background: var(--secondary); color: white; }
-        .btn-start { background: var(--secondary); color: white; font-size: 1.1em; }
-        .btn-end { background: var(--danger); color: white; }
-        .hidden { display: none; }
-        .player-tag { background: #eee; padding: 5px 10px; border-radius: 20px; display: inline-block; margin: 5px; font-size: 0.9em; }
-        #role-display { margin-top: 20px; padding: 20px; border-radius: 10px; color: white; }
-        .role-impostor { background: var(--danger); }
-        .role-citizen { background: var(--secondary); }
-        .player-tag { 
-        animation: fadeIn 0.3s ease-in; 
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="card">
-    <h1>🕵️‍♂️ Impostor v0.2</h1>
+    <h1 class="logo"><img src='logo4.png' width="300px"></h1>
 
     <div id="screen-login">
         <input type="text" id="input-name" placeholder="Twoje imię">
@@ -196,6 +173,11 @@
     }
     
     listContainer.innerHTML = html;
+    });
+
+    socket.on('force_reload', (message) => {
+    localStorage.removeItem('lastRoom'); // Czyścimy pamięć
+    location.reload(); // Przeładowanie strony
     });
 
     socket.on('error', (msg) => alert(msg));

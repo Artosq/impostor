@@ -1,0 +1,150 @@
+:root { 
+    --primary: #3498db;
+    --secondary: #2ecc71;
+    --danger: #e74c3c; 
+    --dark: #2c3e50; 
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    background: #161616; 
+    display: flex; 
+    justify-content: center; 
+    padding: 20px;
+}
+.card { 
+    background: rgb(27, 27, 27); 
+    padding: 30px; 
+    border-radius: 15px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+    width: 100%; 
+    max-width: 400px; 
+    text-align: center; 
+}
+h1 { 
+    color: var(--dark); 
+    margin-bottom: 20px; 
+}
+input, select {
+    width: 100%; 
+    padding: 12px; 
+    margin: 10px 0; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+}
+button { 
+    width: 100%; 
+    padding: 12px; 
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    transition: 0.3s; 
+    margin-top: 10px; 
+}
+.btn-create { 
+    background: var(--primary); 
+    color: white; 
+}
+.btn-join { 
+    background: var(--secondary); 
+    color: white; 
+}
+.btn-start { 
+    background: var(--secondary); 
+    color: white; 
+    font-size: 1.1em; 
+}
+.btn-end { 
+    background: var(--danger); 
+    color: white; 
+}
+.hidden { 
+    display: none; 
+}
+.player-tag { 
+    background: #eee; 
+    padding: 5px 10px; 
+    border-radius: 20px; 
+    display: inline-block;
+    margin: 5px; 
+    font-size: 0.9em; 
+}
+#role-display { 
+    margin-top: 20px; 
+    padding: 20px; 
+    border-radius: 10px; 
+    color: white; 
+}
+.role-impostor { 
+    background: var(--danger); 
+}
+.role-citizen { 
+    background: var(--secondary); 
+}
+.player-tag { 
+animation: fadeIn 0.3s ease-in; 
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: transparent; /* Tło musi być ciemniejsze niż błysk */
+}
+
+.logo {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #ffffff; /* Kolor bazowy tekstu */
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden; /* KLUCZOWE: Ucina błysk poza tekstem */
+    user-select: none;
+    
+    /* Dodajemy lekki cień bazowy, by tekst był czytelny */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Pseudoelement tworzący błysk */
+.logo::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%; /* Startuje daleko poza lewą krawędzią */
+    width: 100%;
+    height: 100%;
+    
+    /* Gradient tworzący ostre, ukośne "światło" */
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,    /* Przezroczysty */
+        rgba(255, 255, 255, 0.1) 30%, /* Bardzo delikatny start */
+        rgba(255, 255, 255, 0.8) 50%, /* Mocne centrum błysku */
+        rgba(255, 255, 255, 0.1) 70%, /* Delikatny koniec */
+        rgba(255, 255, 255, 0) 100%   /* Przezroczysty */
+    );
+    
+    transform: skewX(-25deg); /* Pochylenie błysku */
+    
+    /* GŁÓWNA ANIMACJA: Przesunięcie błysku */
+    animation: shine-effect 6s infinite;
+}
+
+/* DEFINICJA RUCHU BŁYSKU */
+@keyframes shine-effect {
+    0% {
+        left: -150%; /* Start poza ekranem */
+    }
+    30%, 100% {
+        left: 150%; /* Szybkie przejście na prawą stronę i długie czekanie */
+    }
+}
