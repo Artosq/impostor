@@ -40,7 +40,7 @@ io.on('connection', (socket) => {
         };
         io.emit('room_list', rooms);
         socket.join(roomCode);
-        io.emit('room_created', roomCode);
+        socket.emit('room_created', roomCode);
         io.to(roomCode).emit('room_update', rooms[roomCode]);
     });
 
