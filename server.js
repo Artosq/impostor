@@ -40,8 +40,8 @@ io.on('connection', (socket) => {
         };
         socket.join(roomCode);
         socket.emit('room_created', roomCode);
-        socket.emit('room_list', rooms);
         io.to(roomCode).emit('room_update', rooms[roomCode]);
+        socket.emit('room_list', rooms);
     });
 
     // Dołączanie do pokoju
