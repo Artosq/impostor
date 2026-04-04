@@ -27,6 +27,8 @@ const rooms = {};
 io.on('connection', (socket) => {
     console.log(`Połączono: ${socket.id}`);
 
+    socket.emit('room_list', rooms);
+
     // Tworzenie pokoju
     socket.on('create_room', ({ playerName }) => {
         const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
@@ -38,6 +40,7 @@ io.on('connection', (socket) => {
         };
         socket.join(roomCode);
         socket.emit('room_created', roomCode);
+        socket.emit('room_list', rooms);
         io.to(roomCode).emit('room_update', rooms[roomCode]);
     });
 
