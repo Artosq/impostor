@@ -44,6 +44,7 @@
         <div style="margin: 15px 0; color: #999;">— LUB —</div>
         <input type="text" id="input-code" placeholder="Kod pokoju">
         <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
+        <div id="rooms-list"></div>
     </div>
 
     <div id="screen-lobby" class="hidden">
@@ -160,6 +161,33 @@
     socket.on('game_over', (results) => {
         alert(`KONIEC! \nImpostor: ${results.impostorNames.join(', ')} \nHasło: ${results.word}`);
         location.reload(); 
+    });
+
+    socket.on('room_list', (roomsObject) => {
+    const listContainer = document.getElementById('rooms-list');
+    
+    // Zamieniamy obiekt pokojów na tablicę
+    const roomsArray = Object.values(roomsObject);
+    
+    // Czyścimy listę i budujemy nową
+    let html = "";
+    
+    if (roomsArray.length === 0) {
+        html = "<p>Brak aktywnych pokojów. Stwórz własny!</p>";
+    } else {
+        roomsArray.forEach(room => {
+            // Wyświetlamy tylko pokoje, które jeszcze czekają na graczy
+            if (room.status === 'waiting') {
+                html += `
+                <div class="room-item">
+                    <span>Pokój: <strong>${room.code}</strong> (${room.players.length} graczy)</span>
+                    <button onclick="joinRoom('${room.code}')">Dołącz</button>
+                </div>`;
+            }
+        });
+    }
+    
+    listContainer.innerHTML = html;
     });
 
     socket.on('error', (msg) => alert(msg));
