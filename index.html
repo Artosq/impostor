@@ -3,37 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostor Game 🕵️‍♂️</title>
+    <title>Impostor Game v0.1🕵️‍♂️</title>
     <script src="/socket.io/socket.io.js"></script>
-    <style>
-        :root { --primary: #3498db; --secondary: #2ecc71; --danger: #e74c3c; --dark: #2c3e50; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ecf0f1; display: flex; justify-content: center; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        h1 { color: var(--dark); margin-bottom: 20px; }
-        input, select { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        button { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s; margin-top: 10px; }
-        .btn-create { background: var(--primary); color: white; }
-        .btn-join { background: var(--secondary); color: white; }
-        .btn-start { background: var(--secondary); color: white; font-size: 1.1em; }
-        .btn-end { background: var(--danger); color: white; }
-        .hidden { display: none; }
-        .player-tag { background: #eee; padding: 5px 10px; border-radius: 20px; display: inline-block; margin: 5px; font-size: 0.9em; }
-        #role-display { margin-top: 20px; padding: 20px; border-radius: 10px; color: white; }
-        .role-impostor { background: var(--danger); }
-        .role-citizen { background: var(--secondary); }
-        .player-tag { 
-        animation: fadeIn 0.3s ease-in; 
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff4757">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="card">
-    <h1>🕵️‍♂️ Impostor</h1>
+    <h1 class="logo"><img src='logo4.png' width="300px"></h1>
 
     <div id="screen-login">
         <input type="text" id="input-name" placeholder="Twoje imię">
@@ -41,6 +21,7 @@
         <div style="margin: 15px 0; color: #999;">— LUB —</div>
         <input type="text" id="input-code" placeholder="Kod pokoju">
         <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
+        <div id="rooms-list"></div>
     </div>
 
     <div id="screen-lobby" class="hidden">
@@ -51,9 +32,10 @@
             <hr>
             <label>Kategoria:</label>
             <select id="select-category">
-                <option value="Jedzenie">Jedzenie 🍕</option>
-                <option value="Miejsca">Miejsca 🌍</option>
-                <option value="Zawody">Zawody 👷</option>
+                <option value="Przedmioty">Przedmioty</option>
+                <option value="Gry">Gry</option>
+                <option value="Filmy">Filmy</option>
+                <option value="Kraje">Kraje</option>
             </select>
             <label>Liczba Impostorów:</label>
             <select id="select-impostors">
@@ -93,16 +75,23 @@
 
     // KOMUNIKACJA Z SERWEREM
     function createRoom() {
-        const name = document.getElementById('input-name').value;
-        if (!name) return alert("Podaj imię!");
+        let name = document.getElementById('input-name').value;
+        if(!name)name = "User" + Math.floor(1000 + Math.random()*9000)
         socket.emit('create_room', { playerName: name });
     }
 
-    function joinRoom() {
-        const name = document.getElementById('input-name').value;
-        const code = document.getElementById('input-code').value.toUpperCase();
-        if (!name || !code) return alert("Podaj imię i kod!");
-        socket.emit('join_room', { playerName: name, roomCode: code });
+    function joinRoom(listCode) {
+        let name = document.getElementById('input-name').value;
+
+        let code = document.getElementById('input-code').value.toUpperCase();
+
+        if (listCode && listCode !== "") {
+        code = listCode;
+        }
+
+        //if (!name) return alert("Podaj imię i kod!");
+        if(!name)name = "User" + Math.floor(1000 + Math.random()*9000)
+        socket.emit('join_room', { playerName: name, roomCode: listCode });
     }
 
     function startGame() {
@@ -156,6 +145,38 @@
     socket.on('game_over', (results) => {
         alert(`KONIEC! \nImpostor: ${results.impostorNames.join(', ')} \nHasło: ${results.word}`);
         location.reload(); 
+    });
+
+    socket.on('room_list', (roomsObject) => {
+    const listContainer = document.getElementById('rooms-list');
+    
+    // Zamieniamy obiekt pokojów na tablicę
+    const roomsArray = Object.values(roomsObject);
+    
+    // Czyścimy listę i budujemy nową
+    let html = "";
+    
+    if (roomsArray.length === 0) {
+        html = "<p id='no-rooms'>Brak aktywnych pokojów. Stwórz własny!</p>";
+    } else {
+        html = '<div style="margin: 15px 0; color: #999;">— LISTA POKOI —</div>';
+        roomsArray.forEach(room => {
+            // Wyświetlamy tylko pokoje, które jeszcze czekają na graczy
+            if (room.status === 'waiting') {
+                html += `
+                <div class="room-item">
+                    <button onclick="joinRoom('${room.code}')">Dołącz do pokoju: ${room.code} ${room.players.length} graczy</button>
+                </div>`;
+            }
+        });
+    }
+    
+    listContainer.innerHTML = html;
+    });
+
+    socket.on('force_reload', (message) => {
+    localStorage.removeItem('lastRoom'); // Czyścimy pamięć
+    location.reload(); // Przeładowanie strony
     });
 
     socket.on('error', (msg) => alert(msg));
