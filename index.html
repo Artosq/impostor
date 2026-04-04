@@ -76,7 +76,7 @@
     // KOMUNIKACJA Z SERWEREM
     function createRoom() {
         const name = document.getElementById('input-name').value;
-        if (!name) return alert("Podaj imię!");
+        if(!name)name = "User" + Math.floor(1000 + Math.random()*9000)
         socket.emit('create_room', { playerName: name });
     }
 

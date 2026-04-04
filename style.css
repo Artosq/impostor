@@ -10,6 +10,7 @@ body {
     display: flex; 
     justify-content: center; 
     padding: 15px;
+    color: #eee;
 }
 .card { 
     background: rgb(31, 31, 31); 
@@ -147,7 +148,4 @@ animation: fadeIn 0.3s ease-in;
     30%, 100% {
         left: 150%; /* Szybkie przejście na prawą stronę i długie czekanie */
     }
-}
-p{
-    color: white;
 }
