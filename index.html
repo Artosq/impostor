@@ -103,9 +103,11 @@
         socket.emit('create_room', { playerName: name });
     }
 
-    function joinRoom() {
+    function joinRoom(roomCode) {
         const name = document.getElementById('input-name').value;
-        const code = document.getElementById('input-code').value.toUpperCase();
+
+        const code = !roomCode ? document.getElementById('input-code').value.toUpperCase() : roomCode;
+
         if (!name || !code) return alert("Podaj imię i kod!");
         socket.emit('join_room', { playerName: name, roomCode: code });
     }
@@ -180,8 +182,9 @@
             if (room.status === 'waiting') {
                 html += `
                 <div class="room-item">
-                    <span>Pokój: <strong>${room.code}</strong> (${room.players.length} graczy)</span>
-                    <button onclick="joinRoom('${room.code}')">Dołącz</button>
+                    <hr>
+                    <button onclick="joinRoom('${room.code}')">Dołącz do pokoju: ${room.code} ${room.players.length} graczy</button>
+                    <hr>
                 </div>`;
             }
         });
