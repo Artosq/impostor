@@ -38,10 +38,10 @@ io.on('connection', (socket) => {
             players: [{ id: socket.id, name: playerName }],
             status: 'waiting'
         };
+        io.emit('room_list', rooms);
         socket.join(roomCode);
-        socket.emit('room_created', roomCode);
+        io.emit('room_created', roomCode);
         io.to(roomCode).emit('room_update', rooms[roomCode]);
-        socket.emit('room_list', rooms);
     });
 
     // Dołączanie do pokoju
@@ -58,7 +58,6 @@ io.on('connection', (socket) => {
 
     // Start gry
     socket.on('start_game', ({ roomCode, category, impostorCount }) => {
-        socket.emit('room_list', rooms);
         const room = rooms[roomCode];
         if (!room || room.host !== socket.id) return;
 
@@ -74,7 +73,7 @@ io.on('connection', (socket) => {
         let shuffled = [...room.players].sort(() => 0.5 - Math.random());
         let impostors = shuffled.slice(0, impostorCount);
         let impostorIds = impostors.map(i => i.id);
-
+        io.emit('room_list', rooms);
         room.status = 'playing';
         room.results = { 
             impostorNames: impostors.map(i => i.name), 
@@ -98,13 +97,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('end_game', (roomCode) => {
-        socket.emit('room_list', rooms);
         const room = rooms[roomCode];
         if (room && room.host === socket.id) {
             if(room.status === 'playing')
             io.to(roomCode).emit('game_over', room.results);
-        
             delete rooms[roomCode];
+            io.emit('room_list', rooms);
         }
     });
 
