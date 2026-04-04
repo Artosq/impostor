@@ -36,14 +36,14 @@
 <body>
 
 <div class="card">
-    <h1>🕵️‍♂️ Impostor v0.1</h1>
+    <h1>🕵️‍♂️ Impostor v0.2</h1>
 
     <div id="screen-login">
         <input type="text" id="input-name" placeholder="Twoje imię">
         <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
         <div style="margin: 15px 0; color: #999;">— LUB —</div>
         <input type="text" id="input-code" placeholder="Kod pokoju">
-        <button class="btn-join" onclick="joinRoom(document.getElementById('input-code').value.toUpperCase())">Dołącz do Pokoju</button>
+        <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
         <div id="rooms-list"></div>
     </div>
 
@@ -106,13 +106,13 @@
     function joinRoom(listCode) {
         const name = document.getElementById('input-name').value;
 
-        // let code = document.getElementById('input-code').value.toUpperCase();
+        let code = document.getElementById('input-code').value.toUpperCase();
 
-        // if (listCode && listCode !== "") {
-        // code = listCode;
-        // }
+        if (listCode && listCode !== "") {
+        code = listCode;
+        }
 
-        if (!name || !listCode) return alert("Podaj imię i kod!");
+        if (!name) return alert("Podaj imię i kod!");
         socket.emit('join_room', { playerName: name, roomCode: listCode });
     }
 
