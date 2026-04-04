@@ -164,9 +164,7 @@
             if (room.status === 'waiting') {
                 html += `
                 <div class="room-item">
-                    <hr>
                     <button onclick="joinRoom('${room.code}')">Dołącz do pokoju: ${room.code} ${room.players.length} graczy</button>
-                    <hr>
                 </div>`;
             }
         });
