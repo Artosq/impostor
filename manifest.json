@@ -4,7 +4,7 @@
   "description": "Towarzyska gra w zgadywanie haseł i wykrywanie oszusta.",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icon-192-2.png",
       "type": "image/png",
       "sizes": "192x192"
     },
@@ -24,7 +24,7 @@
       "name": "Impostr gra",
       "short_name": "Impostor",
       "url": "/",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [{ "src": "icon-192-2.png", "sizes": "192x192" }]
     }
   ]
 }

@@ -13,8 +13,13 @@
 <body>
 
 <div class="card">
-    <h1 class="logo"><img src='logo4.png' width="300px"></h1>
-
+    <div class="logo"><img src='logo4.png' width="300px"></div>
+    <div class="blood-container">
+    <span class="drop"></span>
+    <span class="drop"></span>
+    <span class="drop"></span>
+    <span class="drop"></span>
+</div>
     <div id="screen-login">
         <input type="text" id="input-name" placeholder="Twoje imię">
         <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
@@ -25,30 +30,35 @@
     </div>
 
     <div id="screen-lobby" class="hidden">
-        <h3>Kod pokoju: <span id="room-code-display" style="color: var(--primary);">----</span></h3>
+        <h3>Kod pokoju: <span id="room-code-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">----</span></h3>
+        <hr>
         <div id="players-list"></div>
         
         <div id="host-controls" class="hidden">
             <hr>
-            <label>Kategoria:</label>
-            <select id="select-category">
-                <option value="Przedmioty">Przedmioty</option>
-                <option value="Gry">Gry</option>
-                <option value="Filmy">Filmy</option>
-                <option value="Kraje">Kraje</option>
-            </select>
-            <label>Liczba Impostorów:</label>
-            <select id="select-impostors">
-                <option value="1">1 Impostor</option>
-                <option value="2">2 Impostorów</option>
-            </select>
-            <button class="btn-start" onclick="startGame()">START GRY</button>
+            <p>Kategoria:</p>
+            <div class="select-category">
+                <button class="category-tile" id="Przedmioty" onclick="selectCategory('Przedmioty')">Inne</button>
+                <button class="category-tile" id="Filmy" onclick="selectCategory('Filmy')">Filmy</button>
+                <button class="category-tile" id="Gry" onclick="selectCategory('Gry')">Gry</button>
+                <button class="category-tile" id="Kraje" onclick="selectCategory('Kraje')">Kraje</button>
+            </div>
+            <p>Liczba Impostorów:</p>
+            <div class="select-category">
+                <button class="impostor-tile" id="1" onclick="selectImpostors('1')">1</button>
+                <button class="impostor-tile" id="2" onclick="selectImpostors('2')">2</button>
+                <button class="impostor-tile" id="3" onclick="selectImpostors('3')">3</button>
+                <button class="impostor-tile" id="4" onclick="selectImpostors('4')">4</button>
+            </div>
+            <button class="btn-start" onclick="startGame()">START GRY
+                
+            </button>
         </div>
         <p id="waiting-msg">Oczekiwanie na start przez hosta...</p>
     </div>
 
     <div id="screen-game" class="hidden">
-        <div id="role-display">
+        <div id="role-display" ontouchstart="this.style.filter = 'brightness(100%)'; " ontouchend="this.style.filter = 'brightness(0%)'">
             <p>Twoja rola:</p>
             <h2 id="role-name">---</h2>
             <hr>
@@ -65,6 +75,9 @@
     const socket = io();
     let currentRoomCode = "";
 
+    function showRole(){
+        document.getElementById('role-display').style.filter = "blur('0px')";
+    }
     // Funkcje pomocnicze do przełączania ekranów
     function showScreen(screenId) {
         ['screen-login', 'screen-lobby', 'screen-game'].forEach(id => {
@@ -94,9 +107,29 @@
         socket.emit('join_room', { playerName: name, roomCode: listCode });
     }
 
+    let category;
+    function selectCategory(id){
+        document.querySelectorAll('.category-tile').forEach(tile => {
+            tile.style.boxShadow = "";
+        })
+        category = id;
+        
+        document.getElementById(id).style.boxShadow = "0px 0px 20px rgb(252, 81, 81)";
+    }
+    selectCategory('Przedmioty');
+    
+    let impostors;
+    function selectImpostors(id){
+        document.querySelectorAll('.impostor-tile').forEach(tile => {
+            tile.style.boxShadow = "";
+        })
+        impostors = id;
+        
+        document.getElementById(id).style.boxShadow = "0px 0px 20px rgb(252, 81, 81)";
+    }
+    selectImpostors('1');
+
     function startGame() {
-        const category = document.getElementById('select-category').value;
-        const impostors = document.getElementById('select-impostors').value;
         socket.emit('start_game', { roomCode: currentRoomCode, category, impostorCount: parseInt(impostors) });
     }
 

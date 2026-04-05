@@ -5,7 +5,7 @@
     --dark: #2c3e50; 
 }
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    font-family:'Times New Roman', Times, serif;
     background: #161616; 
     display: flex; 
     justify-content: center; 
@@ -20,6 +20,8 @@ body {
     width: 100%; 
     max-width: 400px; 
     text-align: center; 
+    position: relative;
+    overflow: hidden;
 }
 h1 { 
     color: var(--dark); 
@@ -34,6 +36,7 @@ input, select {
     box-sizing: border-box; 
 }
 button { 
+    font-family:'Times New Roman', Times, serif;
     width: 100%; 
     padding: 12px; 
     border: none; 
@@ -41,7 +44,9 @@ button {
     cursor: pointer; 
     font-weight: bold; 
     transition: 0.3s; 
-    margin-top: 10px; 
+    margin-top: 5px; 
+    margin-bottom: 5px; 
+    user-select: none;
 }
 .btn-create { 
     background: var(--primary); 
@@ -77,6 +82,9 @@ button {
     padding: 20px; 
     border-radius: 10px; 
     color: white; 
+    filter: brightness(0%);
+    transition: 1s;
+    user-select: none;
 }
 .role-impostor { 
     background: var(--danger); 
@@ -97,7 +105,7 @@ animation: fadeIn 0.3s ease-in;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 0px;
     background: transparent; /* Tło musi być ciemniejsze niż błysk */
 }
 
@@ -117,28 +125,63 @@ animation: fadeIn 0.3s ease-in;
 }
 
 /* Pseudoelement tworzący błysk */
-.logo::after {
+.card::before {
     content: "";
     position: absolute;
     top: 0;
     left: -150%; /* Startuje daleko poza lewą krawędzią */
     width: 100%;
     height: 100%;
+    pointer-events: none;
     
     /* Gradient tworzący ostre, ukośne "światło" */
     background: linear-gradient(
         to right,
         rgba(255, 255, 255, 0) 0%,    /* Przezroczysty */
-        rgba(255, 255, 255, 0.1) 30%, /* Bardzo delikatny start */
-        rgba(255, 255, 255, 0.8) 50%, /* Mocne centrum błysku */
-        rgba(255, 255, 255, 0.1) 70%, /* Delikatny koniec */
+        rgba(255, 255, 255, 0.2) 30%, /* Bardzo delikatny start */
+        rgba(255, 255, 255, 0.3) 50%, /* Mocne centrum błysku */
+        rgba(255, 255, 255, 0.2) 70%, /* Delikatny koniec */
         rgba(255, 255, 255, 0) 100%   /* Przezroczysty */
     );
     
     transform: skewX(-25deg); /* Pochylenie błysku */
     
     /* GŁÓWNA ANIMACJA: Przesunięcie błysku */
-    animation: shine-effect 6s infinite;
+    animation: shine-effect 10s infinite;
+}
+
+.select-category {
+    display: grid;
+    /* Tworzy 4 równe kolumny */
+    grid-template-columns: repeat(4, 1fr); 
+    /* Odstęp między przyciskami */
+    
+    gap: 10px; 
+    margin: 15px 0;
+    width: 100%;
+}
+
+.category-tile {
+    padding: 10px 5px;
+    background: #333;
+    border: 3px solid rgb(70, 70, 70);
+    color: white;
+    border-radius: 0px;
+    font-size: 0.8em; /* Mniejszy druk, żeby zmieściły się w rzędzie */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+
+.impostor-tile {
+    padding: 10px 5px;
+    background: #333;
+    border: 3px solid rgb(70, 70, 70);
+    color: white;
+    border-radius: 0px;
+    font-size: 0.8em; /* Mniejszy druk, żeby zmieściły się w rzędzie */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
 }
 
 /* DEFINICJA RUCHU BŁYSKU */
@@ -148,5 +191,54 @@ animation: fadeIn 0.3s ease-in;
     }
     30%, 100% {
         left: 150%; /* Szybkie przejście na prawą stronę i długie czekanie */
+    }
+}
+
+.blood-container {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    pointer-events: none;
+}
+
+.drop {
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 8px;
+    background-color: #8e0000;
+    border-radius: 0 50% 50% 50%; /* Kształt łzy */
+    transform: rotate(45deg);
+    opacity: 0;
+    animation: drip-fall 5s infinite linear;
+    box-shadow: 0px 0px px rgb(177, 42, 42);
+    filter: brightness(1.2);
+    z-index: 0;
+}
+
+/* Rozmieszczenie kropel w poziomie i ich opóźnienia */
+.drop:nth-child(1) { left: 25%; animation-delay: 0s; }
+.drop:nth-child(2) { left: 35%; animation-delay: 3.7s; width: 6px; height: 6px; }
+.drop:nth-child(3) { left: 65%; animation-delay: 1.3s; width: 10px; height: 10px; }
+.drop:nth-child(4) { left: 75%; animation-delay: 2.5s; }
+
+@keyframes drip-fall {
+    0% {
+        top: 0;
+        opacity: 1;
+        transform: rotate(45deg) scale(1);
+    }
+    30% {
+        /* Efekt "zbierania się" kropli przed upadkiem */
+        top: 5px;
+        transform: rotate(45deg) scale(1.2);
+    }
+    100% {
+        /* Upadek w dół o 200px i zanikanie */
+        top: 200px;
+        opacity: 0;
+        transform: rotate(45deg) scale(0.8);
     }
 }
