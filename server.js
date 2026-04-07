@@ -73,8 +73,8 @@ io.on('connection', (socket) => {
         let shuffled = [...room.players].sort(() => 0.5 - Math.random());
         let impostors = shuffled.slice(0, impostorCount);
         let impostorIds = impostors.map(i => i.id);
-        io.emit('room_list', rooms);
         room.status = 'playing';
+        io.emit('room_list', rooms);
         room.results = { 
             impostorNames: impostors.map(i => i.name), 
             word: selected.word 
@@ -84,9 +84,9 @@ io.on('connection', (socket) => {
             const isImpostor = impostorIds.includes(player.id);
             if (isImpostor) {
                 const hintIndex = impostorIds.indexOf(player.id) % selected.hints.length;
-                io.to(player.id).emit('game_start', { role: 'IMPOSTOR', data: selected.hints[hintIndex] });
+                io.to(player.id).emit('game_start', { role: 'IMPOSTOR', data: selected.hints[hintIndex], gameCat: category});
             } else {
-                io.to(player.id).emit('game_start', { role: 'GRACZ', data: selected.word });
+                io.to(player.id).emit('game_start', { role: 'GRACZ', data: selected.word, gameCat: category});
             }
         });
     });

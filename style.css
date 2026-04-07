@@ -22,6 +22,27 @@ body {
     text-align: center; 
     position: relative;
     overflow: hidden;
+    transition: 1s ease-in-out;
+}
+#error-display{
+    transition: 0.8s ease-in-out;
+    opacity: 0;
+    width: fit-content;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index:999;
+    padding: 10px;
+    opacity: 1;
+    border-radius: 5px;
+    color: var(--danger);
+    text-shadow: 0 0 20px var(--danger);
+    filter: none;
 }
 h1 { 
     color: var(--dark); 

@@ -11,15 +11,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<div class="card">
-    <div class="logo"><img src='logo4.png' width="300px"></div>
-    <div class="blood-container">
+<div class="card" id="card">
+        <div class="blood-container">
     <span class="drop"></span>
     <span class="drop"></span>
     <span class="drop"></span>
     <span class="drop"></span>
 </div>
+    <div id="error-display"></div>
+    <div id="error-blur" style="transition: 0.8s ease-in-out;">
+    <div class="logo"><img src='logo4.png' width="300px"></div>
     <div id="screen-login">
         <input type="text" id="input-name" placeholder="Twoje imię">
         <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
@@ -58,7 +59,8 @@
     </div>
 
     <div id="screen-game" class="hidden">
-        <div id="role-display" ontouchstart="this.style.filter = 'brightness(100%)'; " ontouchend="this.style.filter = 'brightness(0%)'">
+        <h3>Kategoria: <span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);"></span></h3>
+        <div id="role-display" ontouchstart="this.style.filter = 'brightness(100%)'; " ontouchend="this.style.filter = 'brightness(0%)'" onmouseover="this.style.filter = 'brightness(100%)'; " onmouseout="this.style.filter = 'brightness(0%)'; ">
             <p>Twoja rola:</p>
             <h2 id="role-name">---</h2>
             <hr>
@@ -68,6 +70,7 @@
         <div id="host-end-controls" class="hidden">
             <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
         </div>
+    </div>
     </div>
 </div>
 
@@ -97,15 +100,15 @@
     function joinRoom(listCode) {
         let name = document.getElementById('input-name').value;
 
-        let code = document.getElementById('input-code').value.toUpperCase();
-
         if (listCode && listCode !== "") {
         code = listCode;
+        }else{
+            code = document.getElementById('input-code').value.toUpperCase();
         }
 
         //if (!name) return alert("Podaj imię i kod!");
         if(!name)name = randomNick();
-        socket.emit('join_room', { playerName: name, roomCode: listCode });
+        socket.emit('join_room', { playerName: name, roomCode: code });
     }
 
     let category;
@@ -143,9 +146,8 @@
     }
 
     function randomNick(){
-        const prefix = ['Crazy','Fat','Skinny','Zesty','Curvy','Stupid','Nasty','Slutty','Stupid','Dumb','Stinky','Cringe']
-        const rest = ['Nigger','Slut','Gay','Whore','Fucker','Hoe','Cunt','Killer','Pedo','Epstein']
-
+        const prefix = ['Crazy','Fat','Skinny','Zesty','Stupid','Nasty','Slutty','Stupid','Dumb','Stinky','Cringe','Nigga','King','Tight','Clean','Edging']
+        const rest = ['Nigger','Slut','Gay','Whore','Fucker','Hoe','Cunt','Killer','Pedo','Epstein','Putin','Faggot','Cock','Pussy','Balls','Dih','Puh']
         return prefix[Math.floor(Math.random()*prefix.length)] + rest[Math.floor(Math.random()*rest.length)];
     }
 
@@ -178,6 +180,7 @@
         display.className = data.role === 'IMPOSTOR' ? 'role-impostor' : 'role-citizen';
         document.getElementById('role-name').innerText = data.role;
         document.getElementById('role-data').innerText = data.data;
+        document.getElementById('category-display').innerText += data.gameCat;
 
         // Pokazujemy przycisk końca tylko hostowi (możesz to sprawdzić po socket.id)
         socket.emit('check_host', currentRoomCode);
@@ -224,7 +227,17 @@
     location.reload(); // Przeładowanie strony
     });
 
-    socket.on('error', (msg) => alert(msg));
+    socket.on('error', (msg) => {
+        document.getElementById('error-display').innerText = msg;
+        document.getElementById('error-display').style.opacity = '';
+        document.getElementById('error-display').style.top = '5%';
+        document.getElementById('error-blur').style.filter = 'saturate(0%)';
+        setTimeout(() => {
+            document.getElementById('error-display').style.opacity = 0;
+            document.getElementById('error-display').style.top = '';
+            document.getElementById('error-blur').style.filter = '';
+        },3000)
+    });
 </script>
 </body>
 </html>
