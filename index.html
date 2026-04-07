@@ -67,10 +67,20 @@
             <p>Twoja informacja:</p>
             <h1 id="role-data">---</h1>
         </div>
+        <div id="host-vote-controls" class="hidden">
+            <button class="btn-end" onclick="castVote()">Rozpocznij głosowanie</button>
+        </div>
+    </div>
+
+        <div id="screen-vote" class="hidden">
+        <h3><span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
+        <div id="vote-display">
+        </div>
         <div id="host-end-controls" class="hidden">
             <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
         </div>
     </div>
+
     </div>
 </div>
 
@@ -84,7 +94,7 @@
 
     // Funkcje pomocnicze do przełączania ekranów
     function showScreen(screenId) {
-        ['screen-login', 'screen-lobby', 'screen-game'].forEach(id => {
+        ['screen-login', 'screen-lobby', 'screen-game','screen-vote'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
         });
         document.getElementById(screenId).classList.remove('hidden');
@@ -141,14 +151,21 @@
         socket.emit('start_game', { roomCode: currentRoomCode, category, impostorCount: parseInt(impostors) });
     }
 
-    function endGame() {
-        if(confirm("Zakończyć grę?")) socket.emit('end_game', currentRoomCode);
+    function castVote() {
+        if(confirm("Zacząć głosowanie?")) socket.emit('cast_vote', currentRoomCode);
     }
 
     function randomNick(){
         const prefix = ['Crazy','Fat','Skinny','Zesty','Stupid','Nasty','Slutty','Stupid','Dumb','Stinky','Cringe','Nigga','King','Tight','Clean','Edging']
         const rest = ['Nigger','Slut','Gay','Whore','Fucker','Hoe','Cunt','Killer','Pedo','Epstein','Putin','Faggot','Cock','Pussy','Balls','Dih','Puh']
         return prefix[Math.floor(Math.random()*prefix.length)] + rest[Math.floor(Math.random()*rest.length)];
+    }
+
+    function voteOn(selectedTile){
+        document.querySelectorAll('.vote-tile').forEach(tile => {
+            tile.classList.remove('selected');
+        })
+        selectedTile.classList.add('selected');
     }
 
     // OBSŁUGA ZDARZEŃ SOCKET.IO
@@ -174,7 +191,7 @@
         }
     });
 
-    socket.on('game_start', (data) => {
+    socket.on('game_start', (data, room) => {
         showScreen('screen-game');
         const display = document.getElementById('role-display');
         display.className = data.role === 'IMPOSTOR' ? 'role-impostor' : 'role-citizen';
@@ -183,11 +200,25 @@
         document.getElementById('category-display').innerText += data.gameCat;
 
         // Pokazujemy przycisk końca tylko hostowi (możesz to sprawdzić po socket.id)
-        socket.emit('check_host', currentRoomCode);
+        if (socket.id === room.host) {
+        document.getElementById('host-vote-controls').classList.remove('hidden');
+        }
     });
 
     socket.on('is_host', (isHost) => {
-        if(isHost) document.getElementById('host-end-controls').classList.remove('hidden');
+        if(isHost) document.getElementById('host-vote-controls').classList.remove('hidden');
+    });
+
+    socket.on('start_vote', (room) => {
+        const screenVote = document.getElementById('vote-display');
+        showScreen('screen-vote');
+        let html = "";
+        room.players.forEach(p => {   html += `<div class="vote-tile" onclick='voteOn(this)'> ${p.name} </div>`;   
+        screenVote.innerHTML = html;
+        })
+        if (socket.id === room.host) {
+        document.getElementById('host-end-controls').classList.remove('hidden');
+        }
     });
 
     socket.on('game_over', (results) => {

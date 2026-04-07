@@ -84,9 +84,9 @@ io.on('connection', (socket) => {
             const isImpostor = impostorIds.includes(player.id);
             if (isImpostor) {
                 const hintIndex = impostorIds.indexOf(player.id) % selected.hints.length;
-                io.to(player.id).emit('game_start', { role: 'IMPOSTOR', data: selected.hints[hintIndex], gameCat: category});
+                io.to(player.id).emit('game_start', { role: 'IMPOSTOR', data: selected.hints[hintIndex], gameCat: category}, room);
             } else {
-                io.to(player.id).emit('game_start', { role: 'GRACZ', data: selected.word, gameCat: category});
+                io.to(player.id).emit('game_start', { role: 'GRACZ', data: selected.word, gameCat: category}, room);
             }
         });
     });
@@ -96,13 +96,14 @@ io.on('connection', (socket) => {
         if (room) socket.emit('is_host', room.host === socket.id);
     });
 
-    socket.on('end_game', (roomCode) => {
+    socket.on('cast_vote', (roomCode) => {
         const room = rooms[roomCode];
         if (room && room.host === socket.id) {
             if(room.status === 'playing')
-            io.to(roomCode).emit('game_over', room.results);
-            delete rooms[roomCode];
-            io.emit('room_list', rooms);
+            io.to(roomCode).emit('start_vote', room);
+            console.log("START GŁOSOWANIA")
+            //delete rooms[roomCode];
+            //io.emit('room_list', rooms);
         }
     });
 

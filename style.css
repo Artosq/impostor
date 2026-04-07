@@ -218,6 +218,29 @@ animation: fadeIn 0.3s ease-in;
     transition: all 0.3s ease-in-out;
 }
 
+#vote-display{
+    display: grid;
+    /* Tworzy 4 równe kolumny */
+    grid-template-columns: repeat(2, 1fr); 
+    aspect-ratio: 1 / 1;
+    /* Odstęp między przyciskami */
+
+    gap: 10px; 
+    width: 100%;
+}
+.vote-tile{
+background-color: #2b2b2b;
+display: flex;
+justify-content: center;
+align-items: center;
+border-radius: 10px;
+transition: all 1s;
+}
+.vote-tile.selected{
+background-color: var(--secondary);
+box-shadow: 0 0 20px var(--secondary);
+}
+
 /* DEFINICJA RUCHU BŁYSKU */
 @keyframes shine-effect {
     0% {
