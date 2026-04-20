@@ -141,8 +141,6 @@
     let name = document.getElementById('input-name').value || randomNick();
     let code = listCode || document.getElementById('input-code').value.toUpperCase();
 
-    if (!code) return alert("Podaj kod pokoju!");
-
     // Zapisujemy imię i kod
     saveGameSession({ nickName: name, roomCode: code });
     socket.emit('join_room', { playerName: name, roomCode: code });
