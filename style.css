@@ -117,11 +117,15 @@ button {
     display: inline-block;
     margin: 5px; 
     font-size: 0.9em; 
-    box-shadow: 0px 5px 10px black;
+    box-shadow: 0px 5px 5px black;
     font-style: italic;
     font-weight:bold;
     user-select: none;
     cursor: pointer;
+}
+.player-tag.this-player { 
+    background: var(--secondary);
+    box-shadow: 0px 5px 5px black, 0px 0px 20px var(--secondary);
 }
 #role-display { 
     margin-top: 20px; 

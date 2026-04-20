@@ -128,7 +128,7 @@ socket.on('disconnect', () => {
                 delete rooms[code];
             } 
             // 3. SPRAWDZENIE: Czy wyszedł host?
-            else if (isHost) {
+            else if (isHost && room.status == 'waiting') {
                 console.log(`👑 Host wyszedł z pokoju ${code}. Zamykam grę dla wszystkich.`);
                 // Informujemy pozostałych graczy, że host wyszedł i muszą przeładować stronę
                 io.to(code).emit('force_reload', 'Host opuścił pokój. Gra została zakończona.');
@@ -136,6 +136,7 @@ socket.on('disconnect', () => {
             } 
             // 4. Jeśli wyszedł zwykły gracz i inni zostali
             else {
+                if(room.status == 'waiting')
                 io.to(code).emit('room_update', room);
             }
 

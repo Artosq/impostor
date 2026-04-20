@@ -75,6 +75,45 @@
 </div>
 
 <script>
+    window.onload = () => {
+    const savedSession = localStorage.getItem('impostor_session');
+    
+    if (savedSession) {
+        const data = JSON.parse(savedSession);
+        
+        document.getElementById("input-name").value = data.nickName || "";
+
+        // Sprawdź, czy sesja nie jest zbyt stara (np. starsza niż 2 godziny)
+        const expireTime = 1 * 60 * 60 * 1000;
+        if (Date.now() - data.timestamp < expireTime) {
+            
+            // Informujemy serwer, że wracamy
+            socket.emit('rejoin_room', { 
+                roomCode: data.roomCode,
+            });
+
+            // Od razu ustawiamy UI (rola, podpowiedzi), żeby gracz nie widział pustki
+        } else {
+            localStorage.removeItem('impostor_session'); // Stara sesja, usuwamy
+        }
+    }
+    };
+
+    function saveGameSession(newData) {
+    // Pobierz obecną sesję lub stwórz pusty obiekt
+    const currentSession = JSON.parse(localStorage.getItem('impostor_session')) || {};
+    
+    // Połącz stare dane z nowymi (Object.assign lub spread operator)
+    const updatedSession = {
+        ...currentSession,
+        ...newData,
+        timestamp: Date.now()
+    };
+    
+    localStorage.setItem('impostor_session', JSON.stringify(updatedSession));
+    }
+
+    
     const socket = io();
     let currentRoomCode = "";
 
@@ -92,23 +131,21 @@
 
     // KOMUNIKACJA Z SERWEREM
     function createRoom() {
-        let name = document.getElementById('input-name').value;
-        if(!name)name = randomNick();
-        socket.emit('create_room', { playerName: name });
+    let name = document.getElementById('input-name').value || randomNick();
+    // Zapisujemy tylko imię, kod pokoju dopiszemy, gdy serwer go nam wyśle
+    saveGameSession({ nickName: name });
+    socket.emit('create_room', { playerName: name });
     }
 
     function joinRoom(listCode) {
-        let name = document.getElementById('input-name').value;
+    let name = document.getElementById('input-name').value || randomNick();
+    let code = listCode || document.getElementById('input-code').value.toUpperCase();
 
-        if (listCode && listCode !== "") {
-        code = listCode;
-        }else{
-            code = document.getElementById('input-code').value.toUpperCase();
-        }
+    if (!code) return alert("Podaj kod pokoju!");
 
-        //if (!name) return alert("Podaj imię i kod!");
-        if(!name)name = randomNick();
-        socket.emit('join_room', { playerName: name, roomCode: code });
+    // Zapisujemy imię i kod
+    saveGameSession({ nickName: name, roomCode: code });
+    socket.emit('join_room', { playerName: name, roomCode: code });
     }
 
     let category;
@@ -159,15 +196,21 @@
     });
 
     socket.on('room_update', (room) => {
-        currentRoomCode = room.code; // upewnienie się dla dołączających
-        document.getElementById('room-code-display').innerText = room.code;
-        showScreen('screen-lobby');
-        
-        // Lista graczy
-        const list = document.getElementById('players-list');
-        list.innerHTML = room.players.map(p => `<span class="player-tag">${p.name}</span>`).join('');
+    
+    currentRoomCode = room.code;
+    document.getElementById('room-code-display').innerText = room.code;
+    showScreen('screen-lobby');
+    
+    // Lista graczy z wyróżnieniem "Ciebie"
+    const list = document.getElementById('players-list');
+    list.innerHTML = room.players.map(p => {
 
-        // Czy jesteś hostem?
+        const isMe = p.id === socket.id; 
+        const playerClass = isMe ? 'player-tag this-player' : 'player-tag';
+        
+        return `<span class="${playerClass}">${p.name}</span>`;
+    }).join('');
+
         if (socket.id === room.host) {
             document.getElementById('host-controls').classList.remove('hidden');
             document.getElementById('waiting-msg').classList.add('hidden');
@@ -223,7 +266,6 @@
     });
 
     socket.on('force_reload', (message) => {
-    localStorage.removeItem('lastRoom'); // Czyścimy pamięć
     location.reload(); // Przeładowanie strony
     });
 
