@@ -9,6 +9,13 @@
     <meta name="theme-color" content="#ff4757">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="style.css">
+
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+
+
 </head>
 <body>
 <div class="card" id="card">
@@ -22,7 +29,7 @@
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
     <div class="logo"><img src='logo4.png' width="300px"></div>
     <div id="screen-login">
-        <input type="text" id="input-name" placeholder="Twoje imię">
+        <input type="text" id="input-name" placeholder="Twój nick" onchange="saveNick(this.value)">
         <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
         <div style="margin: 15px 0; color: #999;">— LUB —</div>
         <input type="text" id="input-code" placeholder="Kod pokoju">
@@ -71,49 +78,64 @@
             <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
         </div>
     </div>
+            <div id="screen-vote" class="hidden">
+        <h3><span style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
+        <div id="vote-display">
+        </div>
+        <div id="host-end-controls" class="hidden">
+            <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
+        </div>
     </div>
 </div>
 
 <script>
     window.onload = () => {
-    const savedSession = localStorage.getItem('impostor_session');
-    
-    if (savedSession) {
-        const data = JSON.parse(savedSession);
         
-        document.getElementById("input-name").value = data.nickName || "";
+    const savedNick = localStorage.getItem('savedNick');
+    if (savedNick) document.getElementById("input-name").value = savedNick || "";
 
-        // Sprawdź, czy sesja nie jest zbyt stara (np. starsza niż 2 godziny)
-        const expireTime = 1 * 60 * 60 * 1000;
-        if (Date.now() - data.timestamp < expireTime) {
+
+    // const savedSession = localStorage.getItem('impostor_session');
+    
+    // if (savedSession) {
+    //     const data = JSON.parse(savedSession);
+        
+    //     document.getElementById("input-name").value = data.nickName || "";
+
+    //     // Sprawdź, czy sesja nie jest zbyt stara (np. starsza niż 2 godziny)
+    //     const expireTime = 1 * 60 * 60 * 1000;
+    //     if (Date.now() - data.timestamp < expireTime) {
             
-            // Informujemy serwer, że wracamy
-            socket.emit('rejoin_room', { 
-                roomCode: data.roomCode,
-            });
+    //         // Informujemy serwer, że wracamy
+    //         socket.emit('rejoin_room', { 
+    //             roomCode: data.roomCode,
+    //         });
 
-            // Od razu ustawiamy UI (rola, podpowiedzi), żeby gracz nie widział pustki
-        } else {
-            localStorage.removeItem('impostor_session'); // Stara sesja, usuwamy
-        }
-    }
+    //         // Od razu ustawiamy UI (rola, podpowiedzi), żeby gracz nie widział pustki
+    //     } else {
+    //         localStorage.removeItem('impostor_session'); // Stara sesja, usuwamy
+    //     }
+    // }
     };
 
-    function saveGameSession(newData) {
-    // Pobierz obecną sesję lub stwórz pusty obiekt
-    const currentSession = JSON.parse(localStorage.getItem('impostor_session')) || {};
+    // function saveGameSession(newData) {
+    // // Pobierz obecną sesję lub stwórz pusty obiekt
+    // const currentSession = JSON.parse(localStorage.getItem('impostor_session')) || {};
     
-    // Połącz stare dane z nowymi (Object.assign lub spread operator)
-    const updatedSession = {
-        ...currentSession,
-        ...newData,
-        timestamp: Date.now()
-    };
+    // // Połącz stare dane z nowymi (Object.assign lub spread operator)
+    // const updatedSession = {
+    //     ...currentSession,
+    //     ...newData,
+    //     timestamp: Date.now()
+    // };
     
-    localStorage.setItem('impostor_session', JSON.stringify(updatedSession));
+    // localStorage.setItem('impostor_session', JSON.stringify(updatedSession));
+    // }
+
+    function saveNick(newNick) {
+    localStorage.setItem('savedNick', newNick);
     }
 
-    
     const socket = io();
     let currentRoomCode = "";
 
@@ -123,7 +145,7 @@
 
     // Funkcje pomocnicze do przełączania ekranów
     function showScreen(screenId) {
-        ['screen-login', 'screen-lobby', 'screen-game'].forEach(id => {
+        ['screen-login', 'screen-lobby', 'screen-game','screen-vote'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
         });
         document.getElementById(screenId).classList.remove('hidden');
@@ -133,7 +155,7 @@
     function createRoom() {
     let name = document.getElementById('input-name').value || randomNick();
     // Zapisujemy tylko imię, kod pokoju dopiszemy, gdy serwer go nam wyśle
-    saveGameSession({ nickName: name });
+    saveNick(name);
     socket.emit('create_room', { playerName: name });
     }
 
@@ -142,33 +164,38 @@
     let code = listCode || document.getElementById('input-code').value.toUpperCase();
 
     // Zapisujemy imię i kod
-    saveGameSession({ nickName: name, roomCode: code });
+    //saveGameSession({ nickName: name, roomCode: code });
     socket.emit('join_room', { playerName: name, roomCode: code });
+    }
+
+    function castVote() {
+        if(confirm("Zacząć głosowanie?")) socket.emit('cast_vote', currentRoomCode);
+    }
+
+    function voteOn(selectedTile){
+        document.querySelectorAll('.vote-tile').forEach(tile => {
+            tile.classList.remove('selected');
+        })
+        selectedTile.classList.add('selected');
     }
 
     let category;
     function selectCategory(id){
         document.querySelectorAll('.category-tile').forEach(tile => {
-            tile.style.boxShadow = "";
-            tile.style.scale = "1";
+            tile.classList.remove('selected')
         })
         category = id;
-        
-        document.getElementById(id).style.boxShadow = "0px 0px 20px rgb(252, 81, 81)";
-        document.getElementById(id).style.scale = "1.1";
+        document.getElementById(id).classList.add('selected');
     }
     selectCategory('Przedmioty');
     
     let impostors;
     function selectImpostors(id){
         document.querySelectorAll('.impostor-tile').forEach(tile => {
-            tile.style.boxShadow = "";
-            tile.style.scale = "1";
+            tile.classList.remove('selected')
         })
         impostors = id;
-        
-        document.getElementById(id).style.boxShadow = "0px 0px 20px rgb(252, 81, 81)";
-        document.getElementById(id).style.scale = "1.1";
+        document.getElementById(id).classList.add('selected');
     }
     selectImpostors('1');
 
@@ -227,8 +254,16 @@
         socket.emit('check_host', currentRoomCode);
     });
 
-    socket.on('is_host', (isHost) => {
-        if(isHost) document.getElementById('host-end-controls').classList.remove('hidden');
+    socket.on('start_vote', (room) => {
+        const screenVote = document.getElementById('vote-display');
+        showScreen('screen-vote');
+        let html = "";
+        room.players.forEach(p => {   html += `<div class="vote-tile" onclick='voteOn(this)'> ${p.name} </div>`;   
+        screenVote.innerHTML = html;
+        })
+        if (socket.id === room.host) {
+        document.getElementById('host-end-controls').classList.remove('hidden');
+        }
     });
 
     socket.on('game_over', (results) => {
