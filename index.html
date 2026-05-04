@@ -6,7 +6,7 @@
     <title>Impostor Game v0.1🕵️‍♂️</title>
     <script src="/socket.io/socket.io.js"></script>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ff4757">
+    <meta name="theme-color" content="#181818">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="style.css">
 
@@ -75,7 +75,7 @@
             <h1 id="role-data">---</h1>
         </div>
         <div id="host-end-controls" class="hidden">
-            <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
+            <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
         </div>
     </div>
             <div id="screen-vote" class="hidden">
@@ -172,12 +172,28 @@
         if(confirm("Zacząć głosowanie?")) socket.emit('cast_vote', currentRoomCode);
     }
 
-    function voteOn(selectedTile){
-        document.querySelectorAll('.vote-tile').forEach(tile => {
-            tile.classList.remove('selected');
-        })
-        selectedTile.classList.add('selected');
+    let selectedPlayers = [];
+
+function voteOn(selectedTile, impostorCount) {
+    // 1. Sprawdzamy, czy kafelek jest już zaznaczony
+    const isSelected = selectedTile.classList.contains('selected');
+
+    if (!isSelected) {
+        // Dodawanie głosu - sprawdź limit
+        if (selectedPlayers.length < impostorCount) {
+            selectedTile.classList.add('selected');
+            selectedPlayers.push(selectedTile);
+        } else {
+            console.log("Osiągnięto limit głosów!");
+        }
+    } else {
+        // Usuwanie głosu
+        selectedTile.classList.remove('selected');
+        
+        // Usuwamy ten konkretny element z tablicy
+        selectedPlayers = selectedPlayers.filter(tile => tile !== selectedTile);
     }
+}
 
     let category;
     function selectCategory(id){
@@ -258,12 +274,16 @@
         const screenVote = document.getElementById('vote-display');
         showScreen('screen-vote');
         let html = "";
-        room.players.forEach(p => {   html += `<div class="vote-tile" onclick='voteOn(this)'> ${p.name} </div>`;   
+        room.players.forEach(p => {html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount})'> ${p.name} </div>`;   
         screenVote.innerHTML = html;
         })
         if (socket.id === room.host) {
         document.getElementById('host-end-controls').classList.remove('hidden');
         }
+    });
+
+    socket.on('is_host', (isHost) => {
+        if(isHost) document.getElementById('host-end-controls').classList.remove('hidden');
     });
 
     socket.on('game_over', (results) => {
@@ -290,6 +310,11 @@
                 html += `
                 <div class="room-item">
                     <button onclick="joinRoom('${room.code}')">Dołącz do pokoju: ${room.code} ${room.players.length} \u{1F464}</button>
+                </div>`;
+            }else{
+                html += `
+                <div class="room-item">
+                    <button style='opacity: 0.5;'> Pokój zaczął grę ${room.players.length} \u{1F464}</button>
                 </div>`;
             }
         });

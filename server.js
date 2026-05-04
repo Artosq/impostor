@@ -80,6 +80,8 @@ io.on('connection', (socket) => {
             word: selected.word 
         };
 
+        room.impostorCount = impostorCount;
+        
         room.players.forEach((player) => {
             const isImpostor = impostorIds.includes(player.id);
             if (isImpostor) {
@@ -94,6 +96,17 @@ io.on('connection', (socket) => {
     socket.on('check_host', (roomCode) => {
         const room = rooms[roomCode];
         if (room) socket.emit('is_host', room.host === socket.id);
+    });
+
+    socket.on('cast_vote', (roomCode) => {
+        const room = rooms[roomCode];
+        if (room && room.host === socket.id) {
+            if(room.status === 'playing')
+            io.to(roomCode).emit('start_vote', room);
+            console.log("START GŁOSOWANIA")
+            //delete rooms[roomCode];
+            //io.emit('room_list', rooms);
+        }
     });
 
     socket.on('end_game', (roomCode) => {
