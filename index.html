@@ -14,8 +14,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
-
-
 </head>
 <body>
     <canvas id="rippleCanvas"></canvas>
@@ -36,7 +34,7 @@
             <input type="text" id="input-name" placeholder="Twój nick" onchange="saveNick(this.value)">
             <span class="symbol" 
             onclick="rollDice(this)">
-            &#9858;
+            &#9860;
             </span>
         </div>
         <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
@@ -95,7 +93,14 @@
             <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
         </div>
     </div>
-</div>
+        <div id="screen-load" class="hidden">
+        <h3><span id="loading-info">Ładowanie... </span><span id="loading-progress" style="color: var(--danger); text-shadow: 0 0 20px var(--danger);"></span></h3>
+        <div class="progress-wrapper">
+            <canvas id="progressCanvas"></canvas>
+        </div>
+    </div>
+
+</div></div>
 
 <script>
     window.onload = () => {
@@ -152,9 +157,10 @@
         document.getElementById('role-display').style.filter = "blur('0px')";
     }
 
+
     // Funkcje pomocnicze do przełączania ekranów
     function showScreen(screenId) {
-        ['screen-login', 'screen-lobby', 'screen-game','screen-vote'].forEach(id => {
+        ['screen-login', 'screen-lobby', 'screen-game','screen-vote','screen-load'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
         });
         document.getElementById(screenId).classList.remove('hidden');
@@ -274,7 +280,7 @@ function voteOn(selectedTile, impostorCount) {
     });
 
     socket.on('game_start', (data) => {
-        showScreen('screen-game');
+        screenLoad('screen-game');
         const display = document.getElementById('role-display');
         display.className = data.role === 'IMPOSTOR' ? 'role-impostor' : 'role-citizen';
         document.getElementById('role-name').innerText = data.role;
@@ -375,10 +381,10 @@ class Ripple {
         this.x = x;
         this.y = y;
         this.radius = 0;
-        this.maxRadius = Math.max(canvas.width, canvas.height) * 0.6;
+        this.maxRadius = 200;
         this.opacity = 0.5; // Maksymalna przezroczystość fali
         this.speed = 1.2;    // Znacznie wolniejsza animacja
-        this.thickness = 50; // Szerokość gradientu "pierścienia" fali
+        this.thickness = 70; // Szerokość gradientu "pierścienia" fali
     }
 
     draw() {
@@ -437,6 +443,67 @@ window.addEventListener('mousedown', (e) => {
     if (card && card.contains(e.target)) return; 
     ripples.push(new Ripple(e.clientX, e.clientY));
 });
+
+
+    function screenLoad(screen){
+        showScreen('screen-load');
+        document.getElementById('loading-info').innerText = "Pobieranie wirusów...";
+        progress = 0;
+        currentWidth = 0;
+        drawProgressBar(screen);
+    }
+
+const pCanvas = document.getElementById('progressCanvas');
+const pCtx = pCanvas.getContext('2d');
+
+// Parametry paska
+let progress = 0; // Aktualny stan (0 do 100)
+let targetProgress = 100; // Do ilu ma dobić
+let currentWidth = 0; // Pomocnicza do płynnej animacji
+
+// Kolory z Twoich zmiennych CSS
+const colorSecondary = '#2ecc71';
+const colorDark = '#363636'; 
+
+function drawProgressBar() {
+    // Dopasowanie rozdzielczości wewnętrznej canvasu
+    pCanvas.width = pCanvas.clientWidth;
+    pCanvas.height = pCanvas.clientHeight;
+
+    const w = pCanvas.width;
+    const h = pCanvas.height;
+    const padding = 4; // Grubość obramowania
+
+    // Czyścimy tło pod paskiem
+    pCtx.clearRect(0, 0, w, h);
+
+    // 1. Rysujemy obramowanie (Stroke)
+    pCtx.strokeStyle = 'white';
+    pCtx.lineWidth = padding;
+    pCtx.strokeRect(padding/2, padding/2, w - padding, h - padding);
+
+    // 2. Obliczamy płynne przejście szerokości (Linear Interpolation)
+    // Zmienna 0.05 odpowiada za "gładkość" - im mniejsza, tym wolniej dobija
+    let targetWidth = (w - (padding * 2)) * (progress / 100);
+    currentWidth += (targetWidth - currentWidth) * 0.05;
+
+    // 3. Rysujemy wypełnienie (Secondary)
+    pCtx.fillStyle = colorSecondary;
+    // Wypełnienie zaczyna się po wewnętrznej stronie ramki
+    pCtx.fillRect(padding, padding, currentWidth, h - (padding * 2));
+
+    // 4. Animacja pętli
+    if (progress < targetProgress) {
+        progress += 0.5; // Prędkość ładowania
+        document.getElementById('loading-progress').innerText = "(" + Math.round(progress) + "%)"
+    }else{
+        setTimeout(() => {
+            showScreen('screen-game'); 
+        }, 500);
+    }
+    
+    setTimeout(drawProgressBar, 20);
+}
 </script>
 </body>
 </html>
