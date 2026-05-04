@@ -13,8 +13,9 @@ body {
     justify-content: center; 
     padding: 15px;
     color: #eee;
-    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .01) 25%, rgba(255, 255, 255, .01) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .01) 75%, rgba(255, 255, 255, .01) 77%, transparent 78%, transparent), linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .01) 25%, rgba(255, 255, 255, .01) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .01) 75%, rgba(255, 255, 255, .01) 77%, transparent 78%, transparent);
-    background-size: 50px 50px;
+    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .2) 25%, rgba(255, 255, 255, .2) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .2) 75%, rgba(255, 255, 255, .2) 77%, transparent 78%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .2) 25%, rgba(255, 255, 255, .2) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .2) 75%, rgba(255, 255, 255, .2) 77%, transparent 78%, transparent);
+    background-size: 70px 70px;
 }
 #card { 
     background: rgb(31, 31, 31); 
