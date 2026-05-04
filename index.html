@@ -18,6 +18,8 @@
 
 </head>
 <body>
+    <canvas id="rippleCanvas"></canvas>
+
 <div class="card" id="card">
         <div class="blood-container">
     <span class="drop"></span>
@@ -29,7 +31,14 @@
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
     <div class="logo"><img src='logo4.png' width="300px"></div>
     <div id="screen-login">
-        <input type="text" id="input-name" placeholder="Twój nick" onchange="saveNick(this.value)">
+
+        <div class="input-group">
+            <input type="text" id="input-name" placeholder="Twój nick" onchange="saveNick(this.value)">
+            <span class="symbol" 
+            onclick="rollDice(this)">
+            &#9858;
+            </span>
+        </div>
         <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
         <div style="margin: 15px 0; color: #999;">— LUB —</div>
         <input type="text" id="input-code" placeholder="Kod pokoju">
@@ -155,7 +164,6 @@
     function createRoom() {
     let name = document.getElementById('input-name').value || randomNick();
     // Zapisujemy tylko imię, kod pokoju dopiszemy, gdy serwer go nam wyśle
-    saveNick(name);
     socket.emit('create_room', { playerName: name });
     }
 
@@ -227,6 +235,13 @@ function voteOn(selectedTile, impostorCount) {
         const prefix = ['Crazy','Fat','Skinny','Zesty','Jewish','Stupid','Nasty','Slutty','Stupid','Dumb','Stinky','Cringe','Nigga','King','Tight','Clean','Edging']
         const rest = ['Nigger','Slut','Gay','Whore','Jew','Fucker','Hoe','Cunt','Killer','Pedo','Epstein','Putin','Faggot','Cock','Pussy','Balls','Dih','Puh']
         return prefix[Math.floor(Math.random()*prefix.length)] + rest[Math.floor(Math.random()*rest.length)];
+    }
+
+    let diceRotation = 0;
+    function rollDice(element){
+        document.getElementById('input-name').value = randomNick(); 
+        diceRotation += 360;
+        element.style.transform = `rotate(${diceRotation}deg)`;
     }
 
     // OBSŁUGA ZDARZEŃ SOCKET.IO
@@ -338,6 +353,90 @@ function voteOn(selectedTile, impostorCount) {
             document.getElementById('error-blur').style.filter = '';
         },3000)
     });
+
+
+
+
+
+
+const canvas = document.getElementById('rippleCanvas');
+const ctx = canvas.getContext('2d');
+let ripples = [];
+
+function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
+
+class Ripple {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.radius = 0;
+        this.maxRadius = Math.max(canvas.width, canvas.height) * 0.6;
+        this.opacity = 0.5; // Maksymalna przezroczystość fali
+        this.speed = 1.2;    // Znacznie wolniejsza animacja
+        this.thickness = 50; // Szerokość gradientu "pierścienia" fali
+    }
+
+    draw() {
+        if (this.radius <= 0) return;
+
+        ctx.save();
+        
+        // Tworzymy gradient radialny dla efektu płynnej "obręczy" wody
+        // Gradient zaczyna się od środka fali i kończy na jej zewnętrznej krawędzi
+        const gradient = ctx.createRadialGradient(
+            this.x, this.y, Math.max(0, this.radius - this.thickness), 
+            this.x, this.y, this.radius
+        );
+
+        // Płynne przejście koloru: przezroczysty -> biały -> przezroczysty
+        const alpha = this.opacity * (1 - this.radius / this.maxRadius);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        gradient.addColorStop(0.5, `rgba(255, 255, 255, ${alpha})`);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+
+        ctx.beginPath();
+        // Rysujemy pierścień fali
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.lineWidth = this.thickness;
+        ctx.strokeStyle = gradient;
+        ctx.stroke();
+        ctx.closePath();
+        
+        ctx.restore();
+    }
+
+    update() {
+        this.radius += this.speed;
+        // Obliczamy wygasanie fali w stosunku do jej promienia
+        this.opacity = 0.5 * (1 - this.radius / this.maxRadius);
+    }
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Usuwamy fale, które przekroczyły maxRadius lub stały się niewidoczne
+    ripples = ripples.filter(r => r.opacity > 0.01 && r.radius < r.maxRadius);
+    
+    ripples.forEach(r => {
+        r.update();
+        r.draw();
+    });
+    
+    requestAnimationFrame(animate);
+}
+animate();
+
+window.addEventListener('mousedown', (e) => {
+    const card = document.getElementById('card');
+    if (card && card.contains(e.target)) return; 
+    ripples.push(new Ripple(e.clientX, e.clientY));
+});
 </script>
 </body>
 </html>
