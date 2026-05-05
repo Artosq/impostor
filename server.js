@@ -109,15 +109,62 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('end_game', (roomCode) => {
-        const room = rooms[roomCode];
-        if (room && room.host === socket.id) {
-            if(room.status === 'playing')
-            io.to(roomCode).emit('game_over', room.results);
-            delete rooms[roomCode];
-            io.emit('room_list', rooms);
+socket.on('end_game', (roomCode) => {
+    const room = rooms[roomCode];
+
+    // Sprawdzamy, czy pokój istnieje i czy wysyłający jest hostem
+    if (room && room.host === socket.id) {
+        if (room.status === 'playing') {
+            
+            // 1. Zliczanie głosów z wyborów graczy
+            const finalVotes = {}; 
+            
+            if (room.playerChoices) {
+                Object.values(room.playerChoices).forEach(choiceArray => {
+                    choiceArray.forEach(targetId => {
+                        // Dodajemy punkt dla gracza o ID targetId
+                        finalVotes[targetId] = (finalVotes[targetId] || 0) + 1;
+                    });
+                });
+            }
+
+            // 2. Przygotowanie finalnego obiektu wyników
+            const enrichedResults = {
+                ...room.results,     // Oryginalne wyniki (impostorzy, hasło)
+                votes: finalVotes    // Dodajemy nową mapę głosów { socketId: ilość }
+            };
+
+            // 3. Wysyłamy wyniki do wszystkich w pokoju
+            io.to(roomCode).emit('game_over', enrichedResults);
+
+            // Zmieniamy status, aby uniknąć ponownego wywołania tej logiki
+            room.status = 'finished';
         }
-    });
+
+        // 4. Sprzątanie: usuwamy pokój z opóźnieniem 2 sekund
+        // Dzięki temu socket zdąży "przepchnąć" game_over do wszystkich
+        setTimeout(() => {
+            if (rooms[roomCode]) {
+                delete rooms[roomCode];
+                io.emit('room_list', rooms);
+                console.log(`Pokój ${roomCode} został zamknięty.`);
+            }
+        }, 2000);
+    }
+});
+
+socket.on('send_vote', (roomCode, selectedPlayers) => {
+    const room = rooms[roomCode];
+    if (!room || room.status !== 'playing') return;
+
+    if (!room.playerChoices) room.playerChoices = {};
+
+    // Nadpisujemy stary wybór tego gracza nową listą ID
+    // Jeśli gracz wszystko odznaczył, selectedPlayers będzie pustą tablicą []
+    room.playerChoices[socket.id] = selectedPlayers;
+
+    console.log(`Gracz ${socket.id} zmienił wybór na:`, selectedPlayers);
+});
 
 socket.on('disconnect', () => {
     console.log(`🔌 Rozłączono: ${socket.id}`);

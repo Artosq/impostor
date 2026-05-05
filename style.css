@@ -233,7 +233,17 @@ animation: fadeIn 0.5s ease-in;
     /* Dodajemy lekki cień bazowy, by tekst był czytelny */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
-
+#impostor-dialogue{
+    position: absolute;
+    padding: 5px;
+    top: 50px;
+    right: 50px;
+    min-width: 100px;
+    width: fit-content;
+    height: 50px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 5px;
+}
 /* Pseudoelement tworzący błysk */
 .card::before {
     content: "";

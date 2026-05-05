@@ -29,7 +29,7 @@
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
     <div class="logo"><img src='logo4.png' width="300px"></div>
     <div id="screen-login">
-
+        <span id="impostor-thoughts" style='color: var(--danger); text-shadow: 0 0 20px var(--danger); transition: 1s; opacity:0;'>Mądrości impostora</span>
         <div class="input-group">
             <input type="text" id="input-name" placeholder="Twój nick" onchange="saveNick(this.value)">
             <span class="symbol" 
@@ -81,7 +81,7 @@
             <p>Twoja informacja:</p>
             <h1 id="role-data">---</h1>
         </div>
-        <div id="host-end-controls" class="hidden">
+        <div id="host-vote-controls" class="hidden">
             <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
         </div>
     </div>
@@ -146,8 +146,19 @@
     // localStorage.setItem('impostor_session', JSON.stringify(updatedSession));
     // }
 
+    function impostorWisdom(text){
+        const span = document.getElementById('impostor-thoughts');
+        span.innerText = text;
+        span.style.opacity = 1;
+        setTimeout(()=>{
+            span.style.opacity = 0;
+        },5000)
+    }
     function saveNick(newNick) {
     localStorage.setItem('savedNick', newNick);
+    if(newNick.length <= 3){
+        impostorWisdom("Nick krótki jak twój fjut");
+    }
     }
 
     const socket = io();
@@ -207,6 +218,7 @@ function voteOn(selectedTile, impostorCount) {
         // Usuwamy ten konkretny element z tablicy
         selectedPlayers = selectedPlayers.filter(tile => tile !== selectedTile);
     }
+    socket.emit('send_vote', currentRoomCode, selectedPlayers);
 }
 
     let category;
@@ -246,8 +258,15 @@ function voteOn(selectedTile, impostorCount) {
     let diceRotation = 0;
     function rollDice(element){
         document.getElementById('input-name').value = randomNick(); 
+        if (document.getElementById('input-name').value.toLowerCase().includes('jew') || document.getElementById('input-name').value.toLowerCase().includes('jewish'))
+        impostorWisdom("I love Benjamin Netanyahu");
         diceRotation += 360;
         element.style.transform = `rotate(${diceRotation}deg)`;
+
+        const diceSides = ['&#9856','&#9857','&#9858','&#9859','&#9860','&#9861']
+        setTimeout(()=>{
+            element.innerHTML = diceSides[Math.floor(Math.random()*6)];
+        },100)
     }
 
     // OBSŁUGA ZDARZEŃ SOCKET.IO
@@ -280,7 +299,7 @@ function voteOn(selectedTile, impostorCount) {
     });
 
     socket.on('game_start', (data) => {
-        screenLoad('screen-game');
+        showScreen('screen-game');
         const display = document.getElementById('role-display');
         display.className = data.role === 'IMPOSTOR' ? 'role-impostor' : 'role-citizen';
         document.getElementById('role-name').innerText = data.role;
@@ -304,13 +323,40 @@ function voteOn(selectedTile, impostorCount) {
     });
 
     socket.on('is_host', (isHost) => {
-        if(isHost) document.getElementById('host-end-controls').classList.remove('hidden');
+        if(isHost) document.getElementById('host-vote-controls').classList.remove('hidden');
     });
 
-    socket.on('game_over', (results) => {
-        alert(`KONIEC! \nImpostor: ${results.impostorNames.join(', ')} \nHasło: ${results.word}`);
-        location.reload(); 
-    });
+socket.on('game_over', (results) => {
+    // 1. Przygotowanie listy głosów (kto ile zebrał)
+    // Pobieramy wszystkich graczy z aktualnej listy w UI, aby dopasować ID do Nazwy
+    const playersInLobby = Array.from(document.querySelectorAll('.vote-tile, .player-tag'));
+    
+    let votesSummary = "\n\nWyniki głosowania:";
+    let hasVotes = false;
+
+    // Przeszukiwanie otrzymanego obiektu votes { socketId: count }
+    for (const [playerId, count] of Object.entries(results.votes || {})) {
+        // Próbujemy znaleźć nazwę gracza po jego ID (zakładając, że masz je w dataset)
+        // Jeśli nie masz ID w HTML, możesz przesłać nazwy graczy bezpośrednio z serwera
+        votesSummary += `\nGracz (ID: ${playerId}): ${count} głosy/ów`;
+        hasVotes = true;
+    }
+
+    if (!hasVotes) votesSummary += "\nBrak oddanych głosów.";
+
+    // 2. Wyświetlenie rozbudowanego komunikatu
+    const message = `KONIEC!\n` +
+                    `Impostor: ${results.impostorNames.join(', ')}\n` +
+                    `Hasło: ${results.word}` + 
+                    votesSummary;
+
+    alert(message);
+
+    // 3. Opcjonalne: Krótkie opóźnienie przed reloadem, żeby alert nie zniknął za szybko
+    setTimeout(() => {
+        location.reload();
+    }, 500);
+});
 
     socket.on('room_list', (roomsObject) => {
     const listContainer = document.getElementById('rooms-list');
@@ -460,7 +506,7 @@ const pCtx = pCanvas.getContext('2d');
 let progress = 0; // Aktualny stan (0 do 100)
 let targetProgress = 100; // Do ilu ma dobić
 let currentWidth = 0; // Pomocnicza do płynnej animacji
-
+let screenLoaded = false;
 // Kolory z Twoich zmiennych CSS
 const colorSecondary = '#2ecc71';
 const colorDark = '#363636'; 
@@ -499,10 +545,12 @@ function drawProgressBar() {
     }else{
         setTimeout(() => {
             showScreen('screen-game'); 
-        }, 500);
+            screenLoaded = true;
+        }, 1000);
     }
     
-    setTimeout(drawProgressBar, 20);
+    if(screenLoaded) return;
+    setTimeout(drawProgressBar, 10);
 }
 </script>
 </body>
