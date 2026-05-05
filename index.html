@@ -69,7 +69,7 @@
                 
             </button>
         </div>
-        <p id="waiting-msg">Oczekiwanie na start przez hosta...</p>
+        <p class="waiting-msg">Oczekiwanie na start przez hosta...</p>
     </div>
 
     <div id="screen-game" class="hidden">
@@ -81,6 +81,7 @@
             <p>Twoja informacja:</p>
             <h1 id="role-data">---</h1>
         </div>
+        <p class="waiting-msg">Oczekiwanie na rozpoczęcie głosowania przez hosta...</p>
         <div id="host-vote-controls" class="hidden">
             <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
         </div>
@@ -89,6 +90,7 @@
         <h3><span style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
         <div id="vote-display">
         </div>
+        <p class="waiting-msg">Oczekiwanie na zakończenie gry przez hosta...</p>
         <div id="host-end-controls" class="hidden">
             <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
         </div>
@@ -107,8 +109,15 @@
         
     const savedNick = localStorage.getItem('savedNick');
     if (savedNick) document.getElementById("input-name").value = savedNick || "";
+    
+    let userId = localStorage.getItem('userId');
 
+    if(!userId){
+        userId = generateUID();
+        localStorage.setItem('userId',userId);
+    }
 
+    console.log('Twoje UID: ' + userId)
     // const savedSession = localStorage.getItem('impostor_session');
     
     // if (savedSession) {
@@ -159,6 +168,12 @@
     if(newNick.length <= 3){
         impostorWisdom("Nick krótki jak twój fjut");
     }
+    }
+
+    function generateUID() {
+    const part1 = Math.random().toString(36).substring(2, 15);
+    const part2 = Date.now().toString(36); // Dodajemy timestamp dla większej unikalności
+    return `uid-${part1}-${part2}`;
     }
 
     const socket = io();
@@ -270,33 +285,36 @@ function voteOn(selectedTile, impostorCount) {
     }
 
     // OBSŁUGA ZDARZEŃ SOCKET.IO
-    socket.on('room_created', (code) => {
-        currentRoomCode = code;
-        document.getElementById('room-code-display').innerText = code;
-        showScreen('screen-lobby');
-    });
-
     socket.on('room_update', (room) => {
-    
     currentRoomCode = room.code;
     document.getElementById('room-code-display').innerText = room.code;
     showScreen('screen-lobby');
     
-    // Lista graczy z wyróżnieniem "Ciebie"
     const list = document.getElementById('players-list');
+    
     list.innerHTML = room.players.map(p => {
-
         const isMe = p.id === socket.id; 
         const playerClass = isMe ? 'player-tag this-player' : 'player-tag';
         
-        return `<span class="${playerClass}">${p.name}</span>`;
+        // 1. Poprawiony URL (styl 'pixel-art' jako tekst)
+        // 2. Użycie p.uid zamiast p.name dla unikalności
+        const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}`;
+        
+        return `
+            <div class="avatar-container">
+                <img src="${avatarUrl}" class="player-avatar">
+                <span class="${playerClass}">${p.name}</span>
+            </div>
+        `;
     }).join('');
 
-        if (socket.id === room.host) {
-            document.getElementById('host-controls').classList.remove('hidden');
-            document.getElementById('waiting-msg').classList.add('hidden');
-        }
-    });
+    if (socket.id === room.host) {
+        document.getElementById('host-controls').classList.remove('hidden');
+        document.querySelectorAll('.waiting-msg').forEach(el => {
+            el.classList.add('hidden');
+        })
+    }
+});
 
     socket.on('game_start', (data) => {
         showScreen('screen-game');
@@ -314,7 +332,8 @@ function voteOn(selectedTile, impostorCount) {
         const screenVote = document.getElementById('vote-display');
         showScreen('screen-vote');
         let html = "";
-        room.players.forEach(p => {html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount})'> ${p.name} </div>`;   
+        room.players.forEach(p => {html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount})'
+        style="background-image: url('https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}')"> ${p.name} </div>`;   
         screenVote.innerHTML = html;
         })
         if (socket.id === room.host) {

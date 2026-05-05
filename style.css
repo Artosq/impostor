@@ -89,6 +89,7 @@ input{
 input:focus{
     background-color:rgba(255, 255, 255, 0.2);;
     outline: none;
+    box-shadow: inset 0 0 10px white;
 }
 
 .input-group {
@@ -106,6 +107,9 @@ input:focus{
     font-size: 60px;
     transition: 0.6s;
     line-height: 0;
+}
+.symbol:hover{
+    text-shadow: 0 0 10px white;
 }
 
 button { 
@@ -169,24 +173,68 @@ button {
 .hidden { 
     display: none; 
 }
+/* Kontener, który trzyma awatar i nick (dodaj to w JS wokół nich) */
+.avatar-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin: 3px;
+    width: fit-content;
+    transition: 0.5s;
+    margin:10px 0 ;
+}
+
+.player-avatar {
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    position: relative;
+    z-index: 1; /* Pod tekstem */
+    border-radius: 5px;
+    transition: 0.5s;
+    cursor: pointer; 
+}
+
 .player-tag { 
     background: #eee; 
     color: #141414;
-    padding: 5px 10px; 
+    padding: 5px 12px; /* Nieco szerszy padding dla lepszego balansu */
     border-radius: 20px; 
     display: inline-block;
-    margin: 5px; 
+    
+    /* KLUCZOWE ZMIANY DLA EFEKTU NACHODZENIA */
+    position: relative;
+    z-index: 2;         /* Nad awatarem */
+    margin-top: -5px;  /* Podciąga nick do góry na awatar */
+    
     font-size: 0.8em; 
     box-shadow: 0px 5px 5px black;
     font-style: italic;
-    font-weight:bolder;
+    font-weight: bolder;
     user-select: none;
     cursor: pointer;
+    
+    /* Dodatkowe wygładzenie */
+    text-align: center;
+    min-width: 60px;
+    transition: transform 0.2s;
 }
+
 .player-tag.this-player { 
     background: var(--secondary);
     box-shadow: 0px 5px 5px black, 0px 0px 20px var(--secondary);
+    color: black;
 }
+
+/* Opcjonalnie: efekt po najechaniu, skoro masz cursor: pointer */
+.avatar-container:hover{
+    transform: scale(1.1);
+}
+.avatar-container:hover .player-avatar{
+    outline: 5px solid white;
+}
+
 #role-display { 
     margin-top: 20px; 
     padding: 20px; 
@@ -202,7 +250,7 @@ button {
 .role-citizen { 
     background: var(--secondary); 
 }
-.player-tag { 
+.player-tag, .player-avatar{ 
 animation: fadeIn 0.5s ease-in; 
 }
 
@@ -232,17 +280,6 @@ animation: fadeIn 0.5s ease-in;
     
     /* Dodajemy lekki cień bazowy, by tekst był czytelny */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-#impostor-dialogue{
-    position: absolute;
-    padding: 5px;
-    top: 50px;
-    right: 50px;
-    min-width: 100px;
-    width: fit-content;
-    height: 50px;
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 5px;
 }
 /* Pseudoelement tworzący błysk */
 .card::before {
@@ -292,30 +329,34 @@ animation: fadeIn 0.5s ease-in;
 .impostor-tile.selected, .category-tile.selected {
     box-shadow: 0px 0px 10px var(--danger);
     background: rgb(22, 22, 22);
-    scale: 1.1;
 }
 
 #vote-display{
     display: grid;
     /* Tworzy 4 równe kolumny */
     grid-template-columns: repeat(2, 1fr); 
-    aspect-ratio: 1 / 1;
     /* Odstęp między przyciskami */
 
     gap: 10px; 
     width: 100%;
 }
 .vote-tile{
-background-color: #2b2b2b;
-display: flex;
-justify-content: center;
-align-items: center;
-border-radius: 10px;
-transition: 0.5s ease-in-out;
+    aspect-ratio: 1 / 1;
+    padding: 5px;
+    background-color: #2b2b2b;
+    display: flex;
+    justify-content: center;
+    align-items:end;
+    border-radius: 10px;
+    transition: 0.5s;
+    border: 5px solid #141414;
+    filter: saturate(0%);
+    user-select: none;
+    font-size: small;
 }
 .vote-tile.selected{
-outline: 5px solid var(--secondary);
-box-shadow: 0 0 20px var(--secondary);
+    filter: saturate(100%);
+    box-shadow: 0 0 20px var(--secondary);
 }
 
 /* DEFINICJA RUCHU BŁYSKU */
