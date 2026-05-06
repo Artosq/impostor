@@ -112,42 +112,53 @@ io.on('connection', (socket) => {
 socket.on('end_game', (roomCode) => {
     const room = rooms[roomCode];
 
-    // Sprawdzamy, czy pokój istnieje i czy wysyłający jest hostem
-    if (room && room.host === socket.id) {
-        if (room.status === 'playing') {
-            
-            // 1. Zliczanie głosów z wyborów graczy
-            const finalVotes = {}; 
-            
-            if (room.playerChoices) {
-                Object.values(room.playerChoices).forEach(choiceArray => {
-                    choiceArray.forEach(targetId => {
-                        // Dodajemy punkt dla gracza o ID targetId
-                        finalVotes[targetId] = (finalVotes[targetId] || 0) + 1;
-                    });
+    if (room && room.host === socket.id && room.status === 'playing') {
+        const finalVotes = {}; 
+        
+        // Zliczanie głosów
+        if (room.playerChoices) {
+            Object.values(room.playerChoices).forEach(choiceArray => {
+                choiceArray.forEach(targetId => {
+                    finalVotes[targetId] = (finalVotes[targetId] || 0) + 1;
                 });
-            }
-
-            // 2. Przygotowanie finalnego obiektu wyników
-            const enrichedResults = {
-                ...room.results,     // Oryginalne wyniki (impostorzy, hasło)
-                votes: finalVotes    // Dodajemy nową mapę głosów { socketId: ilość }
-            };
-
-            // 3. Wysyłamy wyniki do wszystkich w pokoju
-            io.to(roomCode).emit('game_over', enrichedResults);
-
-            // Zmieniamy status, aby uniknąć ponownego wywołania tej logiki
-            room.status = 'finished';
+            });
         }
 
-        // 4. Sprzątanie: usuwamy pokój z opóźnieniem 2 sekund
-        // Dzięki temu socket zdąży "przepchnąć" game_over do wszystkich
+        // 1. Sortujemy graczy po ilości głosów (malejąco)
+        const sortedVotedIds = Object.keys(finalVotes).sort((a, b) => finalVotes[b] - finalVotes[a]);
+
+        // 2. Pobieramy liczbę impostorów, aby wiedzieć ilu graczy "wyrzucić"
+        const impostorCount = room.impostorCount || 1; // Upewnij się, że masz to zapamiętane w obiekcie room
+        const kickedIds = sortedVotedIds.slice(0, impostorCount);
+
+        // Mapujemy ID na nazwy graczy w sposób odporny na błędy
+        const kickedPlayerNames = kickedIds.map(id => {
+            // Szukamy gracza w tablicy room.players
+            const p = room.players.find(player => player.id === id);
+            
+            if (p) {
+                return p.name;
+            } else {
+                // Jeśli nie znaleziono po ID socketu, spróbuj wyświetlić cokolwiek co pomoże w debugowaniu
+                console.log(`Błąd: Nie znaleziono gracza o ID: ${id}`);
+                return "Tajemniczy Gracz"; 
+            }
+        });
+        
+        const enrichedResults = {
+            ...room.results,
+            votes: finalVotes,
+            kickedPlayers: kickedPlayerNames // Wysyłamy tablicę stringów z nazwami
+        };
+
+        io.to(roomCode).emit('game_over', enrichedResults);
+        room.status = 'finished';
+
+        // Sprzątanie pokoju (zostawiamy 2s na odebranie emit)
         setTimeout(() => {
             if (rooms[roomCode]) {
                 delete rooms[roomCode];
                 io.emit('room_list', rooms);
-                console.log(`Pokój ${roomCode} został zamknięty.`);
             }
         }, 2000);
     }

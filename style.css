@@ -169,11 +169,6 @@ button {
     color: white; 
 }
 
-
-.hidden { 
-    display: none; 
-}
-/* Kontener, który trzyma awatar i nick (dodaj to w JS wokół nich) */
 .avatar-container {
     display: inline-flex;
     flex-direction: column;
@@ -259,14 +254,6 @@ animation: fadeIn 0.5s ease-in;
     to { opacity: 1; transform: translateY(0); }
 }
 
-.logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 0px;
-    background: transparent; /* Tło musi być ciemniejsze niż błysk */
-}
-
 .logo {
     font-size: 3rem;
     font-weight: 800;
@@ -281,7 +268,43 @@ animation: fadeIn 0.5s ease-in;
     /* Dodajemy lekki cień bazowy, by tekst był czytelny */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
-/* Pseudoelement tworzący błysk */
+#player-stats{
+    display: flex;
+    align-items: flex-end; /* Centrowanie pionowe symbolu i inputa */
+    justify-content: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+#main-player-avatar{
+    width: 30%;
+    border-radius: 10px;
+    border: 5px solid black;
+    flex: 1;
+    transition: 0.5s;
+}
+#main-player-avatar:hover{
+    box-shadow: 0 0 20px black;
+    transform: scale(1.05);
+}
+
+#main-exp-wrapper{
+    background-color: transparent;
+    width: 100%;
+    margin-left: 10px;
+    border: 5px solid black;
+    background-color: #161616;
+    border-radius: 10px;
+    transition: 0.5s;
+}
+#main-exp-wrapper:hover{
+    box-shadow: 0 0 20px black;
+    transform: scale(1.05);
+}
+
+canvas{
+    border-radius: 5px;
+}
+
 .card::before {
     content: "";
     position: absolute;
@@ -376,6 +399,7 @@ animation: fadeIn 0.5s ease-in;
     width: 100%;
     height: 10px;
     pointer-events: none;
+    display: none;
 }
 
 .drop {
@@ -418,13 +442,12 @@ animation: fadeIn 0.5s ease-in;
     }
 }
 
-.progress-wrapper {
-    width: 100%;
-    margin: 10px 0;
-}
-
 #progressCanvas {
     width: 100%;
     height: 30px; /* Wysokość paska */
     display: block;
+}
+
+.hidden { 
+    display: none; 
 }

@@ -27,11 +27,17 @@
 </div>
     <div id="error-display"></div>
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
-    <div class="logo"><img src='logo4.png' width="300px"></div>
+    <div class="logo hidden" id="logo"><img src='logo4.png' width="300px"></div>
     <div id="screen-login">
+    <div id="player-stats">
+        <img src='icon-192.png' id="main-player-avatar">
+        <div id="main-exp-wrapper">
+        <canvas id="progressCanvas"></canvas>
+        </div>
+    </div>
         <span id="impostor-thoughts" style='color: var(--danger); text-shadow: 0 0 20px var(--danger); transition: 1s; opacity:0;'>Mądrości impostora</span>
         <div class="input-group">
-            <input type="text" id="input-name" placeholder="Twój nick" onchange="saveNick(this.value)">
+            <input type="text" id="input-name" placeholder="Twój nick" onchange="changeNick(); saveNick(this.value)">
             <span class="symbol" 
             onclick="rollDice(this)">
             &#9860;
@@ -97,9 +103,6 @@
     </div>
         <div id="screen-load" class="hidden">
         <h3><span id="loading-info">Ładowanie... </span><span id="loading-progress" style="color: var(--danger); text-shadow: 0 0 20px var(--danger);"></span></h3>
-        <div class="progress-wrapper">
-            <canvas id="progressCanvas"></canvas>
-        </div>
     </div>
 
 </div></div>
@@ -110,6 +113,11 @@
     const savedNick = localStorage.getItem('savedNick');
     if (savedNick) document.getElementById("input-name").value = savedNick || "";
     
+    changeNick();
+    progress = 0;
+    currentWidth = 0;
+    updateExp();
+
     let userId = localStorage.getItem('userId');
 
     if(!userId){
@@ -163,6 +171,13 @@
             span.style.opacity = 0;
         },5000)
     }
+
+    function changeNick(){
+        const playerAvatar = document.getElementById('main-player-avatar');
+        const value = document.getElementById('input-name').value;
+        playerAvatar.src = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${value}&backgroundType=solid`;
+    }
+
     function saveNick(newNick) {
     localStorage.setItem('savedNick', newNick);
     if(newNick.length <= 3){
@@ -190,6 +205,8 @@
             document.getElementById(id).classList.add('hidden');
         });
         document.getElementById(screenId).classList.remove('hidden');
+        if(screenId == 'screen-login'){document.getElementById('logo').classList.add('hidden'); document.getElementById('player-stats').classList.remove('hidden');}
+        else{document.getElementById('logo').classList.remove('hidden'); document.getElementById('player-stats').classList.add('hidden');}
     }
 
     // KOMUNIKACJA Z SERWEREM
@@ -212,29 +229,32 @@
         if(confirm("Zacząć głosowanie?")) socket.emit('cast_vote', currentRoomCode);
     }
 
-    let selectedPlayers = [];
+    let selectedPlayers = []; // Pamiętaj, aby czyścić tę tablicę przy starcie głosowania!
 
-function voteOn(selectedTile, impostorCount) {
-    // 1. Sprawdzamy, czy kafelek jest już zaznaczony
-    const isSelected = selectedTile.classList.contains('selected');
+    function voteOn(selectedTile, impostorCount, playerId) {
+        const isSelected = selectedTile.classList.contains('selected');
 
-    if (!isSelected) {
-        // Dodawanie głosu - sprawdź limit
-        if (selectedPlayers.length < impostorCount) {
-            selectedTile.classList.add('selected');
-            selectedPlayers.push(selectedTile);
+        if (!isSelected) {
+            // Dodawanie głosu
+            if (selectedPlayers.length < impostorCount) {
+                selectedTile.classList.add('selected');
+                selectedPlayers.push(playerId);
+            } else {
+                // Opcjonalnie: usuń pierwszy zaznaczony, aby zrobić miejsce na nowy (wygodniejsze dla gracza)
+                console.log("Limit głosów osiągnięty!");
+                return; 
+            }
         } else {
-            console.log("Osiągnięto limit głosów!");
+            // Usuwanie głosu
+            selectedTile.classList.remove('selected');
+            // TUTAJ POPRAWKA: filtrujemy po playerId, a nie po obiekcie kafelka
+            selectedPlayers = selectedPlayers.filter(id => id !== playerId);
         }
-    } else {
-        // Usuwanie głosu
-        selectedTile.classList.remove('selected');
-        
-        // Usuwamy ten konkretny element z tablicy
-        selectedPlayers = selectedPlayers.filter(tile => tile !== selectedTile);
+
+        // Wysyłamy aktualną tablicę ID (socketów)
+        socket.emit('send_vote', currentRoomCode, selectedPlayers);
     }
-    socket.emit('send_vote', currentRoomCode, selectedPlayers);
-}
+
 
     let category;
     function selectCategory(id){
@@ -273,8 +293,10 @@ function voteOn(selectedTile, impostorCount) {
     let diceRotation = 0;
     function rollDice(element){
         document.getElementById('input-name').value = randomNick(); 
+        changeNick();
         if (document.getElementById('input-name').value.toLowerCase().includes('jew') || document.getElementById('input-name').value.toLowerCase().includes('jewish'))
         impostorWisdom("I love Benjamin Netanyahu");
+    
         diceRotation += 360;
         element.style.transform = `rotate(${diceRotation}deg)`;
 
@@ -332,7 +354,7 @@ function voteOn(selectedTile, impostorCount) {
         const screenVote = document.getElementById('vote-display');
         showScreen('screen-vote');
         let html = "";
-        room.players.forEach(p => {html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount})'
+        room.players.forEach(p => {html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.id}")'
         style="background-image: url('https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}')"> ${p.name} </div>`;   
         screenVote.innerHTML = html;
         })
@@ -346,35 +368,40 @@ function voteOn(selectedTile, impostorCount) {
     });
 
 socket.on('game_over', (results) => {
-    // 1. Przygotowanie listy głosów (kto ile zebrał)
-    // Pobieramy wszystkich graczy z aktualnej listy w UI, aby dopasować ID do Nazwy
-    const playersInLobby = Array.from(document.querySelectorAll('.vote-tile, .player-tag'));
+    // 1. Zmiana ekranu na ładowanie/wyniki
+    showScreen('screen-load');
     
-    let votesSummary = "\n\nWyniki głosowania:";
-    let hasVotes = false;
+    const loadingInfo = document.getElementById('loading-info');
+    const loadingProgress = document.getElementById('loading-progress');
 
-    // Przeszukiwanie otrzymanego obiektu votes { socketId: count }
-    for (const [playerId, count] of Object.entries(results.votes || {})) {
-        // Próbujemy znaleźć nazwę gracza po jego ID (zakładając, że masz je w dataset)
-        // Jeśli nie masz ID w HTML, możesz przesłać nazwy graczy bezpośrednio z serwera
-        votesSummary += `\nGracz (ID: ${playerId}): ${count} głosy/ów`;
-        hasVotes = true;
-    }
+    // 2. Przygotowanie głównej informacji o wygranej/przegranej
+    loadingInfo.innerHTML = `<span style="font-size: 1.5rem; display: block; margin-bottom: 10px;">KONIEC GRY</span>`;
+    
+    // 3. Budowanie treści wyników
+    let resultsHTML = `
+        <div style="text-align: center; line-height: 1.6;">
+            <p>Impostorzy: <span style="color: var(--danger)">${results.impostorNames.join(', ')}</span></p>
+            <p>Hasło: <span style="color: var(--secondary)">${results.word}</span></p>
+            <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
+            <p style="text-transform: uppercase; font-weight: bold;">Wyrzuceni z pokoju:</p>
+            <p style="color: #ff4d4d; font-size: 1.2rem;">${results.kickedPlayers.length > 0 ? results.kickedPlayers.join(' oraz ') : 'Nikt (remis/brak głosów)'}</p>
+        </div>
+    `;
 
-    if (!hasVotes) votesSummary += "\nBrak oddanych głosów.";
+    loadingProgress.innerHTML = resultsHTML;
 
-    // 2. Wyświetlenie rozbudowanego komunikatu
-    const message = `KONIEC!\n` +
-                    `Impostor: ${results.impostorNames.join(', ')}\n` +
-                    `Hasło: ${results.word}` + 
-                    votesSummary;
-
-    alert(message);
-
-    // 3. Opcjonalne: Krótkie opóźnienie przed reloadem, żeby alert nie zniknął za szybko
+    // 4. Zamiast nagłego reloadu, dodajemy przycisk powrotu lub długie opóźnienie
+    // Usunąłem setTimeout z reloadem, aby gracz mógł przeczytać wyniki. 
+    // Lepiej dodać przycisk "Powrót do menu" po 5 sekundach.
+    
     setTimeout(() => {
-        location.reload();
-    }, 500);
+        const btn = document.createElement('button');
+        btn.className = "btn-join";
+        btn.style.marginTop = "20px";
+        btn.innerText = "POWRÓT DO MENU";
+        btn.onclick = () => location.reload();
+        loadingProgress.appendChild(btn);
+    }, 3000);
 });
 
     socket.on('room_list', (roomsObject) => {
@@ -510,26 +537,31 @@ window.addEventListener('mousedown', (e) => {
 });
 
 
-    function screenLoad(screen){
-        showScreen('screen-load');
-        document.getElementById('loading-info').innerText = "Pobieranie wirusów...";
-        progress = 0;
-        currentWidth = 0;
-        drawProgressBar(screen);
-    }
+    // function screenLoad(screen){
+    //     showScreen('screen-load');
+    //     document.getElementById('loading-info').innerText = "Pobieranie wirusów...";
+    //     progress = 0;
+    //     currentWidth = 0;
+    //     drawProgressBar(screen);
+    // }
 
 const pCanvas = document.getElementById('progressCanvas');
 const pCtx = pCanvas.getContext('2d');
 
-// Parametry paska
 let progress = 0; // Aktualny stan (0 do 100)
 let targetProgress = 100; // Do ilu ma dobić
 let currentWidth = 0; // Pomocnicza do płynnej animacji
-let screenLoaded = false;
+//let screenLoaded = false;
 // Kolory z Twoich zmiennych CSS
 const colorSecondary = '#2ecc71';
 const colorDark = '#363636'; 
 
+function updateExp(){
+    progress = 0; // Aktualny stan (0 do 100)
+    targetProgress = 57; // Do ilu ma dobić
+    currentWidth = 0; // Pomocnicza do płynnej animacji
+    drawProgressBar();
+}
 function drawProgressBar() {
     // Dopasowanie rozdzielczości wewnętrznej canvasu
     pCanvas.width = pCanvas.clientWidth;
@@ -537,15 +569,15 @@ function drawProgressBar() {
 
     const w = pCanvas.width;
     const h = pCanvas.height;
-    const padding = 4; // Grubość obramowania
+    const padding = 0; // Grubość obramowania
 
     // Czyścimy tło pod paskiem
     pCtx.clearRect(0, 0, w, h);
 
     // 1. Rysujemy obramowanie (Stroke)
-    pCtx.strokeStyle = 'white';
-    pCtx.lineWidth = padding;
-    pCtx.strokeRect(padding/2, padding/2, w - padding, h - padding);
+    //pCtx.strokeStyle = 'white';
+    //pCtx.lineWidth = padding;
+    //pCtx.strokeRect(padding/2, padding/2, w - padding, h - padding);
 
     // 2. Obliczamy płynne przejście szerokości (Linear Interpolation)
     // Zmienna 0.05 odpowiada za "gładkość" - im mniejsza, tym wolniej dobija
@@ -560,16 +592,17 @@ function drawProgressBar() {
     // 4. Animacja pętli
     if (progress < targetProgress) {
         progress += 0.5; // Prędkość ładowania
-        document.getElementById('loading-progress').innerText = "(" + Math.round(progress) + "%)"
+        //document.getElementById('loading-progress').innerText = "(" + Math.round(progress) + "%)"
     }else{
-        setTimeout(() => {
-            showScreen('screen-game'); 
-            screenLoaded = true;
-        }, 1000);
+        // setTimeout(() => {
+        //     showScreen('screen-game'); 
+        //screenLoaded = true;
+        // }, 1000);
     }
+
+    //if(currentWidth >= targetWidth) return;
     
-    if(screenLoaded) return;
-    setTimeout(drawProgressBar, 10);
+    requestAnimationFrame(drawProgressBar);
 }
 </script>
 </body>
