@@ -29,12 +29,15 @@
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
     <div class="logo hidden" id="logo"><img src='logo4.png' width="300px"></div>
     <div id="screen-login">
-    <div id="player-stats">
-        <img src='icon-192.png' id="main-player-avatar">
-        <div id="main-exp-wrapper">
-        <canvas id="progressCanvas"></canvas>
+        <div id="player-stats">
+            <img src='icon-192.png' id="main-player-avatar">
+            <div id="player-stats-rest">
+                <span id="exp-counter" style='color: var(--secondary); text-shadow: 0 0 20px var(--secondary); transition: 1s;'>Exp: 947</span>
+                <div id="main-exp-wrapper">
+                    <canvas id="progressCanvas"></canvas>
+                </div>
+            </div>
         </div>
-    </div>
         <span id="impostor-thoughts" style='color: var(--danger); text-shadow: 0 0 20px var(--danger); transition: 1s; opacity:0;'>Mądrości impostora</span>
         <div class="input-group">
             <input type="text" id="input-name" placeholder="Twój nick" onchange="changeNick(); saveNick(this.value)">
@@ -104,28 +107,47 @@
         <div id="screen-load" class="hidden">
         <h3><span id="loading-info">Ładowanie... </span><span id="loading-progress" style="color: var(--danger); text-shadow: 0 0 20px var(--danger);"></span></h3>
     </div>
+    <div id="screen-customize" class="hidden">
+        
+    </div>
 
 </div></div>
 
 <script>
+    let playerExp;
+    let userId;
+
+    const botConfig = {
+        seed: "Gamer99",         // Unikalny identyfikator (zmienia wszystko)
+        eyes: "shade01",          // eyes01 - eyes25
+        mouth: "diagram",        // mouth01 - mouth11
+        background: "222222",    // Kolor tła w HEX
+    };
+    
     window.onload = () => {
         
-    const savedNick = localStorage.getItem('savedNick');
+    let savedNick = localStorage.getItem('savedNick');
     if (savedNick) document.getElementById("input-name").value = savedNick || "";
     
     changeNick();
     progress = 0;
     currentWidth = 0;
-    updateExp();
 
-    let userId = localStorage.getItem('userId');
+    playerExp = parseInt(localStorage.getItem('playerExp'));
+
+    if (!playerExp || playerExp <= 0) playerExp = 0;
+    
+    updateExp(playerExp);
+
+    console.log("EXP: "+playerExp)
+    userId = localStorage.getItem('userId');
 
     if(!userId){
         userId = generateUID();
         localStorage.setItem('userId',userId);
     }
 
-    console.log('Twoje UID: ' + userId)
+    console.log('Twoje UID: ' + userId);
     // const savedSession = localStorage.getItem('impostor_session');
     
     // if (savedSession) {
@@ -175,6 +197,12 @@
     function changeNick(){
         const playerAvatar = document.getElementById('main-player-avatar');
         const value = document.getElementById('input-name').value;
+
+    // Template String dla Bottts Neutral
+    let botUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+
+    // Przykład użycia w Twoim avatarze gracza:
+    document.getElementById('main-player-avatar').src = botUrl;
         playerAvatar.src = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${value}&backgroundType=solid`;
     }
 
@@ -213,7 +241,7 @@
     function createRoom() {
     let name = document.getElementById('input-name').value || randomNick();
     // Zapisujemy tylko imię, kod pokoju dopiszemy, gdy serwer go nam wyśle
-    socket.emit('create_room', { playerName: name });
+    socket.emit('create_room', { playerName: name ,playerBot: botConfig});
     }
 
     function joinRoom(listCode) {
@@ -222,7 +250,7 @@
 
     // Zapisujemy imię i kod
     //saveGameSession({ nickName: name, roomCode: code });
-    socket.emit('join_room', { playerName: name, roomCode: code });
+    socket.emit('join_room', { playerName: name, roomCode: code ,playerBot: botConfig});
     }
 
     function castVote() {
@@ -317,11 +345,11 @@
     list.innerHTML = room.players.map(p => {
         const isMe = p.id === socket.id; 
         const playerClass = isMe ? 'player-tag this-player' : 'player-tag';
-        
+
         // 1. Poprawiony URL (styl 'pixel-art' jako tekst)
         // 2. Użycie p.uid zamiast p.name dla unikalności
-        const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}`;
-        
+        //const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${p.bot.eyes}&mouth=${p.bot.mouth}&backgroundColor=${p.bot.background}`;
+        const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}&backgroundType=solid`;
         return `
             <div class="avatar-container">
                 <img src="${avatarUrl}" class="player-avatar">
@@ -390,6 +418,9 @@ socket.on('game_over', (results) => {
 
     loadingProgress.innerHTML = resultsHTML;
 
+    playerExp += 50;
+    updateExp(playerExp);
+    
     // 4. Zamiast nagłego reloadu, dodajemy przycisk powrotu lub długie opóźnienie
     // Usunąłem setTimeout z reloadem, aby gracz mógł przeczytać wyniki. 
     // Lepiej dodać przycisk "Powrót do menu" po 5 sekundach.
@@ -556,10 +587,12 @@ let currentWidth = 0; // Pomocnicza do płynnej animacji
 const colorSecondary = '#2ecc71';
 const colorDark = '#363636'; 
 
-function updateExp(){
+function updateExp(exp){
     progress = 0; // Aktualny stan (0 do 100)
-    targetProgress = 57; // Do ilu ma dobić
-    currentWidth = 0; // Pomocnicza do płynnej animacji
+    targetProgress = exp; // Do ilu ma dobić
+    currentWidth = 0; // Pomocnicza do płynnej animacjis
+    localStorage.setItem('playerExp', exp);
+    //localStorage.setItem('playerExp',playerExp);
     drawProgressBar();
 }
 function drawProgressBar() {
@@ -575,8 +608,8 @@ function drawProgressBar() {
     pCtx.clearRect(0, 0, w, h);
 
     // 1. Rysujemy obramowanie (Stroke)
-    //pCtx.strokeStyle = 'white';
-    //pCtx.lineWidth = padding;
+    pCtx.strokeStyle = colorDark;
+    pCtx.lineWidth = padding;
     //pCtx.strokeRect(padding/2, padding/2, w - padding, h - padding);
 
     // 2. Obliczamy płynne przejście szerokości (Linear Interpolation)
@@ -589,6 +622,16 @@ function drawProgressBar() {
     // Wypełnienie zaczyna się po wewnętrznej stronie ramki
     pCtx.fillRect(padding, padding, currentWidth, h - (padding * 2));
 
+    // 3.5 Rysujemy tekst postępu
+
+    pCtx.font = "bold 14px 'Silkscreen', sans serif"; // Lub Twoja czcionka pixel-art
+    pCtx.fillStyle = "white";
+    pCtx.textAlign = "center";
+    pCtx.textBaseline = "middle";
+
+    // Rysujemy napis na samym środku canvasu
+    //pCtx.fillText(Math.round(progress) + "/200", w / 2, h / 2);
+
     // 4. Animacja pętli
     if (progress < targetProgress) {
         progress += 0.5; // Prędkość ładowania
@@ -599,9 +642,8 @@ function drawProgressBar() {
         //screenLoaded = true;
         // }, 1000);
     }
-
+    document.getElementById('exp-counter').innerText = `EXP: ${Math.round(playerExp*progress/targetProgress)}`;
     //if(currentWidth >= targetWidth) return;
-    
     requestAnimationFrame(drawProgressBar);
 }
 </script>

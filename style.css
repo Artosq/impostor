@@ -37,7 +37,7 @@ body {
     border-radius: 15px; 
     box-shadow: 0 10px 25px rgba(0,0,0,1); 
     width: 100%; 
-    max-width: 400px; 
+    max-width: 350px; 
     text-align: center; 
     position: relative;
     overflow: hidden;
@@ -268,43 +268,62 @@ animation: fadeIn 0.5s ease-in;
     /* Dodajemy lekki cień bazowy, by tekst był czytelny */
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
-#player-stats{
-    display: flex;
-    align-items: flex-end; /* Centrowanie pionowe symbolu i inputa */
-    justify-content: left;
-    width: 100%;
-    margin-bottom: 10px;
-}
-#main-player-avatar{
-    width: 30%;
-    border-radius: 10px;
-    border: 5px solid black;
-    flex: 1;
-    transition: 0.5s;
-}
+
 #main-player-avatar:hover{
     box-shadow: 0 0 20px black;
     transform: scale(1.05);
 }
 
-#main-exp-wrapper{
-    background-color: transparent;
-    width: 100%;
-    margin-left: 10px;
-    border: 5px solid black;
-    background-color: #161616;
-    border-radius: 10px;
-    transition: 0.5s;
-}
 #main-exp-wrapper:hover{
     box-shadow: 0 0 20px black;
     transform: scale(1.05);
 }
 
-canvas{
-    border-radius: 5px;
+#player-stats {
+    display: flex;
+    align-items: end; /* Wyśrodkowanie awatara i statystyk względem siebie */
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    height: auto;
 }
 
+#main-player-avatar {
+    width: 100px;
+    border-radius: 10px;
+    border: 5px solid black;
+    flex-shrink: 0;
+    transition: 0.5s;
+    object-fit: cover;
+}
+
+#player-stats-rest {
+    flex: 1;         /* Pozwala statystykom zająć resztę miejsca */
+    display: flex;
+    justify-content: left;
+    flex-direction: column; /* Napis EXP nad paskiem */
+    gap: 5px;             /* Elegancki odstęp między napisem a paskiem */
+    margin-left: 10px;    /* Teraz ten margines będzie wyraźnie widoczny */
+}
+
+#main-exp-wrapper {
+    width: 100%;          /* Wypełnia całą szerokość player-stats-rest */
+    border: 5px solid black;
+    background-color: #161616;
+    border-radius: 100px;
+    transition: 0.5s;
+    padding: 3px;
+    box-sizing: border-box; /* Ważne: padding nie powiększa wrappera */
+}
+
+/* Canvas musi wypełniać wrapper */
+#progressCanvas {
+    width: 100%;
+    height: 25px;         /* Ustaw stałą wysokość paska */
+    display: block;       /* Usuwa domyślny margines pod obrazkiem */
+    box-shadow: 0 0 10px var(--secondary);
+    border-radius: 50px;
+}
 .card::before {
     content: "";
     position: absolute;
@@ -440,12 +459,6 @@ canvas{
         opacity: 0;
         transform: rotate(45deg) scale(0.8);
     }
-}
-
-#progressCanvas {
-    width: 100%;
-    height: 30px; /* Wysokość paska */
-    display: block;
 }
 
 .hidden { 

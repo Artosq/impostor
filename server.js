@@ -30,12 +30,12 @@ io.on('connection', (socket) => {
     socket.emit('room_list', rooms);
 
     // Tworzenie pokoju
-    socket.on('create_room', ({ playerName }) => {
+    socket.on('create_room', ({ playerName ,playerBot}) => {
         const roomCode = Math.floor(1000 + Math.random() * 9000).toString();
         rooms[roomCode] = {
             code: roomCode,
             host: socket.id,
-            players: [{ id: socket.id, name: playerName }],
+            players: [{ id: socket.id, name: playerName, bot: {eyes: playerBot.eyes, mouth: playerBot.mouth, background: playerBot.background}}],
             status: 'waiting'
         };
         io.emit('room_list', rooms);
@@ -45,10 +45,10 @@ io.on('connection', (socket) => {
     });
 
     // Dołączanie do pokoju
-    socket.on('join_room', ({ playerName, roomCode }) => {
+    socket.on('join_room', ({ playerName, roomCode ,playerBot}) => {
         const room = rooms[roomCode];
         if (room && room.status === 'waiting') {
-            room.players.push({ id: socket.id, name: playerName });
+            room.players.push({ id: socket.id, name: playerName, bot: {eyes: playerBot.eyes, mouth: playerBot.mouth, background: playerBot.background}});
             socket.join(roomCode);
             io.to(roomCode).emit('room_update', room);
         } else {
