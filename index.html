@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#181818">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="style.css">
-
+    <link rel="stylesheet" href="scrollbar.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
 </head>
 <body>
     <canvas id="rippleCanvas"></canvas>
-
+<h1 class="hidden" style="color: white; letter-spacing: 12px; margin-top: 0px;">IMPOSTOR</h1>
 <div class="card" id="card">
         <div class="blood-container">
     <span class="drop"></span>
@@ -30,7 +30,7 @@
     <div class="logo hidden" id="logo"><img src='logo4.png' width="300px"></div>
     <div id="screen-login">
         <div id="player-stats">
-            <img src='icon-192.png' id="main-player-avatar">
+            <img src='icon-192.png' id="main-player-avatar" onclick="customizeAvatar()">
             <div id="player-stats-rest">
                 <span id="exp-counter" style='color: var(--secondary); text-shadow: 0 0 20px var(--secondary); transition: 1s;'>Exp: 947</span>
                 <div id="main-exp-wrapper">
@@ -52,7 +52,6 @@
         <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
         <div id="rooms-list"></div>
     </div>
-
     <div id="screen-lobby" class="hidden">
         <h3>Kod pokoju: <span id="room-code-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">----</span></h3>
 
@@ -108,7 +107,23 @@
         <h3><span id="loading-info">Ładowanie... </span><span id="loading-progress" style="color: var(--danger); text-shadow: 0 0 20px var(--danger);"></span></h3>
     </div>
     <div id="screen-customize" class="hidden">
-        
+        <img src='icon-192.png' id="customize-player-avatar">
+        <div id="customize-options">
+
+                <h3>Oczy:</h3>
+            <div class="customize-category" id="eyes-customize">
+
+            </div>
+                <h3>usta:</h3>
+            <div class="customize-category" id="mouth-customize">
+
+            </div>
+            <h3>tło:</h3>
+            <div class="customize-category" id="background-customize">
+                
+            </div>
+        </div>
+        <button class='btn-join'onclick="showScreen('screen-login')">Powrót do menu -></button>
     </div>
 
 </div></div>
@@ -117,36 +132,78 @@
     let playerExp;
     let userId;
 
-    const botConfig = {
-        seed: "Gamer99",         // Unikalny identyfikator (zmienia wszystko)
-        eyes: "shade01",          // eyes01 - eyes25
-        mouth: "diagram",        // mouth01 - mouth11
-        background: "222222",    // Kolor tła w HEX
+    const botAssets = {
+        eyes: [
+            "bulging",      // index 0
+            "dizzy",        // index 1
+            "eva",          // index 2
+            "frame1",       // index 3
+            "frame2",       // index 4
+            "glow",         // index 5
+            "happy",        // index 6
+            "hearts",       // index 7
+            "robocop",      // index 8
+            "round",        // index 9
+            "roundFrame01", // index 10
+            "roundFrame02", // index 11
+            "sensor",       // index 12s
+            "shade01"       // index 13
+        ],
+        mouth: [
+            "bite",         // index 0
+            "diagram",      // index 1
+            "grill01",      // index 2
+            "grill02",      // index 3
+            "grill03",      // index 4
+            "smile01",      // index 5
+            "smile02",      // index 6
+            "square01",     // index 7
+            "square02"      // index 8
+        ]
+    };
+
+    let botConfig = {
+        eyes: botAssets.eyes[0],          // eyes01 - eyes25
+        mouth: botAssets.mouth[0],        // mouth01 - mouth11
+        background: '555555'
     };
     
+    let playerAvatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+
     window.onload = () => {
-        
+
+    const savedBotConfig = localStorage.getItem('botConfig');
+    if (savedBotConfig) {
+        try {
+            const parsed = JSON.parse(savedBotConfig);
+            
+            // Walidacja: upewnij się, że obiekt ma potrzebne pola
+            if (parsed && parsed.eyes && parsed.mouth) {
+                botConfig = parsed;
+            }
+        } catch (e) {
+            localStorage.removeItem('botConfig'); // Czyścimy błędne dane
+        }
+    }
+
+// Po wczytaniu danych odświeżamy obrazek
+changeNick();
     let savedNick = localStorage.getItem('savedNick');
     if (savedNick) document.getElementById("input-name").value = savedNick || "";
-    
     changeNick();
     progress = 0;
     currentWidth = 0;
 
     playerExp = parseInt(localStorage.getItem('playerExp'));
-
     if (!playerExp || playerExp <= 0) playerExp = 0;
-    
     updateExp(playerExp);
-
     console.log("EXP: "+playerExp)
-    userId = localStorage.getItem('userId');
 
+    userId = localStorage.getItem('userId');
     if(!userId){
         userId = generateUID();
         localStorage.setItem('userId',userId);
     }
-
     console.log('Twoje UID: ' + userId);
     // const savedSession = localStorage.getItem('impostor_session');
     
@@ -169,6 +226,44 @@
     //         localStorage.removeItem('impostor_session'); // Stara sesja, usuwamy
     //     }
     // }
+
+            const mouthCustom = document.getElementById('mouth-customize');
+        const eyesCustom = document.getElementById('eyes-customize');
+        const bgCustom = document.getElementById('background-customize');
+
+        // 1. Generowanie OCZU
+        eyesCustom.innerHTML = botAssets.eyes.map(eyeName => {
+            const tUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${eyeName}&mouth=&backgroundColor=transparent`;
+            return `<img class="customize-tile eyes-custom ${botConfig.eyes === eyeName ? 'selected' : ''}"  
+                        src="${tUrl}" 
+                        onclick="updatePart(this, 'eyes', '${eyeName}')">`;
+        }).join('');
+
+        // 2. Generowanie UST
+        mouthCustom.innerHTML = botAssets.mouth.map(mouthName => {
+            const tUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=&mouth=${mouthName}&backgroundColor=transparent`;
+            return `<img class="customize-tile mouth-custom ${botConfig.mouth === mouthName ? 'selected' : ''}" 
+                        src="${tUrl}" 
+                        onclick="updatePart(this, 'mouth', '${mouthName}')">`;
+        }).join('');
+
+        // 3. Generowanie KOLORÓW TŁA (Przykładowa paleta)
+        const diceBearPalette = [
+        "f44336", "e91e63", "9c27b0", "673ab7", "3f51b5", 
+        "2196f3", "03a9f4", "00bcd4", "009688", "4caf50", 
+        "8bc34a", "cddc39", "ffeb3b", "ffc107", "ff9800", 
+        "ff5722", "795548", "9e9e9e", "607d8b", "263238"
+        ];
+        bgCustom.innerHTML = diceBearPalette.map(color => {
+            return `<div class="customize-tile background-custom ${botConfig.background === color ? 'selected' : ''}" 
+                        style="background-color: #${color}" 
+                        onclick="updatePart(this,'background', '${color}')"></div>`;
+        }).join('');
+
+        // Aktualizacja głównego podglądu w menu customizacji
+        document.getElementById('customize-player-avatar').src = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+        //document.getElementById('customize-options').style.backgroundImage = `url(https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background})`;
+
     };
 
     // function saveGameSession(newData) {
@@ -185,6 +280,39 @@
     // localStorage.setItem('impostor_session', JSON.stringify(updatedSession));
     // }
 
+    function customizeAvatar() {
+        showScreen('screen-customize');
+    }
+
+    // Funkcja pomocnicza do zmiany części i odświeżenia widoku
+    function updatePart(element, part, value) {
+        botConfig[part] = value;
+
+        // Obsługa wizualna zaznaczenia (ramki)
+        if(part === 'eyes') {
+            document.querySelectorAll('.eyes-custom').forEach(t => t.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+        if(part === 'mouth') {
+            document.querySelectorAll('.mouth-custom').forEach(t => t.classList.remove('selected'));
+            element.classList.add('selected');
+        }
+        // DODAJ TO DLA TŁA:
+        if(part === 'background') {
+            document.querySelectorAll('.background-custom').forEach(t => t.classList.remove('selected'));
+            if(element) element.classList.add('selected');
+        }
+
+        localStorage.setItem('botConfig', JSON.stringify(botConfig));
+        
+        // Odświeżanie obrazków
+        const newUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+        document.getElementById('customize-player-avatar').src = newUrl;
+        //document.getElementById('customize-options').style.backgroundImage = `url(${newUrl})`;
+        changeNick(); 
+    }
+
+
     function impostorWisdom(text){
         const span = document.getElementById('impostor-thoughts');
         span.innerText = text;
@@ -199,11 +327,12 @@
         const value = document.getElementById('input-name').value;
 
     // Template String dla Bottts Neutral
-    let botUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+    playerAvatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
 
     // Przykład użycia w Twoim avatarze gracza:
-    document.getElementById('main-player-avatar').src = botUrl;
-        playerAvatar.src = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${value}&backgroundType=solid`;
+    //document.getElementById('main-player-avatar').src = botUrl;
+        playerAvatar.src = playerAvatarUrl;
+        //`https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${value}&backgroundType=solid`;
     }
 
     function saveNick(newNick) {
@@ -229,11 +358,11 @@
 
     // Funkcje pomocnicze do przełączania ekranów
     function showScreen(screenId) {
-        ['screen-login', 'screen-lobby', 'screen-game','screen-vote','screen-load'].forEach(id => {
+        ['screen-login', 'screen-lobby', 'screen-game','screen-vote','screen-load','screen-customize'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
         });
         document.getElementById(screenId).classList.remove('hidden');
-        if(screenId == 'screen-login'){document.getElementById('logo').classList.add('hidden'); document.getElementById('player-stats').classList.remove('hidden');}
+        if(screenId == 'screen-login' || screenId == 'screen-customize'){document.getElementById('logo').classList.add('hidden'); document.getElementById('player-stats').classList.remove('hidden');}
         else{document.getElementById('logo').classList.remove('hidden'); document.getElementById('player-stats').classList.add('hidden');}
     }
 
@@ -348,8 +477,8 @@
 
         // 1. Poprawiony URL (styl 'pixel-art' jako tekst)
         // 2. Użycie p.uid zamiast p.name dla unikalności
-        //const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${p.bot.eyes}&mouth=${p.bot.mouth}&backgroundColor=${p.bot.background}`;
-        const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}&backgroundType=solid`;
+        const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${p.bot.eyes}&mouth=${p.bot.mouth}&backgroundColor=${p.bot.background}`;
+        //const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}&backgroundType=solid`;
         return `
             <div class="avatar-container">
                 <img src="${avatarUrl}" class="player-avatar">
@@ -589,7 +718,7 @@ const colorDark = '#363636';
 
 function updateExp(exp){
     progress = 0; // Aktualny stan (0 do 100)
-    targetProgress = exp; // Do ilu ma dobić
+    targetProgress = exp/5; // Do ilu ma dobić
     currentWidth = 0; // Pomocnicza do płynnej animacjis
     localStorage.setItem('playerExp', exp);
     //localStorage.setItem('playerExp',playerExp);

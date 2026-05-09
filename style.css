@@ -324,6 +324,51 @@ animation: fadeIn 0.5s ease-in;
     box-shadow: 0 0 10px var(--secondary);
     border-radius: 50px;
 }
+#customize-player-avatar{
+    width: 60%;
+    border-radius: 20px;
+    animation: fadeIn 1s;
+    border: 10px solid black;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+#customize-options{
+    box-sizing: border-box;
+    width: 100%;
+    aspect-ratio: 1/1;
+    overflow-y: scroll;
+    overflow-x: visible;
+    padding: 0 20px;
+    border: 5px solid black;
+    border-radius: 10px;
+    background-color: #333333;
+    margin-bottom: 10px;
+}
+.customize-category{
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 5px; 
+    margin-bottom: 20px;
+    width: 100%;
+}
+.customize-tile{
+    animation: fadeIn 1s;
+    aspect-ratio: 1/1;
+    flex: 1;
+    border-radius: 10px;
+    background-color: rgba(163, 163, 163,0.5);
+    border: 5px solid black;
+    transition: 0.5s;
+}
+.customize-tile.selected{
+    box-shadow: 0 0 20px var(--secondary);
+    transform: scale(1.1);
+}
+#background-input{
+    width: 100%;
+    height: 50px;
+}
 .card::before {
     content: "";
     position: absolute;

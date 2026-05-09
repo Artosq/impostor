@@ -1,0 +1,31 @@
+/* Styl dla przeglądarek opartych na Webkit (Chrome, Edge, Safari, Brave) */
+
+/* 1. Szerokość scrollbara */
+::-webkit-scrollbar {
+  width: 8px;               /* Pionowy */
+  height: 8px;              /* Poziomy */
+}
+
+/* 2. Tło (tor, po którym porusza się suwak) */
+::-webkit-scrollbar-track {
+  background: transparent;  /* Transparentne tło wygląda najczyściej */
+}
+
+/* 3. Suwak (uchwyt) */
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;      /* Neutralny jasnoszary (jak obudowa bota) */
+  border-radius: 20px;      /* Maksymalne zaokrąglenie */
+  border: 2px solid transparent; /* Dodaje "oddech" wokół suwaka */
+  background-clip: content-box;
+}
+
+/* 4. Efekt po najechaniu */
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;      /* Nieco ciemniejszy przy interakcji */
+}
+
+/* Styl dla Firefox (obsługuje tylko podstawy) */
+* {
+  scrollbar-width:none ;
+  scrollbar-color: #d1d5db transparent;
+}
