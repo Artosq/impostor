@@ -762,6 +762,7 @@ function updateExp(exp){
     if(exp > getRequiredExp(playerLVL)){
         exp -= getRequiredExp(playerLVL);
         playerLVL++;
+        return updateExp(exp)
     }
     progress = 0; // Aktualny stan (0 do 100)
     targetProgress = exp/getRequiredExp(playerLVL+1)*100; // Do ilu ma dobić
@@ -774,7 +775,7 @@ function updateExp(exp){
 
 function getRequiredExp(level) {
     const baseXP = 100;
-    return Math.floor(baseXP + (playerLVL - 2)*50);
+    return Math.floor(baseXP + (playerLVL - 1)*50);
 }
 
 function drawProgressBar() {
