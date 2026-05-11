@@ -825,7 +825,10 @@ function drawProgressBar() {
         //screenLoaded = true;
         // }, 1000);
     }
-    document.getElementById('exp-counter').innerHTML = `LVL: ${playerLVL} <br> EXP: ${Math.floor(playerExp*progress/targetProgress)} / ${getRequiredExp(playerLVL+1)}`;
+    document.getElementById('exp-counter').innerHTML = `
+    LVL: ${playerLVL || 0} <br> 
+    EXP: ${Math.floor((playerExp * progress / targetProgress) || 0)} / ${getRequiredExp(playerLVL + 1) || 0}
+`;
     //if(currentWidth >= targetWidth) return;
     requestAnimationFrame(drawProgressBar);
 }
