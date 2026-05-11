@@ -32,7 +32,7 @@
         <div id="player-stats">
             <img src='icon-192.png' id="main-player-avatar" onclick="customizeAvatar()">
             <div id="player-stats-rest">
-                <span id="exp-counter" style='color: var(--secondary); text-shadow: 0 0 20px var(--secondary); transition: 1s;'>Exp: 947</span>
+                <span id="exp-counter" style='font-size: 14px; color: var(--secondary); text-shadow: 0 0 20px var(--secondary); transition: 1s;'>Exp: 947</span>
                 <div id="main-exp-wrapper">
                     <canvas id="progressCanvas"></canvas>
                 </div>
@@ -73,11 +73,10 @@
                 <button class="impostor-tile" id="3" onclick="selectImpostors('3')">3</button>
                 <button class="impostor-tile" id="4" onclick="selectImpostors('4')">4</button>
             </div>
-            <button class="btn-start" onclick="startGame()">START GRY
-                
-            </button>
+            <button id="btn-start" class="btn-start" onclick="startGame()">START GRY</button>
         </div>
         <p class="waiting-msg">Oczekiwanie na start przez hosta...</p>
+        <button onclick="leaveRoom()">Wyjdź z pokoju</button>
     </div>
 
     <div id="screen-game" class="hidden">
@@ -130,7 +129,9 @@
 
 <script>
     let playerExp;
+    let playerLVL;
     let userId;
+
 
     const botAssets = {
         eyes: [
@@ -187,7 +188,6 @@
     }
 
 // Po wczytaniu danych odświeżamy obrazek
-changeNick();
     let savedNick = localStorage.getItem('savedNick');
     if (savedNick) document.getElementById("input-name").value = savedNick || "";
     changeNick();
@@ -196,6 +196,10 @@ changeNick();
 
     playerExp = parseInt(localStorage.getItem('playerExp'));
     if (!playerExp || playerExp <= 0) playerExp = 0;
+    
+    playerLVL = parseInt(localStorage.getItem('playerLVL'));
+    if (!playerLVL || playerLVL <= 1) playerLVL = 1;
+
     updateExp(playerExp);
     console.log("EXP: "+playerExp)
 
@@ -205,6 +209,13 @@ changeNick();
         localStorage.setItem('userId',userId);
     }
     console.log('Twoje UID: ' + userId);
+
+    const lastRoomCode = localStorage.getItem('lastRoomCode');
+
+    socket.emit('rejoin_room', { 
+        roomCode: lastRoomCode, 
+        userId: userId
+    });
     // const savedSession = localStorage.getItem('impostor_session');
     
     // if (savedSession) {
@@ -279,7 +290,7 @@ changeNick();
     
     // localStorage.setItem('impostor_session', JSON.stringify(updatedSession));
     // }
-
+    
     function customizeAvatar() {
         showScreen('screen-customize');
     }
@@ -370,17 +381,35 @@ changeNick();
     function createRoom() {
     let name = document.getElementById('input-name').value || randomNick();
     // Zapisujemy tylko imię, kod pokoju dopiszemy, gdy serwer go nam wyśle
-    socket.emit('create_room', { playerName: name ,playerBot: botConfig});
+    let playerBot = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+    socket.emit('create_room', { playerName: name ,playerBot: playerBot, userId: userId});
     }
 
     function joinRoom(listCode) {
     let name = document.getElementById('input-name').value || randomNick();
     let code = listCode || document.getElementById('input-code').value.toUpperCase();
-
+    let playerBot = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
     // Zapisujemy imię i kod
     //saveGameSession({ nickName: name, roomCode: code });
-    socket.emit('join_room', { playerName: name, roomCode: code ,playerBot: botConfig});
+    socket.emit('join_room', { playerName: name, roomCode: code ,playerBot: playerBot, userId: userId});
     }
+
+    function leaveRoom() {
+        const code = currentRoomCode || localStorage.getItem('lastRoomCode');
+        socket.emit('leave_room', code);
+        
+        // Czyścimy dane z pamięci przeglądarki, żeby nie próbował robić rejoin
+        localStorage.removeItem('lastRoomCode');
+        
+        // Powrót do menu głównego
+        window.location.reload(); 
+}
+
+// Opcjonalnie obsłuż potwierdzenie z serwera
+socket.on('left_room_success', () => {
+    console.log("Pomyślnie opuszczono pokój.");
+    showScreen('screen-main'); // Przełącz na ekran startowy
+});
 
     function castVote() {
         if(confirm("Zacząć głosowanie?")) socket.emit('cast_vote', currentRoomCode);
@@ -466,7 +495,9 @@ changeNick();
     // OBSŁUGA ZDARZEŃ SOCKET.IO
     socket.on('room_update', (room) => {
     currentRoomCode = room.code;
+    socket.emit('check_host', currentRoomCode);
     document.getElementById('room-code-display').innerText = room.code;
+    localStorage.setItem('lastRoomCode',room.code);
     showScreen('screen-lobby');
     
     const list = document.getElementById('players-list');
@@ -477,22 +508,15 @@ changeNick();
 
         // 1. Poprawiony URL (styl 'pixel-art' jako tekst)
         // 2. Użycie p.uid zamiast p.name dla unikalności
-        const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${p.bot.eyes}&mouth=${p.bot.mouth}&backgroundColor=${p.bot.background}`;
         //const avatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}&backgroundType=solid`;
         return `
             <div class="avatar-container">
-                <img src="${avatarUrl}" class="player-avatar">
+                <img src="${p.bot}" class="player-avatar">
                 <span class="${playerClass}">${p.name}</span>
             </div>
         `;
     }).join('');
 
-    if (socket.id === room.host) {
-        document.getElementById('host-controls').classList.remove('hidden');
-        document.querySelectorAll('.waiting-msg').forEach(el => {
-            el.classList.add('hidden');
-        })
-    }
 });
 
     socket.on('game_start', (data) => {
@@ -512,16 +536,28 @@ changeNick();
         showScreen('screen-vote');
         let html = "";
         room.players.forEach(p => {html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.id}")'
-        style="background-image: url('https://api.dicebear.com/8.x/bottts-neutral/svg?seed=${p.name}')"> ${p.name} </div>`;   
+        style="background-image: url('${p.bot}')"> ${p.name} </div>`;   
         screenVote.innerHTML = html;
         })
-        if (socket.id === room.host) {
-        document.getElementById('host-end-controls').classList.remove('hidden');
-        }
+        // if (socket.id === room.host) {
+        // document.getElementById('host-end-controls').classList.remove('hidden');
+        // }
     });
 
     socket.on('is_host', (isHost) => {
-        if(isHost) document.getElementById('host-vote-controls').classList.remove('hidden');
+        // To zdarzenie powinno odblokowywać wszystkie przyciski hosta na różnych ekranach
+        if (isHost) {
+            const hostGameControls = document.getElementById('host-vote-controls'); // Przycisk "Zacznij głosowanie"
+            const hostEndControls = document.getElementById('host-end-controls');   // Przycisk "Zakończ grę"
+            
+            if(hostGameControls) hostGameControls.classList.remove('hidden');
+            if(hostEndControls) hostEndControls.classList.remove('hidden');
+            document.getElementById('host-controls').classList.remove('hidden');
+
+                document.querySelectorAll('.waiting-msg').forEach(el => {
+                    el.classList.add('hidden');
+                })
+        }
     });
 
 socket.on('game_over', (results) => {
@@ -549,7 +585,7 @@ socket.on('game_over', (results) => {
 
     playerExp += 50;
     updateExp(playerExp);
-    
+    localStorage.removeItem('lastRoomCode');
     // 4. Zamiast nagłego reloadu, dodajemy przycisk powrotu lub długie opóźnienie
     // Usunąłem setTimeout z reloadem, aby gracz mógł przeczytać wyniki. 
     // Lepiej dodać przycisk "Powrót do menu" po 5 sekundach.
@@ -612,6 +648,12 @@ socket.on('game_over', (results) => {
         },3000)
     });
 
+    socket.on('rejoin_failed', (result) => {
+        if(result)
+        localStorage.removeItem('lastRoomCode');
+        else
+        currentRoomCode = localStorage.getItem('lastRoomCode');
+    })
 
 
 
@@ -717,13 +759,24 @@ const colorSecondary = '#2ecc71';
 const colorDark = '#363636'; 
 
 function updateExp(exp){
+    if(exp > getRequiredExp(playerLVL)){
+        exp -= getRequiredExp(playerLVL);
+        playerLVL++;
+    }
     progress = 0; // Aktualny stan (0 do 100)
-    targetProgress = exp/5; // Do ilu ma dobić
+    targetProgress = exp/getRequiredExp(playerLVL+1)*100; // Do ilu ma dobić
     currentWidth = 0; // Pomocnicza do płynnej animacjis
     localStorage.setItem('playerExp', exp);
+    localStorage.setItem('playerLVL', playerLVL);
     //localStorage.setItem('playerExp',playerExp);
     drawProgressBar();
 }
+
+function getRequiredExp(level) {
+    const baseXP = 100;
+    return Math.floor(baseXP + (playerLVL - 2)*50);
+}
+
 function drawProgressBar() {
     // Dopasowanie rozdzielczości wewnętrznej canvasu
     pCanvas.width = pCanvas.clientWidth;
@@ -771,7 +824,7 @@ function drawProgressBar() {
         //screenLoaded = true;
         // }, 1000);
     }
-    document.getElementById('exp-counter').innerText = `EXP: ${Math.round(playerExp*progress/targetProgress)}`;
+    document.getElementById('exp-counter').innerHTML = `LVL: ${playerLVL} <br> EXP: ${Math.round(playerExp*progress/targetProgress)} / ${getRequiredExp(playerLVL+1)}`;
     //if(currentWidth >= targetWidth) return;
     requestAnimationFrame(drawProgressBar);
 }
