@@ -759,7 +759,7 @@ const colorSecondary = '#2ecc71';
 const colorDark = '#363636'; 
 
 function updateExp(exp){
-    if(exp > getRequiredExp(playerLVL)){
+    if(exp >= getRequiredExp(playerLVL)){
         exp -= getRequiredExp(playerLVL);
         playerLVL++;
         return updateExp(exp);
