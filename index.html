@@ -762,7 +762,7 @@ function updateExp(exp){
     if(exp > getRequiredExp(playerLVL)){
         exp -= getRequiredExp(playerLVL);
         playerLVL++;
-        return updateExp(exp)
+        return updateExp(exp);
     }
     progress = 0; // Aktualny stan (0 do 100)
     targetProgress = exp/getRequiredExp(playerLVL+1)*100; // Do ilu ma dobić
@@ -825,7 +825,7 @@ function drawProgressBar() {
         //screenLoaded = true;
         // }, 1000);
     }
-    document.getElementById('exp-counter').innerHTML = `LVL: ${playerLVL} <br> EXP: ${Math.round(playerExp*progress/targetProgress)} / ${getRequiredExp(playerLVL+1)}`;
+    document.getElementById('exp-counter').innerHTML = `LVL: ${playerLVL} <br> EXP: ${Math.floor(playerExp*progress/targetProgress)} / ${getRequiredExp(playerLVL+1)}`;
     //if(currentWidth >= targetWidth) return;
     requestAnimationFrame(drawProgressBar);
 }
