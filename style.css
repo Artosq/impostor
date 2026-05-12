@@ -107,6 +107,9 @@ input:focus{
     font-size: 60px;
     transition: 0.6s;
     line-height: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 .symbol:hover{
     text-shadow: 0 0 10px white;
