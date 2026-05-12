@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
 
             case 'finished':
                 // Jeśli pokój jeszcze istnieje, wysyłamy wyniki końcowe
-                socket.emit('game_over', room);
+                //socket.emit('game_over', room);
                 break;
         }
         socket.emit('rejoin_failed', false);
