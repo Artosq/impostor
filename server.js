@@ -107,7 +107,7 @@ io.on('connection', (socket) => {
 
             case 'finished':
                 // Jeśli pokój jeszcze istnieje, wysyłamy wyniki końcowe
-                socket.emit('game_over', room.results);
+                socket.emit('game_over', room);
                 break;
         }
         socket.emit('rejoin_failed', false);
@@ -259,7 +259,7 @@ socket.on('end_game', (roomCode) => {
                 io.to(roomCode).emit('force_reload');
                 io.emit('room_list', rooms);
             }
-        }, 10000); // Zwiększyłem do 10s, żeby gracze zdążyli zobaczyć wyniki
+        }, 30000); // Zwiększyłem do 10s, żeby gracze zdążyli zobaczyć wyniki
     }
 });
 
