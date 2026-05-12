@@ -153,30 +153,30 @@ socket.on('start_game', ({ roomCode, category, impostorCount }) => {
             word: selected.word 
         };
 
-        // Przypisywanie ról i danych każdemu graczowi z osobna
-        room.players.forEach((player) => {
-            const isImpostor = impostorIds.includes(player.id);
-            
-            player.gameCat = category; // Zapisujemy kategorię u gracza
+    const sharedHintIndex = Math.floor(Math.random() * selected.hints.length);
+    const sharedHint = selected.hints[sharedHintIndex];
 
-            if (isImpostor) {
-                // Przypisujemy podpowiedź (hint)
-                const hintIndex = impostorIds.indexOf(player.id) % selected.hints.length;
-                player.role = 'IMPOSTOR';
-                player.gameData = selected.hints[hintIndex];
-            } else {
-                // Przypisujemy pełne słowo
-                player.role = 'GRACZ';
-                player.gameData = selected.word;
-            }
+    room.players.forEach((player) => {
+        const isImpostor = impostorIds.includes(player.id);
+        
+        player.gameCat = category;
 
-            // Wysyłamy spersonalizowany start do każdego połączenia
-            io.to(player.id).emit('game_start', { 
-                role: player.role, 
-                data: player.gameData, 
-                gameCat: player.gameCat 
-            });
+        if (isImpostor) {
+            player.role = 'IMPOSTOR';
+            // 2. Każdy impostor dostaje tę samą, wylosowaną wyżej podpowiedź
+            player.gameData = sharedHint;
+        } else {
+            player.role = 'GRACZ';
+            player.gameData = selected.word;
+        }
+
+        // Wysyłamy dane do gracza
+        io.to(player.id).emit('game_start', { 
+            role: player.role, 
+            data: player.gameData, 
+            gameCat: player.gameCat 
         });
+    });
 
         // Aktualizacja listy pokojów dla osób w lobby
         io.emit('room_list', rooms);
