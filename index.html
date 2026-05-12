@@ -27,7 +27,7 @@
 </div>
     <div id="error-display"></div>
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
-    <div class="logo hidden" id="logo"><img src='logo4.png' width="300px"></div>
+    <div class="logo hidden" id="logo"><img src='logo4.png' width="250px"></div>
     <div id="screen-login">
         <div id="player-stats">
             <img src='icon-192.png' id="main-player-avatar" onclick="customizeAvatar()">
@@ -40,7 +40,7 @@
         </div>
         <span id="impostor-thoughts" style='color: var(--danger); text-shadow: 0 0 20px var(--danger); transition: 1s; opacity:0;'>Mądrości impostora</span>
         <div class="input-group">
-            <input type="text" id="input-name" placeholder="Twój nick" onchange="changeNick(); saveNick(this.value)">
+            <input type="text" maxlength="12" id="input-name" placeholder="Twój nick" onchange="changeNick(); saveNick(this.value)">
             <span class="symbol" 
             onclick="rollDice(this)">
             &#9860;
@@ -92,8 +92,9 @@
         <div id="host-vote-controls" class="hidden">
             <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
         </div>
+        <button onclick="leaveRoom()">Wyjdź z pokoju</button>
     </div>
-            <div id="screen-vote" class="hidden">
+    <div id="screen-vote" class="hidden">
         <h3><span style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
         <div id="vote-display">
         </div>
@@ -101,19 +102,45 @@
         <div id="host-end-controls" class="hidden">
             <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
         </div>
+        <button onclick="leaveRoom()">Wyjdź z pokoju</button>
     </div>
         <div id="screen-load" class="hidden">
         <h3><span id="loading-info">Ładowanie... </span><span id="loading-progress" style="color: var(--danger); text-shadow: 0 0 20px var(--danger);"></span></h3>
     </div>
+
+<!-- Ekran Wyników -->
+    <div id="screen-results" class="screen hidden">
+        <h1 style="color: var(--danger); text-shadow: 0 0 20px var(--danger);">KONIEC GRY</h1>
+        <h2 id="res-player-status" style="color: var(--danger); text-shadow: 0 0 20px var(--danger);">KONIEC GRY</h2>
+
+            <h3>Hasło: <span id="res-word" style="color: var(--secondary); text-shadow: 0 0 20px var(--secondary);">hasło</span></h3>
+                
+            <h3>Impostorzy:</h3>
+            <div id="res-impostors" class="res-player-display">
+                impostors
+            </div>
+
+            <h3>Wyrzuceni gracze:</h3>
+            <div id="res-kicked" class="res-player-display">
+                kicked
+            </div>
+            <p id="res-exp" style="color: var(--secondary);">exp</p>
+            <ul id="res-votes-details">
+                <!-- Opcjonalnie: kto ile dostał głosów -->
+            </ul>
+
+            <button onclick="location.reload()" class="btn-prymarny">Powrót do menu</button>
+    </div>
+
     <div id="screen-customize" class="hidden">
         <img src='icon-192.png' id="customize-player-avatar">
         <div id="customize-options">
 
-                <h3>Oczy:</h3>
+            <h3>Oczy:</h3>
             <div class="customize-category" id="eyes-customize">
 
             </div>
-                <h3>usta:</h3>
+            <h3 id="mouth-link">usta:</h3>
             <div class="customize-category" id="mouth-customize">
 
             </div>
@@ -172,7 +199,6 @@
     let playerAvatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
 
     window.onload = () => {
-
     const savedBotConfig = localStorage.getItem('botConfig');
     if (savedBotConfig) {
         try {
@@ -187,7 +213,6 @@
         }
     }
 
-// Po wczytaniu danych odświeżamy obrazek
     let savedNick = localStorage.getItem('savedNick');
     if (savedNick) document.getElementById("input-name").value = savedNick || "";
     changeNick();
@@ -210,35 +235,7 @@
     }
     console.log('Twoje UID: ' + userId);
 
-    const lastRoomCode = localStorage.getItem('lastRoomCode');
-
-    socket.emit('rejoin_room', { 
-        roomCode: lastRoomCode, 
-        userId: userId
-    });
-    // const savedSession = localStorage.getItem('impostor_session');
-    
-    // if (savedSession) {
-    //     const data = JSON.parse(savedSession);
-        
-    //     document.getElementById("input-name").value = data.nickName || "";
-
-    //     // Sprawdź, czy sesja nie jest zbyt stara (np. starsza niż 2 godziny)
-    //     const expireTime = 1 * 60 * 60 * 1000;
-    //     if (Date.now() - data.timestamp < expireTime) {
-            
-    //         // Informujemy serwer, że wracamy
-    //         socket.emit('rejoin_room', { 
-    //             roomCode: data.roomCode,
-    //         });
-
-    //         // Od razu ustawiamy UI (rola, podpowiedzi), żeby gracz nie widział pustki
-    //     } else {
-    //         localStorage.removeItem('impostor_session'); // Stara sesja, usuwamy
-    //     }
-    // }
-
-            const mouthCustom = document.getElementById('mouth-customize');
+        const mouthCustom = document.getElementById('mouth-customize');
         const eyesCustom = document.getElementById('eyes-customize');
         const bgCustom = document.getElementById('background-customize');
 
@@ -261,7 +258,7 @@
         // 3. Generowanie KOLORÓW TŁA (Przykładowa paleta)
         const diceBearPalette = [
         "f44336", "e91e63", "9c27b0", "673ab7", "3f51b5", 
-        "2196f3", "03a9f4", "00bcd4", "009688", "4caf50", 
+        "2196f3", "009688", "4caf50", 
         "8bc34a", "cddc39", "ffeb3b", "ffc107", "ff9800", 
         "ff5722", "795548", "9e9e9e", "607d8b", "263238"
         ];
@@ -276,20 +273,6 @@
         //document.getElementById('customize-options').style.backgroundImage = `url(https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background})`;
 
     };
-
-    // function saveGameSession(newData) {
-    // // Pobierz obecną sesję lub stwórz pusty obiekt
-    // const currentSession = JSON.parse(localStorage.getItem('impostor_session')) || {};
-    
-    // // Połącz stare dane z nowymi (Object.assign lub spread operator)
-    // const updatedSession = {
-    //     ...currentSession,
-    //     ...newData,
-    //     timestamp: Date.now()
-    // };
-    
-    // localStorage.setItem('impostor_session', JSON.stringify(updatedSession));
-    // }
     
     function customizeAvatar() {
         showScreen('screen-customize');
@@ -369,11 +352,11 @@
 
     // Funkcje pomocnicze do przełączania ekranów
     function showScreen(screenId) {
-        ['screen-login', 'screen-lobby', 'screen-game','screen-vote','screen-load','screen-customize'].forEach(id => {
+        ['screen-login', 'screen-lobby', 'screen-game','screen-vote','screen-load','screen-customize','screen-results'].forEach(id => {
             document.getElementById(id).classList.add('hidden');
         });
         document.getElementById(screenId).classList.remove('hidden');
-        if(screenId == 'screen-login' || screenId == 'screen-customize'){document.getElementById('logo').classList.add('hidden'); document.getElementById('player-stats').classList.remove('hidden');}
+        if(screenId == 'screen-login' || screenId == 'screen-customize' || screenId == 'screen-results'){document.getElementById('logo').classList.add('hidden'); document.getElementById('player-stats').classList.remove('hidden');}
         else{document.getElementById('logo').classList.remove('hidden'); document.getElementById('player-stats').classList.add('hidden');}
     }
 
@@ -400,16 +383,13 @@
         
         // Czyścimy dane z pamięci przeglądarki, żeby nie próbował robić rejoin
         localStorage.removeItem('lastRoomCode');
-        
-        // Powrót do menu głównego
-        window.location.reload(); 
-}
+    }
 
 // Opcjonalnie obsłuż potwierdzenie z serwera
-socket.on('left_room_success', () => {
-    console.log("Pomyślnie opuszczono pokój.");
-    showScreen('screen-main'); // Przełącz na ekran startowy
-});
+    socket.on('left_room_success', () => {
+        console.log("Pomyślnie opuszczono pokój.");
+        showScreen('screen-login'); // Przełącz na ekran startowy
+    });
 
     function castVote() {
         if(confirm("Zacząć głosowanie?")) socket.emit('cast_vote', currentRoomCode);
@@ -525,7 +505,7 @@ socket.on('left_room_success', () => {
         display.className = data.role === 'IMPOSTOR' ? 'role-impostor' : 'role-citizen';
         document.getElementById('role-name').innerText = data.role;
         document.getElementById('role-data').innerText = data.data;
-        document.getElementById('category-display').innerText += data.gameCat;
+        document.getElementById('category-display').innerText = data.gameCat;
 
         // Pokazujemy przycisk końca tylko hostowi (możesz to sprawdzić po socket.id)
         socket.emit('check_host', currentRoomCode);
@@ -535,70 +515,73 @@ socket.on('left_room_success', () => {
         const screenVote = document.getElementById('vote-display');
         showScreen('screen-vote');
         let html = "";
-        room.players.forEach(p => {html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.id}")'
-        style="background-image: url('${p.bot}')"> ${p.name} </div>`;   
+        room.players.forEach(p => {
+            // Zmieniono "${p.id}" na "${p.userId}"
+            html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.userId}")'
+            style="background-image: url('${p.bot}')"> ${p.name} </div>`;   
+        });
         screenVote.innerHTML = html;
-        })
-        // if (socket.id === room.host) {
-        // document.getElementById('host-end-controls').classList.remove('hidden');
-        // }
     });
 
     socket.on('is_host', (isHost) => {
         // To zdarzenie powinno odblokowywać wszystkie przyciski hosta na różnych ekranach
+        const hostVoteControls = document.getElementById('host-vote-controls'); // Przycisk "Zacznij głosowanie"
+        const hostEndControls = document.getElementById('host-end-controls');   // Przycisk "Zakończ grę"
+        const hostGameControls = document.getElementById('host-controls');
         if (isHost) {
-            const hostGameControls = document.getElementById('host-vote-controls'); // Przycisk "Zacznij głosowanie"
-            const hostEndControls = document.getElementById('host-end-controls');   // Przycisk "Zakończ grę"
             
             if(hostGameControls) hostGameControls.classList.remove('hidden');
             if(hostEndControls) hostEndControls.classList.remove('hidden');
-            document.getElementById('host-controls').classList.remove('hidden');
+            if(hostVoteControls) hostVoteControls.classList.remove('hidden');
 
-                document.querySelectorAll('.waiting-msg').forEach(el => {
-                    el.classList.add('hidden');
-                })
+            document.querySelectorAll('.waiting-msg').forEach(el => {
+                el.classList.add('hidden');
+            })
+        } else {
+            if(hostGameControls) hostGameControls.classList.add('hidden');
+            if(hostEndControls) hostEndControls.classList.add('hidden');
+            if(hostVoteControls) hostVoteControls.classList.add('hidden');
+
+            document.querySelectorAll('.waiting-msg').forEach(el => {
+                el.classList.remove('hidden');
+            })
         }
     });
 
-socket.on('game_over', (results) => {
-    // 1. Zmiana ekranu na ładowanie/wyniki
-    showScreen('screen-load');
-    
-    const loadingInfo = document.getElementById('loading-info');
-    const loadingProgress = document.getElementById('loading-progress');
+    socket.on('game_over', (room) => {
+    showScreen('screen-results');
+    console.log(room);
+    document.getElementById('res-word').innerText = room.results.word;
 
-    // 2. Przygotowanie głównej informacji o wygranej/przegranej
-    loadingInfo.innerHTML = `<span style="font-size: 1.5rem; display: block; margin-bottom: 10px;">KONIEC GRY</span>`;
-    
-    // 3. Budowanie treści wyników
-    let resultsHTML = `
-        <div style="text-align: center; line-height: 1.6;">
-            <p>Impostorzy: <span style="color: var(--danger)">${results.impostorNames.join(', ')}</span></p>
-            <p>Hasło: <span style="color: var(--secondary)">${results.word}</span></p>
-            <hr style="border-color: rgba(255,255,255,0.1); margin: 15px 0;">
-            <p style="text-transform: uppercase; font-weight: bold;">Wyrzuceni z pokoju:</p>
-            <p style="color: #ff4d4d; font-size: 1.2rem;">${results.kickedPlayers.length > 0 ? results.kickedPlayers.join(' oraz ') : 'Nikt (remis/brak głosów)'}</p>
-        </div>
-    `;
+    const impostorsDiv = document.getElementById('res-impostors');
+    impostorsDiv.innerHTML = room.results.impostorNames.map(i => 
+        `<div class="res-player-tile" style="background-image: url('${i.bot}')"> ${i.name} </div>`
+    ).join("");
 
-    loadingProgress.innerHTML = resultsHTML;
-
-    playerExp += 50;
-    updateExp(playerExp);
-    localStorage.removeItem('lastRoomCode');
-    // 4. Zamiast nagłego reloadu, dodajemy przycisk powrotu lub długie opóźnienie
-    // Usunąłem setTimeout z reloadem, aby gracz mógł przeczytać wyniki. 
-    // Lepiej dodać przycisk "Powrót do menu" po 5 sekundach.
+    const kickedDiv = document.getElementById('res-kicked');
+    kickedDiv.innerHTML = room.results.kickedPlayers.map(k => 
+        `<div class="res-player-tile" style="background-image: url('${k.bot}')"> ${k.name} </div>`
+    ).join("");
     
-    setTimeout(() => {
-        const btn = document.createElement('button');
-        btn.className = "btn-join";
-        btn.style.marginTop = "20px";
-        btn.innerText = "POWRÓT DO MENU";
-        btn.onclick = () => location.reload();
-        loadingProgress.appendChild(btn);
-    }, 3000);
-});
+    const thisPlayer = room.players.find(p => p.userId === userId);
+    const wasIKicked = room.results.kickedPlayers.some(player => player.userId === userId);
+
+    if(wasIKicked){
+        document.getElementById("res-player-status").innerText = "Zostałeś zabity!";
+    }else{
+        document.getElementById("res-player-status").innerText = "Przeżyłeś!";
+    }
+    let gainedExp = 0;
+
+    gainedExp += 10;
+    gainedExp += (room.players.length*5);
+    if(!wasIKicked) gainedExp += 10;
+
+    if(room.results.winner == thisPlayer.role) gainedExp *= 1.5;
+    document.getElementById('res-exp').innerHTML = `Zdobyty exp: ${gainedExp}`;
+    playerExp += Math.floor(gainedExp);
+    updateExp(playerExp)
+    });
 
     socket.on('room_list', (roomsObject) => {
     const listContainer = document.getElementById('rooms-list');
@@ -655,6 +638,19 @@ socket.on('game_over', (results) => {
         currentRoomCode = localStorage.getItem('lastRoomCode');
     })
 
+    socket.on("connect", () => {
+        const lastRoomCode = localStorage.getItem('lastRoomCode');
+
+        socket.emit('rejoin_room', { 
+        roomCode: lastRoomCode, 
+        userId: userId
+    });
+    });
+
+    // Opcjonalnie: obsługa błędów połączenia
+    socket.on("connect_error", (error) => {
+    console.error("Błąd połączenia:", error.message);
+    });
 
 
 

@@ -107,11 +107,7 @@ io.on('connection', (socket) => {
 
             case 'finished':
                 // Jeśli pokój jeszcze istnieje, wysyłamy wyniki końcowe
-                socket.emit('game_over', {
-                    ...room.results,
-                    votes: room.playerChoices || {},
-                    kickedPlayers: room.results.kickedPlayers || []
-                });
+                socket.emit('game_over', room.results);
                 break;
         }
         socket.emit('rejoin_failed', false);
@@ -128,10 +124,8 @@ socket.on('start_game', ({ roomCode, category, impostorCount }) => {
     const room = rooms[roomCode];
     if (!room) return;
 
-    // Szukamy obiektu gracza po aktualnym socket.id
     const player = room.players.find(p => p.id === socket.id);
     
-    // Sprawdzamy czy ten gracz (jego userId) jest hostem pokoju
     if (!player || room.host !== player.userId) return;
     
         if (room.players.length < (parseInt(impostorCount) + 1)) {
@@ -153,7 +147,7 @@ socket.on('start_game', ({ roomCode, category, impostorCount }) => {
         room.status = 'playing';
         room.impostorCount = impostorCount;
         room.results = { 
-            impostorNames: impostors.map(i => i.name), 
+            impostorNames: impostors,
             word: selected.word 
         };
 
@@ -215,113 +209,76 @@ socket.on('cast_vote', (roomCode) => {
         }
     });
 
-    socket.on('end_game', (roomCode) => {
-        const room = rooms[roomCode];
-        if (!room) return;
+socket.on('end_game', (roomCode) => {
+    const room = rooms[roomCode];
+    if (!room) return;
 
-        // Znajdujemy gracza wysyłającego żądanie
-        const requester = room.players.find(p => p.id === socket.id);
+    const requester = room.players.find(p => p.id === socket.id);
 
-        // Weryfikacja uprawnień hosta (po userId)
-        if (requester && room.host === requester.userId && room.status === 'voting') {
-            const finalVotes = {}; 
-            
-            // Zliczanie głosów
-            if (room.playerChoices) {
-                Object.values(room.playerChoices).forEach(choiceArray => {
-                    choiceArray.forEach(targetId => {
-                        finalVotes[targetId] = (finalVotes[targetId] || 0) + 1;
-                    });
+    if (requester && room.host === requester.userId && room.status === 'voting') {
+        const finalVotes = {}; 
+        
+        if (room.playerChoices) {
+            Object.values(room.playerChoices).forEach(choiceArray => {
+                choiceArray.forEach(targetUserId => {
+                    finalVotes[targetUserId] = (finalVotes[targetUserId] || 0) + 1;
                 });
-            }
-
-            // 1. Sortujemy ID graczy po ilości głosów
-            const sortedVotedIds = Object.keys(finalVotes).sort((a, b) => finalVotes[b] - finalVotes[a]);
-
-            // 2. Pobieramy liczbę impostorów i wyznaczamy "wyrzuconych"
-            const impostorCount = parseInt(room.impostorCount) || 1;
-            const kickedIds = sortedVotedIds.slice(0, impostorCount);
-
-            // 3. Mapujemy ID na nazwy (używając find, co jest bezpieczne przy reconnectach)
-            const kickedPlayerNames = kickedIds.map(id => {
-                const p = room.players.find(player => player.id === id);
-                return p ? p.name : "Nieznany gracz";
             });
-            
-            const enrichedResults = {
-                ...room.results,
-                votes: finalVotes,
-                kickedPlayers: kickedPlayerNames
-            };
-
-            io.to(roomCode).emit('game_over', enrichedResults);
-            room.status = 'finished';
-
-            // Sprzątanie pokoju (zwiększono do 5s, by każdy zdążył odebrać wyniki)
-            setTimeout(() => {
-                if (rooms[roomCode] && rooms[roomCode].status === 'finished') {
-                    delete rooms[roomCode];
-                    io.emit('room_list', rooms);
-                }
-            }, 5000);
-        } else if (!requester || room.host !== requester.userId) {
-            socket.emit('error', 'Tylko host może zakończyć grę!');
         }
-    });
 
-socket.on('send_vote', (roomCode, selectedPlayers) => {
+        const sortedVotedUserIds = Object.keys(finalVotes).sort((a, b) => finalVotes[b] - finalVotes[a]);
+        const impostorCount = parseInt(room.impostorCount) || 1;
+        const kickedUserIds = sortedVotedUserIds.slice(0, impostorCount);
+
+        // ZMIANA: Pobieramy pełne obiekty graczy dla wyrzuconych
+        const kickedPlayersObjects = kickedUserIds.map(uId => {
+            return room.players.find(player => player.userId === uId);
+        }).filter(p => p); // Usuwamy undefined jeśli gracz zniknął
+
+        const actualImpostorIds = room.results.impostorNames.map(i => i.userId);
+        const allImpostorsCaught = actualImpostorIds.every(id => kickedUserIds.includes(id));
+
+        let winner = allImpostorsCaught ? "GRACZ" : "IMPOSTOR";
+
+        const enrichedResults = {
+            ...room.results,
+            votes: finalVotes,
+            kickedPlayers: kickedPlayersObjects,
+            winner: winner
+        };
+
+        // Zapisujemy wyniki w pokoju (ważne dla Rejoin!)
+        room.results = enrichedResults; 
+        room.status = 'finished';
+
+        io.to(roomCode).emit('game_over', room);
+
+        setTimeout(() => {
+            if (rooms[roomCode] && rooms[roomCode].status === 'finished') {
+                delete rooms[roomCode];
+                io.to(roomCode).emit('force_reload');
+                io.emit('room_list', rooms);
+            }
+        }, 10000); // Zwiększyłem do 10s, żeby gracze zdążyli zobaczyć wyniki
+    }
+});
+
+socket.on('send_vote', (roomCode, selectedUserIds) => { // selectedUserIds zamiast socketId
     const room = rooms[roomCode];
     if (!room || room.status !== 'voting') return;
 
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+
     if (!room.playerChoices) room.playerChoices = {};
 
-    // Nadpisujemy stary wybór tego gracza nową listą ID
-    // Jeśli gracz wszystko odznaczył, selectedPlayers będzie pustą tablicą []
-    room.playerChoices[socket.id] = selectedPlayers;
+    // Kluczem w playerChoices staje się userId głosującego, 
+    // a wartością tablica userId osób, na które głosuje.
+    room.playerChoices[player.userId] = selectedUserIds;
 
-    console.log(`Gracz ${socket.id} zmienił wybór na:`, selectedPlayers);
+    console.log(`Gracz ${player.name} (userId: ${player.userId}) zmienił wybór na:`, selectedUserIds);
 });
 
-// socket.on('disconnect', () => {
-//     console.log(`🔌 Rozłączono: ${socket.id}`);
-
-//     for (const code in rooms) {
-//         const room = rooms[code];
-//         const playerIndex = room.players.findIndex(p => p.id === socket.id);
-
-//         if (playerIndex !== -1) {
-//             const isHost = (room.host === socket.id);
-//             const playerName = room.players[playerIndex].name;
-
-//             // 1. Usuwamy gracza z tablicy
-//             room.players.splice(playerIndex, 1);
-
-//             console.log(`🏃 Gracz ${playerName} wyszedł z pokoju ${code}.`);
-
-//             // 2. SPRAWDZENIE: Czy w pokoju ktokolwiek został?
-//             if (room.players.length === 0) {
-//                 console.log(`🗑️ Pokój ${code} jest pusty - usuwam go.`);
-//                 delete rooms[code];
-//             } 
-//             // 3. SPRAWDZENIE: Czy wyszedł host?
-//             else if (isHost && room.status == 'waiting') {
-//                 console.log(`👑 Host wyszedł z pokoju ${code}. Zamykam grę dla wszystkich.`);
-//                 // Informujemy pozostałych graczy, że host wyszedł i muszą przeładować stronę
-//                 io.to(code).emit('force_reload', 'Host opuścił pokój. Gra została zakończona.');
-//                 delete rooms[code]; // Usuwamy pokój, bo bez hosta gra nie ma sensu
-//             } 
-//             // 4. Jeśli wyszedł zwykły gracz i inni zostali
-//             else {
-//                 if(room.status == 'waiting')
-//                 io.to(code).emit('room_update', room);
-//             }
-
-//             // Aktualizacja globalnej listy pokojów dla osób w lobby
-//             io.emit('room_list', rooms);
-//             break; 
-//         }
-//     }
-// });
     socket.on('leave_room', (roomCode) => {
             const room = rooms[roomCode];
             if (!room) return;
@@ -340,11 +297,15 @@ socket.on('send_vote', (roomCode, selectedPlayers) => {
                 console.log(`Gracz ${player.name} opuścił pokój ${roomCode}`);
 
                 // 2. Czy pokój jest pusty?
+                if (room.players.length < 2 && room.status == "playing") {
+                    io.to(roomCode).emit('left_room_success');
+                    delete rooms[roomCode];
+                } 
                 if (room.players.length === 0) {
                     delete rooms[roomCode];
                 } 
                 // 3. Czy wyszedł host, ale zostali inni gracze?
-                else if (isHost) {
+                else if (isHost && (room.status == "waiting" || room.status == "voting")) {
                     // Opcja A: Przekazujemy hosta następnej osobie
                     room.host = room.players[0].userId;
                     io.to(room.players[0].id).emit('is_host', true);
@@ -353,7 +314,7 @@ socket.on('send_vote', (roomCode, selectedPlayers) => {
                     console.log(`Nowy host w pokoju ${roomCode}: ${room.players[0].name}`);
                 } 
                 // 4. Wyszedł zwykły gracz
-                else {
+                else if(room.status == "waiting"){
                     io.to(roomCode).emit('room_update', room);
                 }
 

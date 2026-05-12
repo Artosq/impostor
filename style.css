@@ -125,6 +125,7 @@ button {
     margin-top: 5px; 
     margin-bottom: 5px; 
     user-select: none;
+    color: black;
 }
 .btn-create { 
     border: 5px solid var(--primary); 
@@ -165,8 +166,16 @@ button {
     transform: scale(1.05);
 }
 .btn-end { 
-    background: var(--danger); 
+    border: 5px solid var(--danger); 
+    color: var(--danger); 
+    background-color: transparent;
+}
+.btn-end:hover { 
+    border: 5px solid transparent; 
     color: white; 
+    background-color: var(--danger);
+    box-shadow: 0 0 20px var(--danger); 
+    transform: scale(1.05);
 }
 
 .avatar-container {
@@ -238,6 +247,7 @@ button {
     filter: brightness(0%);
     transition: 1s;
     user-select: none;
+    margin-bottom: 20px;
 }
 .role-impostor { 
     background: var(--danger); 
@@ -347,15 +357,16 @@ animation: fadeIn 0.5s ease-in;
 .customize-category{
     display: grid;
     box-sizing: border-box;
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(4, minmax(0, 1fr)); 
     gap: 5px; 
-    margin-bottom: 20px;
+    margin-bottom: 100px;
     width: 100%;
 }
 .customize-tile{
     animation: fadeIn 1s;
     aspect-ratio: 1/1;
     flex: 1;
+    max-width: 100px;
     border-radius: 10px;
     background-color: rgba(163, 163, 163,0.5);
     border: 5px solid black;
@@ -426,6 +437,7 @@ animation: fadeIn 0.5s ease-in;
 
     gap: 10px; 
     width: 100%;
+    margin-bottom: 20px;
 }
 .vote-tile{
     aspect-ratio: 1 / 1;
@@ -433,19 +445,53 @@ animation: fadeIn 0.5s ease-in;
     background-color: #2b2b2b;
     display: flex;
     justify-content: center;
-    align-items:end;
+    align-items: end;
     border-radius: 10px;
     transition: 0.5s;
     border: 5px solid #141414;
     filter: saturate(0%);
     user-select: none;
     font-size: small;
+    box-sizing: border-box;
+
+    overflow: hidden;       /* Wszystko co wystaje, zostanie ukryte */
+    white-space: nowrap;    /* Nick zawsze będzie w jednej linii */
 }
 .vote-tile.selected{
     filter: saturate(100%);
     box-shadow: 0 0 20px var(--secondary);
 }
 
+.names-list {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 1.2rem;
+}
+
+.res-player-tile{
+    width: 70px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    border-radius: 10px;
+    border: 5px solid black;
+    font-size: 10px;
+    background-size: cover;
+    background-position: center;
+    color: white;
+
+    overflow: hidden;
+}
+
+.res-player-display{
+    display: flex;
+    justify-content: center;
+    gap: 5px; 
+    width: 100%;
+}
 /* DEFINICJA RUCHU BŁYSKU */
 @keyframes shine-effect {
     0% {
