@@ -36,7 +36,8 @@ io.on('connection', (socket) => {
             code: roomCode,
             host: userId,
             players: [{ userId: userId, id: socket.id, name: playerName, bot: playerBot}],
-            status: 'waiting'
+            status: 'waiting',
+            lastActivity: Date.now();
         };
         io.emit('room_list', rooms);
         socket.join(roomCode);
@@ -123,6 +124,7 @@ io.on('connection', (socket) => {
 socket.on('start_game', ({ roomCode, category, impostorCount }) => {
     const room = rooms[roomCode];
     if (!room) return;
+    room.lastActivity = Date.now();
 
     const player = room.players.find(p => p.id === socket.id);
     
@@ -191,6 +193,7 @@ socket.on('start_game', ({ roomCode, category, impostorCount }) => {
 socket.on('cast_vote', (roomCode) => {
         const room = rooms[roomCode];
         if (!room) return;
+        room.lastActivity = Date.now();
 
         // Znajdujemy gracza wysyłającego żądanie wewnątrz pokoju
         const requester = room.players.find(p => p.id === socket.id);
@@ -212,6 +215,7 @@ socket.on('cast_vote', (roomCode) => {
 socket.on('end_game', (roomCode) => {
     const room = rooms[roomCode];
     if (!room) return;
+    room.lastActivity = Date.now();
 
     const requester = room.players.find(p => p.id === socket.id);
 
@@ -325,6 +329,23 @@ socket.on('send_vote', (roomCode, selectedUserIds) => { // selectedUserIds zamia
         });
 
     });
+
+    setInterval(() => {
+    const now = Date.now();
+    Object.keys(rooms).forEach(roomCode => {
+        const room = rooms[roomCode];
+        
+        // Jeśli w pokoju nikt nie był aktywny przez 30 minut
+        // LUB jeśli status to 'finished' i minęło 15 sekund
+        const isExpired = now - room.lastActivity > 10 * 60 * 1000;
+        
+        if (isExpired || room.players.length === 0) {
+            delete rooms[roomCode];
+            console.log(`Sprzątacz usunął pokój widmo: ${roomCode}`);
+        }
+    });
+    io.emit('room_list', rooms);
+    }, 30000);
 
 const PORT = process.env.PORT || 10000;
 server.listen(PORT, '0.0.0.0', () => {
