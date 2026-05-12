@@ -37,7 +37,7 @@ io.on('connection', (socket) => {
             host: userId,
             players: [{ userId: userId, id: socket.id, name: playerName, bot: playerBot}],
             status: 'waiting',
-            lastActivity: Date.now();
+            lastActivity: Date.now()
         };
         io.emit('room_list', rooms);
         socket.join(roomCode);
