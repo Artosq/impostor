@@ -247,7 +247,7 @@ button {
     box-sizing: border-box;
     width: 100%;
     aspect-ratio: 1/1;
-    filter: brightness(0%);
+    filter: brightness(100%);
     transition: 1s;
     user-select: none;
     margin-bottom: 20px;
