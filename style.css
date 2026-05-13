@@ -45,6 +45,9 @@ body {
 .screen{
     animation: screenFadeIn 0.5s;
 }
+.room-item{
+    animation: fadeIn 0.5s;
+}
 #error-display{
     transition: 0.8s ease-in-out;
     opacity: 0;
