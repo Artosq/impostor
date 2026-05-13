@@ -30,7 +30,6 @@ body {
     z-index: -1; /* Pod kartą */
     pointer-events: none; /* Kliknięcia przechodzą "przez" canvas */
 }
-
 #card { 
     background: rgb(31, 31, 31); 
     padding: 30px; 
@@ -42,6 +41,9 @@ body {
     position: relative;
     overflow: hidden;
     transition: 1s ease-in-out;
+}
+.screen{
+    animation: screenFadeIn 0.5s;
 }
 #error-display{
     transition: 0.8s ease-in-out;
@@ -89,7 +91,6 @@ input{
 input:focus{
     background-color:rgba(255, 255, 255, 0.2);;
     outline: none;
-    box-shadow: inset 0 0 10px white;
 }
 
 .input-group {
@@ -264,6 +265,11 @@ animation: fadeIn 0.5s ease-in;
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes screenFadeIn {
+    from { opacity: 0;}
+    to { opacity: 1;}
+}
+
 .logo {
     font-size: 3rem;
     font-weight: 800;
@@ -337,33 +343,55 @@ animation: fadeIn 0.5s ease-in;
 #customize-player-avatar{
     width: 60%;
     border-radius: 20px;
-    animation: fadeIn 1s;
+    animation: fadeIn 0.5s;
     border: 10px solid black;
     box-sizing: border-box;
     margin-bottom: 10px;
 }
+#customize-categories-panel{
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px; 
+    width: 100%;
+}
+.customize-categories-tile{
+    padding: 10px 5px;
+    background: rgb(53, 53, 53);
+    border: 5px solid rgb(22, 22, 22);
+    color: white;
+    border-radius: 10px;
+    font-size: 0.8em; /* Mniejszy druk, żeby zmieściły się w rzędzie */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 100%;
+}
+.customize-categories-tile.selected{
+    box-shadow: 0 0 20px var(--danger);
+}
+
 #customize-options{
     box-sizing: border-box;
     width: 100%;
     aspect-ratio: 1/1;
     overflow-y: scroll;
     overflow-x: visible;
-    padding: 0 20px;
-    border: 5px solid black;
+    padding: 20px;
+    border: 5px solid rgb(22, 22, 22);
     border-radius: 10px;
     background-color: #333333;
     margin-bottom: 10px;
 }
 .customize-category{
+    animation: fadeIn 0.5s;
     display: grid;
     box-sizing: border-box;
     grid-template-columns: repeat(4, minmax(0, 1fr)); 
     gap: 5px; 
-    margin-bottom: 20px;
     width: 100%;
 }
 .customize-tile{
-    animation: fadeIn 1s;
     aspect-ratio: 1/1;
     flex: 1;
     box-sizing: border-box;
@@ -371,7 +399,7 @@ animation: fadeIn 0.5s ease-in;
     border-radius: 10px;
     background-color: rgba(163, 163, 163,0.5);
     border: 5px solid black;
-    transition: 0.5s;
+    transition: all 0.5s;
 }
 .customize-tile.selected{
     box-shadow: 0 0 20px var(--secondary);

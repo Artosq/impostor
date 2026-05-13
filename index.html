@@ -29,7 +29,7 @@
     <div id="error-display"></div>
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
     <div class="logo hidden" id="logo"><img src='logo4.png' width="250px"></div>
-    <div id="screen-login">
+    <div id="screen-login" class="screen">
         <div id="player-stats">
             <img src='icon-192.png' id="main-player-avatar" onclick="customizeAvatar()">
             <div id="player-stats-rest">
@@ -53,7 +53,7 @@
         <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
         <div id="rooms-list"></div>
     </div>
-    <div id="screen-lobby" class="hidden">
+    <div id="screen-lobby" class="screen hidden">
         <h3>Kod pokoju: <span id="room-code-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">----</span></h3>
 
         <div id="players-list"></div>
@@ -80,7 +80,7 @@
         <button onclick="leaveRoom()">Wyjdź z pokoju</button>
     </div>
 
-    <div id="screen-game" class="hidden">
+    <div id="screen-game" class="screen hidden">
         <h3>Kategoria: <span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);"></span></h3>
         <div id="role-display" ontouchstart="this.style.filter = 'brightness(100%)'; " ontouchend="this.style.filter = 'brightness(0%)'">
             <p>Twoja rola:</p>
@@ -95,7 +95,7 @@
         </div>
         <button onclick="leaveRoom()">Wyjdź z pokoju</button>
     </div>
-    <div id="screen-vote" class="hidden">
+    <div id="screen-vote" class="screen hidden">
         <h3><span style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
         <div id="vote-display">
         </div>
@@ -133,20 +133,24 @@
             <button onclick="location.reload()" class="btn-prymarny">Powrót do menu</button>
     </div>
 
-    <div id="screen-customize" class="hidden">
+    <div id="screen-customize" class="screen hidden">
         <img src='icon-192.png' id="customize-player-avatar">
+
+        <div id="customize-categories-panel">
+            <button class="customize-categories-tile selected" onclick="changeCustomizeCategory(this, 'eyes-customize')">Oczy</button>
+            <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'mouth-customize')">Buzia</button>
+            <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'background-customize')">Tło</button>
+        </div>
+
         <div id="customize-options">
 
-            <h3>Oczy:</h3>
             <div class="customize-category" id="eyes-customize">
 
             </div>
-            <h3 id="mouth-link">usta:</h3>
-            <div class="customize-category" id="mouth-customize">
+            <div class="customize-category hidden" id="mouth-customize">
 
             </div>
-            <h3>tło:</h3>
-            <div class="customize-category" id="background-customize">
+            <div class="customize-category hidden" id="background-customize">
                 
             </div>
         </div>
@@ -277,6 +281,19 @@
     
     function customizeAvatar() {
         showScreen('screen-customize');
+    }
+
+    function changeCustomizeCategory(element, category){
+
+        document.querySelectorAll(".customize-category").forEach(el => {
+            el.classList.add("hidden");
+        })
+        document.getElementById(category).classList.remove("hidden");
+
+        document.querySelectorAll(".customize-categories-tile").forEach(el => {
+            el.classList.remove("selected");
+        })
+        element.classList.add("selected");
     }
 
     // Funkcja pomocnicza do zmiany części i odświeżenia widoku
