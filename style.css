@@ -244,7 +244,7 @@ button {
     padding: 20px; 
     border-radius: 10px; 
     color: white; 
-    filter: brightness(100%);
+    filter: brightness(0%);
     transition: 1s;
     user-select: none;
     margin-bottom: 20px;
