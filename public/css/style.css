@@ -195,7 +195,11 @@ button {
     transform: scale(1.05);
     box-shadow: 0 0 20px var(--secondary);
 }
-
+@media (display-mode: standalone) {
+    .btn-download{
+    display: none;
+}
+}
 .avatar-container {
     display: inline-flex;
     flex-direction: column;
