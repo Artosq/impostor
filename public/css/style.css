@@ -181,7 +181,7 @@ button {
     transform: scale(1.05);
 }
 .btn-download{
-    display: block;
+    display: none;
     border: 5px solid var(--secondary); 
     color: var(--secondary); 
     background-color: transparent;
