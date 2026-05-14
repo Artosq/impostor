@@ -9,8 +9,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#181818">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="scrollbar.css">
+    <link rel="stylesheet" href="public/css/style.css">
+    <link rel="stylesheet" href="public/css/scrollbar.css">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -28,6 +28,7 @@
 </div>
     <div id="error-display"></div>
     <div id="error-blur" style="transition: 0.8s ease-in-out;">
+    <button class="btn-download" id="btn-download">POBIERZ APLIKACJE IMPOSTOR</button>
     <div class="logo hidden" id="logo"><img src='logo4.png' width="250px"></div>
     <div id="screen-login" class="screen">
         <div id="player-stats">
@@ -670,6 +671,39 @@
     console.error("Błąd połączenia:", error.message);
     });
 
+let deferredPrompt;
+const installBtn = document.getElementById('btn-download');
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Zapobiegaj automatycznemu pokazywaniu paska przez Chrome
+    e.preventDefault();
+    // Zachowaj zdarzenie, aby wywołać je później
+    deferredPrompt = e;
+    // Pokaż przycisk, bo wiemy już, że PWA można zainstalować
+    installBtn.style.display = 'block';
+});
+
+installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    
+    // Pokaż systemowe okienko instalacji
+    deferredPrompt.prompt();
+    
+    // Czekaj na decyzję użytkownika
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`Użytkownik wybrał: ${outcome}`);
+    
+    // Czyścimy zmienną, bo promptu można użyć tylko raz
+    deferredPrompt = null;
+    installBtn.style.display = 'none';
+});
+
+// Ukryj przycisk, jeśli apka zostanie zainstalowana inną drogą
+window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    deferredPrompt = null;
+    console.log('PWA zainstalowane pomyślnie!');
+});
 
 
 
