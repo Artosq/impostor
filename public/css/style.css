@@ -1,0 +1,604 @@
+:root { 
+    --primary: #3498db;
+    --secondary: #2ecc71;
+    --danger: #e74c3c; 
+    --dark: #2c3e50; 
+}
+
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    font-family: "Silkscreen", sans-serif;
+    font-weight: 400;
+    background: #161616; 
+    display: flex; 
+    justify-content: center; 
+    padding: 15px;
+    color: #eee;
+    background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .2) 25%, rgba(255, 255, 255, .2) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .2) 75%, rgba(255, 255, 255, .2) 77%, transparent 78%, transparent),
+    linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .2) 25%, rgba(255, 255, 255, .2) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .2) 75%, rgba(255, 255, 255, .2) 77%, transparent 78%, transparent);
+    background-size: 70px 70px;
+}
+#rippleCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Pod kartą */
+    pointer-events: none; /* Kliknięcia przechodzą "przez" canvas */
+}
+#card { 
+    background: rgb(31, 31, 31); 
+    padding: 30px; 
+    border-radius: 15px; 
+    box-shadow: 0 10px 25px rgba(0,0,0,1); 
+    width: 100%; 
+    max-width: 350px; 
+    text-align: center; 
+    position: relative;
+    overflow: hidden;
+    transition: 1s ease-in-out;
+}
+.screen{
+    animation: screenFadeIn 0.5s;
+}
+.room-item{
+    animation: fadeIn 0.5s;
+}
+#error-display{
+    transition: 0.8s ease-in-out;
+    opacity: 0;
+    width: fit-content;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index:999;
+    padding: 10px;
+    opacity: 1;
+    border-radius: 5px;
+    color: var(--danger);
+    text-shadow: 0 0 20px var(--danger);
+    filter: none;
+}
+h1 { 
+    color: var(--dark); 
+    margin-bottom: 20px; 
+}
+input, select {
+    width: 100%; 
+    padding: 12px; 
+    margin: 10px 0; 
+    border: 1px solid #ddd; 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+}
+input{
+    font-family: "Silkscreen", sans-serif;
+    border-radius: 0px;
+    background-color: rgba(0, 0, 0, 0.3);
+    opacity: 1;
+    border: none;
+    border-bottom: 3px solid rgba(255, 255, 255, 0.5);
+    color: white;
+    transition: all 0.5s;
+    flex: 1
+}
+input:focus{
+    background-color:rgba(255, 255, 255, 0.2);;
+    outline: none;
+}
+
+.input-group {
+    display: flex;
+    align-items: center; /* Centrowanie pionowe symbolu i inputa */
+    width: 100%;
+}
+
+.symbol{
+    color: white;
+    margin-left: 10px;
+    padding-bottom: 5px;
+    user-select: none;
+    cursor: pointer; 
+    font-size: 60px;
+    transition: 0.6s;
+    line-height: 0;
+}
+.symbol:hover{
+    text-shadow: 0 0 10px white;
+}
+
+button { 
+    font-family: "Silkscreen", sans-serif;
+    width: 100%; 
+    padding: 12px; 
+    outline: none;
+    border: none; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    transition: 0.5s; 
+    margin-top: 5px; 
+    margin-bottom: 5px; 
+    user-select: none;
+    color: black;
+}
+.btn-create { 
+    border: 5px solid var(--primary); 
+    color: var(--primary); 
+    background-color: transparent;
+}
+.btn-create:hover { 
+    border: 5px solid transparent; 
+    color: white; 
+    background-color: var(--primary);
+    box-shadow: 0 0 20px var(--primary); 
+    transform: scale(1.05);
+}
+.btn-join { 
+    border: 5px solid var(--secondary); 
+    color: var(--secondary); 
+    background-color: transparent;
+}
+.btn-join:hover { 
+    border: 5px solid transparent; 
+    color: white; 
+    background-color: var(--secondary);
+    box-shadow: 0 0 20px var(--secondary); 
+    transform: scale(1.05);
+}
+.btn-start { 
+    border: 5px solid var(--secondary); 
+    color: var(--secondary); 
+    background-color: transparent;
+    font-size: 1.1em; 
+}
+.btn-start:hover { 
+    border: 5px solid transparent; 
+    color: white; 
+    background-color: var(--secondary);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--secondary);
+}
+.btn-end { 
+    border: 5px solid var(--danger); 
+    color: var(--danger); 
+    background-color: transparent;
+}
+.btn-end:hover { 
+    border: 5px solid transparent; 
+    color: white; 
+    background-color: var(--danger);
+    box-shadow: 0 0 20px var(--danger); 
+    transform: scale(1.05);
+}
+.btn-download{
+    display: block;
+    border: 5px solid var(--secondary); 
+    color: var(--secondary); 
+    background-color: transparent;
+    font-size: 1.1em; 
+    margin-bottom: 20px;
+}
+.btn-download:hover{
+    border: 5px solid transparent; 
+    color: white; 
+    background-color: var(--secondary);
+    transform: scale(1.05);
+    box-shadow: 0 0 20px var(--secondary);
+}
+
+.avatar-container {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin: 3px;
+    width: fit-content;
+    transition: 0.5s;
+    margin:10px 0 ;
+}
+
+.player-avatar {
+    width: 50px;
+    height: 50px;
+    background: transparent;
+    position: relative;
+    z-index: 1; /* Pod tekstem */
+    border-radius: 5px;
+    transition: 0.5s;
+    cursor: pointer; 
+}
+
+.player-tag { 
+    background: #eee; 
+    color: #141414;
+    padding: 5px 12px; /* Nieco szerszy padding dla lepszego balansu */
+    border-radius: 20px; 
+    display: inline-block;
+    
+    /* KLUCZOWE ZMIANY DLA EFEKTU NACHODZENIA */
+    position: relative;
+    z-index: 2;         /* Nad awatarem */
+    margin-top: -5px;  /* Podciąga nick do góry na awatar */
+    
+    font-size: 0.8em; 
+    box-shadow: 0px 5px 5px black;
+    font-style: italic;
+    font-weight: bolder;
+    user-select: none;
+    cursor: pointer;
+    
+    /* Dodatkowe wygładzenie */
+    text-align: center;
+    min-width: 60px;
+    transition: transform 0.2s;
+}
+
+.player-tag.this-player { 
+    background: var(--secondary);
+    box-shadow: 0px 5px 5px black, 0px 0px 20px var(--secondary);
+    color: black;
+}
+
+/* Opcjonalnie: efekt po najechaniu, skoro masz cursor: pointer */
+.avatar-container:hover{
+    transform: scale(1.1);
+}
+.avatar-container:hover .player-avatar{
+    outline: 5px solid white;
+}
+
+#role-display { 
+    padding: 20px; 
+    border-radius: 10px; 
+    color: white; 
+    box-sizing: border-box;
+    width: 100%;
+    filter: brightness(100%);
+    transition: 1s;
+    user-select: none;
+    margin-bottom: 20px;
+}
+.role-impostor { 
+    background: var(--danger); 
+}
+.role-citizen { 
+    background: var(--secondary); 
+}
+.player-tag, .player-avatar{ 
+animation: fadeIn 0.5s ease-in; 
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes screenFadeIn {
+    from { opacity: 0;}
+    to { opacity: 1;}
+}
+
+.logo {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #ffffff; /* Kolor bazowy tekstu */
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    position: relative;
+    display: inline-block;
+    overflow: hidden; /* KLUCZOWE: Ucina błysk poza tekstem */
+    user-select: none;
+    
+    /* Dodajemy lekki cień bazowy, by tekst był czytelny */
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#main-player-avatar:hover{
+    box-shadow: 0 0 20px black;
+    transform: scale(1.05);
+}
+
+#main-exp-wrapper:hover{
+    box-shadow: 0 0 20px black;
+    transform: scale(1.05);
+}
+
+#player-stats {
+    display: flex;
+    align-items: end; /* Wyśrodkowanie awatara i statystyk względem siebie */
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;
+    height: auto;
+}
+
+#main-player-avatar {
+    width: 100px;
+    border-radius: 10px;
+    border: 5px solid black;
+    flex-shrink: 0;
+    transition: 0.5s;
+    object-fit: cover;
+}
+
+#player-stats-rest {
+    flex: 1;         /* Pozwala statystykom zająć resztę miejsca */
+    display: flex;
+    justify-content: left;
+    flex-direction: column; /* Napis EXP nad paskiem */
+    gap: 5px;             /* Elegancki odstęp między napisem a paskiem */
+    margin-left: 10px;    /* Teraz ten margines będzie wyraźnie widoczny */
+}
+
+#main-exp-wrapper {
+    width: 100%;          /* Wypełnia całą szerokość player-stats-rest */
+    border: 5px solid black;
+    background-color: #161616;
+    border-radius: 100px;
+    transition: 0.5s;
+    padding: 3px;
+    box-sizing: border-box; /* Ważne: padding nie powiększa wrappera */
+}
+
+/* Canvas musi wypełniać wrapper */
+#progressCanvas {
+    width: 100%;
+    height: 25px;         /* Ustaw stałą wysokość paska */
+    display: block;       /* Usuwa domyślny margines pod obrazkiem */
+    box-shadow: 0 0 10px var(--secondary);
+    border-radius: 50px;
+}
+#customize-player-avatar{
+    width: 60%;
+    border-radius: 20px;
+    animation: fadeIn 0.5s;
+    border: 10px solid black;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+#customize-categories-panel{
+    box-sizing: border-box;
+    margin-bottom: 10px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px; 
+    width: 100%;
+}
+.customize-categories-tile{
+    padding: 10px 5px;
+    background: rgb(53, 53, 53);
+    border: 5px solid rgb(22, 22, 22);
+    color: white;
+    border-radius: 10px;
+    font-size: 0.8em; /* Mniejszy druk, żeby zmieściły się w rzędzie */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 100%;
+}
+.customize-categories-tile.selected{
+    box-shadow: 0 0 20px var(--danger);
+}
+
+#customize-options{
+    box-sizing: border-box;
+    width: 100%;
+    aspect-ratio: 1/1;
+    overflow-y: scroll;
+    overflow-x: visible;
+    padding: 20px;
+    border: 5px solid rgb(22, 22, 22);
+    border-radius: 10px;
+    background-color: #333333;
+    margin-bottom: 10px;
+}
+.customize-category{
+    animation: fadeIn 0.5s;
+    display: grid;
+    box-sizing: border-box;
+    grid-template-columns: repeat(4, minmax(0, 1fr)); 
+    gap: 5px; 
+    width: 100%;
+}
+.customize-tile{
+    aspect-ratio: 1/1;
+    flex: 1;
+    box-sizing: border-box;
+    width: 100%;
+    border-radius: 10px;
+    background-color: rgba(163, 163, 163,0.5);
+    border: 5px solid black;
+    transition: all 0.5s;
+}
+.customize-tile.selected{
+    box-shadow: 0 0 20px var(--secondary);
+    transform: scale(1.1);
+}
+#background-input{
+    width: 100%;
+    height: 50px;
+}
+.card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -150%; /* Startuje daleko poza lewą krawędzią */
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    
+    /* Gradient tworzący ostre, ukośne "światło" */
+    background: linear-gradient(
+        to right,
+        rgba(255, 255, 255, 0) 0%,    /* Przezroczysty */
+        rgba(255, 255, 255, 0.2) 30%, /* Bardzo delikatny start */
+        rgba(255, 255, 255, 0.3) 50%, /* Mocne centrum błysku */
+        rgba(255, 255, 255, 0.2) 70%, /* Delikatny koniec */
+        rgba(255, 255, 255, 0) 100%   /* Przezroczysty */
+    );
+    
+    transform: skewX(-25deg); /* Pochylenie błysku */
+    
+    /* GŁÓWNA ANIMACJA: Przesunięcie błysku */
+    animation: shine-effect 10s infinite;
+}
+
+.select-category {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 10px; 
+    margin: 15px 0;
+    width: 100%;
+}
+
+.impostor-tile, .category-tile {
+    padding: 10px 5px;
+    background: transparent;
+    border: 3px solid rgb(22, 22, 22);
+    color: white;
+    border-radius: 5px;
+    font-size: 0.8em; /* Mniejszy druk, żeby zmieściły się w rzędzie */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+}
+
+.impostor-tile.selected, .category-tile.selected {
+    box-shadow: 0px 0px 10px var(--danger);
+    background: rgb(22, 22, 22);
+}
+
+#vote-display{
+    display: grid;
+    /* Tworzy 4 równe kolumny */
+    grid-template-columns: repeat(2, 1fr); 
+    /* Odstęp między przyciskami */
+
+    gap: 10px; 
+    width: 100%;
+    margin-bottom: 20px;
+}
+.vote-tile{
+    aspect-ratio: 1 / 1;
+    padding: 5px;
+    background-color: #2b2b2b;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    border-radius: 10px;
+    transition: 0.5s;
+    border: 5px solid #141414;
+    filter: saturate(0%);
+    user-select: none;
+    font-size: small;
+    box-sizing: border-box;
+
+    overflow: hidden;       /* Wszystko co wystaje, zostanie ukryte */
+    white-space: nowrap;    /* Nick zawsze będzie w jednej linii */
+}
+.vote-tile.selected{
+    filter: saturate(100%);
+    box-shadow: 0 0 20px var(--secondary);
+}
+
+.names-list {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    font-size: 1.2rem;
+}
+
+.res-player-tile{
+    width: 70px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    border-radius: 10px;
+    border: 5px solid black;
+    font-size: 10px;
+    background-size: cover;
+    background-position: center;
+    color: white;
+
+    overflow: hidden;
+}
+
+.res-player-display{
+    display: flex;
+    justify-content: center;
+    gap: 5px; 
+    width: 100%;
+}
+/* DEFINICJA RUCHU BŁYSKU */
+@keyframes shine-effect {
+    0% {
+        left: -150%; /* Start poza ekranem */
+    }
+    30%, 100% {
+        left: 150%; /* Szybkie przejście na prawą stronę i długie czekanie */
+    }
+}
+
+.blood-container {
+    position: absolute;
+    top: -5px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    pointer-events: none;
+    display: none;
+}
+
+.drop {
+    position: absolute;
+    top: 0;
+    width: 8px;
+    height: 8px;
+    background-color: #8e0000;
+    border-radius: 0 50% 50% 50%; /* Kształt łzy */
+    transform: rotate(45deg);
+    opacity: 0;
+    animation: drip-fall 5s infinite linear;
+    box-shadow: 0px 0px px rgb(177, 42, 42);
+    filter: brightness(1.2);
+    z-index: 0;
+}
+
+/* Rozmieszczenie kropel w poziomie i ich opóźnienia */
+.drop:nth-child(1) { left: 25%; animation-delay: 0s; }
+.drop:nth-child(2) { left: 35%; animation-delay: 3.7s; width: 6px; height: 6px; }
+.drop:nth-child(3) { left: 65%; animation-delay: 1.3s; width: 10px; height: 10px; }
+.drop:nth-child(4) { left: 75%; animation-delay: 2.5s; }
+
+@keyframes drip-fall {
+    0% {
+        top: 0;
+        opacity: 1;
+        transform: rotate(45deg) scale(1);
+    }
+    30% {
+        /* Efekt "zbierania się" kropli przed upadkiem */
+        top: 5px;
+        transform: rotate(45deg) scale(1.2);
+    }
+    100% {
+        /* Upadek w dół o 200px i zanikanie */
+        top: 200px;
+        opacity: 0;
+        transform: rotate(45deg) scale(0.8);
+    }
+}
+
+.hidden { 
+    display: none; 
+}
