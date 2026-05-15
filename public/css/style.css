@@ -267,7 +267,7 @@ button {
     color: white; 
     box-sizing: border-box;
     width: 100%;
-    filter: brightness(100%);
+    filter: brightness(0%);
     transition: 1s;
     user-select: none;
     margin-bottom: 20px;
