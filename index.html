@@ -827,57 +827,39 @@ function getRequiredExp(level) {
 }
 
 function drawProgressBar() {
-    // Dopasowanie rozdzielczości wewnętrznej canvasu
     pCanvas.width = pCanvas.clientWidth;
     pCanvas.height = pCanvas.clientHeight;
 
     const w = pCanvas.width;
     const h = pCanvas.height;
-    const padding = 0; // Grubość obramowania
-
-    // Czyścimy tło pod paskiem
+    const padding = 0;
+    
     pCtx.clearRect(0, 0, w, h);
 
-    // 1. Rysujemy obramowanie (Stroke)
     pCtx.strokeStyle = colorDark;
     pCtx.lineWidth = padding;
-    //pCtx.strokeRect(padding/2, padding/2, w - padding, h - padding);
 
-    // 2. Obliczamy płynne przejście szerokości (Linear Interpolation)
-    // Zmienna 0.05 odpowiada za "gładkość" - im mniejsza, tym wolniej dobija
     let targetWidth = (w - (padding * 2)) * (progress / 100);
     currentWidth += (targetWidth - currentWidth) * 0.05;
-
-    // 3. Rysujemy wypełnienie (Secondary)
+    
     pCtx.fillStyle = colorSecondary;
-    // Wypełnienie zaczyna się po wewnętrznej stronie ramki
     pCtx.fillRect(padding, padding, currentWidth, h - (padding * 2));
 
-    // 3.5 Rysujemy tekst postępu
 
-    pCtx.font = "bold 14px 'Silkscreen', sans serif"; // Lub Twoja czcionka pixel-art
+    pCtx.font = "bold 14px 'Silkscreen', sans serif";
     pCtx.fillStyle = "white";
     pCtx.textAlign = "center";
     pCtx.textBaseline = "middle";
 
-    // Rysujemy napis na samym środku canvasu
     //pCtx.fillText(Math.round(progress) + "/200", w / 2, h / 2);
 
-    // 4. Animacja pętli
     if (progress < targetProgress) {
         progress += 0.5; // Prędkość ładowania
-        //document.getElementById('loading-progress').innerText = "(" + Math.round(progress) + "%)"
-    }else{
-        // setTimeout(() => {
-        //     showScreen('screen-game'); 
-        //screenLoaded = true;
-        // }, 1000);
     }
     document.getElementById('exp-counter').innerHTML = `
     LVL: ${playerLVL || 0} <br> 
     EXP: ${Math.floor((playerExp * progress / targetProgress) || 0)} / ${getRequiredExp(playerLVL + 1) || 0}
 `;
-    //if(currentWidth >= targetWidth) return;
     requestAnimationFrame(drawProgressBar);
 }
 </script>
