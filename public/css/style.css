@@ -412,7 +412,7 @@ animation: fadeIn 0.5s ease-in;
     display: grid;
     box-sizing: border-box;
     grid-template-columns: repeat(3, minmax(0, 1fr)); 
-    gap: 5px; 
+    gap: 8px; 
     width: 100%;
 }
 .customize-tile{
