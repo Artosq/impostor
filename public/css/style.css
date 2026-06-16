@@ -374,7 +374,7 @@ animation: fadeIn 0.5s ease-in;
     box-sizing: border-box;
     margin-bottom: 10px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 5px; 
     width: 100%;
 }
@@ -404,12 +404,13 @@ animation: fadeIn 0.5s ease-in;
     border-radius: 10px;
     background-color: #333333;
     margin-bottom: 10px;
+    box-shadow: inset 0 -20px 20px -10px rgba(0, 0, 0, 0.5);
 }
 .customize-category{
     animation: fadeIn 0.5s;
     display: grid;
     box-sizing: border-box;
-    grid-template-columns: repeat(4, minmax(0, 1fr)); 
+    grid-template-columns: repeat(3, minmax(0, 1fr)); 
     gap: 5px; 
     width: 100%;
 }

@@ -140,20 +140,15 @@
         <div id="customize-categories-panel">
             <button class="customize-categories-tile selected" onclick="changeCustomizeCategory(this, 'eyes-customize')">Oczy</button>
             <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'mouth-customize')">Buzia</button>
+            <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'pattern-customize')">Wzór</button>
             <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'background-customize')">Tło</button>
         </div>
 
         <div id="customize-options">
-
-            <div class="customize-category" id="eyes-customize">
-
-            </div>
-            <div class="customize-category hidden" id="mouth-customize">
-
-            </div>
-            <div class="customize-category hidden" id="background-customize">
-                
-            </div>
+            <div class="customize-category" id="eyes-customize"></div>
+            <div class="customize-category hidden" id="mouth-customize"></div>
+            <div class="customize-category hidden" id="background-customize"></div>
+            <div class="customize-category hidden" id="pattern-customize"></div>
         </div>
         <button class='btn-join'onclick="showScreen('screen-login')">Powrót do menu -></button>
     </div>
@@ -168,41 +163,28 @@
 
     const botAssets = {
         eyes: [
-            "bulging",
-            "dizzy",
-            "eva",
-            "frame1",
-            "frame2",
-            "glow",
-            "happy",
-            "hearts",
-            "robocop",
-            "round",
-            "roundFrame01",
-            "roundFrame02",
-            "sensor",
-            "shade01"
+            "bulging", "dizzy", "eva", "frame1", "frame2",
+            "glow", "happy", "hearts", "robocop", "round",
+            "roundFrame01", "roundFrame02", "sensor", "shade01"
         ],
         mouth: [
-            "bite",
-            "diagram",
-            "grill01",
-            "grill02",
-            "grill03",
-            "smile01",
-            "smile02",
-            "square01",
-            "square02"
+            "bite", "diagram", "grill01", "grill02", "grill03",
+            "smile01", "smile02", "square01", "square02"
+        ],
+        pattern: [
+            "grunge02", "camo01", "camo02", "circuits", 
+            "dirty01", "dirty02", "dots", "grunge01" 
         ]
     };
 
     let botConfig = {
-        eyes: botAssets.eyes[0],
-        mouth: botAssets.mouth[0],
-        background: '555555'
+        eyes: botAssets.eyes[Math.floor(Math.random()*botAssets.eyes.length)],
+        mouth: botAssets.mouth[Math.floor(Math.random()*botAssets.mouth.length)],
+        background: '555555',
+        pattern: "camo01"
     };
     
-    let playerAvatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+    let playerAvatarUrl = getBotUrl();
 
     window.onload = () => {
     const savedBotConfig = localStorage.getItem('botConfig');
@@ -210,7 +192,7 @@
         try {
             const parsed = JSON.parse(savedBotConfig);
             
-            if (parsed && parsed.eyes && parsed.mouth) {
+            if (parsed && parsed.eyes && parsed.mouth && parsed.pattern) {
                 botConfig = parsed;
             }
         } catch (e) {
@@ -243,19 +225,27 @@
         const mouthCustom = document.getElementById('mouth-customize');
         const eyesCustom = document.getElementById('eyes-customize');
         const bgCustom = document.getElementById('background-customize');
+        const patternCustom = document.getElementById('pattern-customize');
 
         eyesCustom.innerHTML = botAssets.eyes.map(eyeName => {
-            const tUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${eyeName}&mouth=&backgroundColor=transparent`;
+            const tUrl = `https://api.dicebear.com/10.x/bottts-neutral/svg?eyesVariant=${eyeName}&mouthVariant=&backgroundColor=&textureVariant=&textureProbability=100`;
             return `<img class="customize-tile eyes-custom ${botConfig.eyes === eyeName ? 'selected' : ''}"  
                         src="${tUrl}" 
                         onclick="updatePart(this, 'eyes', '${eyeName}')">`;
         }).join('');
 
         mouthCustom.innerHTML = botAssets.mouth.map(mouthName => {
-            const tUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=&mouth=${mouthName}&backgroundColor=transparent`;
+            const tUrl = `https://api.dicebear.com/10.x/bottts-neutral/svg?eyesVariant=&mouthVariant=${mouthName}&backgroundColor=&textureVariant=&textureProbability=100`;
             return `<img class="customize-tile mouth-custom ${botConfig.mouth === mouthName ? 'selected' : ''}" 
                         src="${tUrl}" 
                         onclick="updatePart(this, 'mouth', '${mouthName}')">`;
+        }).join('');
+
+        patternCustom.innerHTML = botAssets.pattern.map(patternName => {
+            const tUrl = `https://api.dicebear.com/10.x/bottts-neutral/svg?eyesVariant=&mouthVariant=&backgroundColor=&textureVariant=${patternName}&textureProbability=100`;
+            return `<img class="customize-tile pattern-custom ${botConfig.pattern === patternName ? 'selected' : ''}" 
+                        src="${tUrl}" 
+                        onclick="updatePart(this, 'pattern', '${patternName}')">`;
         }).join('');
 
         const diceBearPalette = [
@@ -264,13 +254,22 @@
         "8bc34a", "cddc39", "ffeb3b", "ffc107", "ff9800", 
         "ff5722", "795548", "9e9e9e", "607d8b", "263238"
         ];
+
+        const diceBearColors = [
+        'e45e4d', 'de6811', 'c67c11', 'b18911', '9b9312',
+        '7a9f12', '40a843', '15a876', '15a594', '15a2a9', 
+        '159fbf', '1499da', '448ef4', '7681f5', '9975ea', 
+        'b46bd6', 'ca62bb', 'd95c9a', 'e25a75', '978d87', 
+        '8f8f8f', '879198', "607d8b", "263238"
+        ];
+
         bgCustom.innerHTML = diceBearPalette.map(color => {
             return `<div class="customize-tile background-custom ${botConfig.background === color ? 'selected' : ''}" 
                         style="background-color: #${color}" 
                         onclick="updatePart(this,'background', '${color}')"></div>`;
         }).join('');
 
-        document.getElementById('customize-player-avatar').src = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+        document.getElementById('customize-player-avatar').src = getBotUrl();
         //document.getElementById('customize-options').style.backgroundImage = `url(https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background})`;
 
     };
@@ -310,9 +309,14 @@
             if(element) element.classList.add('selected');
         }
 
+        if(part === 'pattern') {
+            document.querySelectorAll('.pattern-custom').forEach(t => t.classList.remove('selected'));
+            if(element) element.classList.add('selected');
+        }
+
         localStorage.setItem('botConfig', JSON.stringify(botConfig));
         
-        const newUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+        const newUrl = getBotUrl();
         document.getElementById('customize-player-avatar').src = newUrl;
         //document.getElementById('customize-options').style.backgroundImage = `url(${newUrl})`;
         changeNick(); 
@@ -332,7 +336,7 @@
         const playerAvatar = document.getElementById('main-player-avatar');
         const value = document.getElementById('input-name').value;
 
-    playerAvatarUrl = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+    playerAvatarUrl = getBotUrl();
 
     //document.getElementById('main-player-avatar').src = botUrl;
         playerAvatar.src = playerAvatarUrl;
@@ -359,6 +363,9 @@
         document.getElementById('role-display').style.filter = "blur('0px')";
     }
 
+    function getBotUrl(){
+        return `https://api.dicebear.com/10.x/bottts-neutral/svg?eyesVariant=${botConfig.eyes}&mouthVariant=${botConfig.mouth}&backgroundColor=${botConfig.background}&textureVariant=${botConfig.pattern}&textureProbability=100`;
+    }
 
     function showScreen(screenId) {
         ['screen-login', 'screen-lobby', 'screen-game','screen-vote','screen-load','screen-customize','screen-results'].forEach(id => {
@@ -371,14 +378,14 @@
 
     function createRoom() {
     let name = document.getElementById('input-name').value || randomNick();
-    let playerBot = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+    let playerBot = getBotUrl();
     socket.emit('create_room', { playerName: name ,playerBot: playerBot, userId: userId});
     }
 
     function joinRoom(listCode) {
     let name = document.getElementById('input-name').value || randomNick();
     let code = listCode || document.getElementById('input-code').value.toUpperCase();
-    let playerBot = `https://api.dicebear.com/8.x/bottts-neutral/svg?eyes=${botConfig.eyes}&mouth=${botConfig.mouth}&backgroundColor=${botConfig.background}`;
+    let playerBot = getBotUrl();
     socket.emit('join_room', { playerName: name, roomCode: code ,playerBot: playerBot, userId: userId});
     }
 
