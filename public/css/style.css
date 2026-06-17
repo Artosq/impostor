@@ -297,6 +297,9 @@ button {
 .role-citizen { 
     background: var(--secondary); 
 }
+.role-none { 
+    background: var(--primary); 
+}
 .player-tag, .player-avatar{ 
 animation: fadeIn 0.5s ease-in; 
 }
