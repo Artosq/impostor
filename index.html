@@ -332,16 +332,15 @@
         localStorage.setItem('botConfig', JSON.stringify(botConfig));
         
         const newUrl = getBotUrl();
-        //document.getElementById('customize-player-avatar').style.top = "-400px";
+        document.getElementById('customize-player-avatar').style.top = "-400px";
 
-        // clearTimeout(animacjaAvatara);
-        // animacjaAvatara = setTimeout(()=>{
-        //     document.getElementById('customize-player-avatar').style.top = "0";
-        //     document.getElementById('customize-player-avatar').src = newUrl;
-        // },1000)
-        document.getElementById('customize-player-avatar').src = newUrl;
+        clearTimeout(animacjaAvatara);
+        animacjaAvatara = setTimeout(()=>{
+            document.getElementById('customize-player-avatar').style.top = "0";
+            document.getElementById('customize-player-avatar').src = newUrl;
+        },1000)
+        //document.getElementById('customize-player-avatar').src = newUrl;
 
-        //document.getElementById('customize-options').style.backgroundImage = `url(${newUrl})`;
         changeNick(); 
     }
 
