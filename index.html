@@ -304,8 +304,8 @@
         element.classList.add("selected");
     }
 
-    let animacjaAvatara;
-
+    //let animacjaAvatara;
+    //let obrot = 0;
     function updatePart(element, part, value) {
         botConfig[part] = value;
 
@@ -332,14 +332,21 @@
         localStorage.setItem('botConfig', JSON.stringify(botConfig));
         
         const newUrl = getBotUrl();
-        document.getElementById('customize-player-avatar').style.top = "-400px";
+        document.getElementById('customize-player-avatar').src = newUrl;
+        // document.getElementById('customize-player-avatar').style.top = "-400px";
 
-        clearTimeout(animacjaAvatara);
-        animacjaAvatara = setTimeout(()=>{
-            document.getElementById('customize-player-avatar').style.top = "0";
-            document.getElementById('customize-player-avatar').src = newUrl;
-        },1000)
+        // clearTimeout(animacjaAvatara);
+        // animacjaAvatara = setTimeout(()=>{
+        //     document.getElementById('customize-player-avatar').style.top = "0";
+        //     document.getElementById('customize-player-avatar').src = newUrl;
+        // },600)
         //document.getElementById('customize-player-avatar').src = newUrl;
+        // obrot += 720;
+        // document.getElementById('customize-player-avatar').style.transform = `rotateY(${obrot}deg)`;
+
+        // setTimeout(()=>{
+        //     document.getElementById('customize-player-avatar').src = newUrl;
+        // },300)
 
         changeNick(); 
     }
@@ -502,11 +509,52 @@
         },100)
     }
 
-    socket.on('room_update', (room) => {
+function sendFuck(adressor){
+    // Naprawione: dane spakowane w jeden obiekt {}
+    socket.emit('send_fuck', { roomCode: currentRoomCode, targetUserId: adressor });
+}
+
+socket.on('receive_fuck', (data) => {
+    // Szukamy kontenera gracza, który wysłał fucka
+    let sender = document.getElementById(data.userId);
+    if (!sender) return; // Zabezpieczenie na wypadek, gdyby nie znalazło elementu
+
+    let fuckElement = document.createElement('div');
+    
+    fuckElement.style.position = 'absolute';
+    fuckElement.style.top = '100%';
+    fuckElement.style.left = '50%';
+    fuckElement.style.transform = 'translate(-50%, -60%)';
+    fuckElement.style.fontSize = '40px';
+    fuckElement.style.zIndex = '9999';
+    fuckElement.style.pointerEvents = 'none';
+    fuckElement.style.transition = '0.6s';
+    fuckElement.style.opacity = '0';
+    
+    fuckElement.innerText = '🖕';
+
+    // Wrzucamy do kontenera tego konkretnego gracza
+    sender.appendChild(fuckElement);
+
+    setTimeout(() => {
+        fuckElement.style.opacity = '1';
+        fuckElement.style.top = '50%';
+    }, 500);
+
+    setTimeout(() => {
+    fuckElement.style.opacity = '0';
+    fuckElement.style.top = '100%';
+        setTimeout(() => {
+            fuckElement.remove();
+        }, 500);
+    }, 4000);
+});
+
+socket.on('room_update', (room) => {
     currentRoomCode = room.code;
     socket.emit('check_host', currentRoomCode);
     document.getElementById('room-code-display').innerText = room.code;
-    localStorage.setItem('lastRoomCode',room.code);
+    localStorage.setItem('lastRoomCode', room.code);
     showScreen('screen-lobby');
     
     const list = document.getElementById('players-list');
@@ -516,13 +564,12 @@
         const playerClass = isMe ? 'player-tag this-player' : 'player-tag';
 
         return `
-            <div class="avatar-container">
+            <div class="avatar-container" onclick="sendFuck('${p.userId}')" id="${p.userId}" style="position: relative;">
                 <img src="${p.bot}" class="player-avatar">
                 <span class="${playerClass}">${p.name}</span>
             </div>
         `;
     }).join('');
-
 });
 
     socket.on('game_start', (data) => {

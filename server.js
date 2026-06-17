@@ -303,6 +303,23 @@ socket.on('send_answer', (roomCode, answer) => {
     player.answer = answer;
 });
 
+
+    socket.on('send_fuck', ({ roomCode, targetUserId }) => {
+        const room = rooms[roomCode];
+        if (!room) return;
+
+        const sender = room.players.find(p => p.id === socket.id);
+        if (!sender) return;
+
+        const target = room.players.find(p => p.userId === targetUserId);
+        if (!target) return;
+
+        io.to(target.id).emit('receive_fuck', {
+            name: sender.name,
+            userId: sender.userId
+        });
+    });
+
     socket.on('leave_room', (roomCode) => {
             const room = rooms[roomCode];
             if (!room) return;
