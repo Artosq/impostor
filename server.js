@@ -183,6 +183,7 @@ socket.on('start_game', ({ roomCode, category, impostorCount }) => {
                 player.role = 'GRACZ';
                 player.gameData = playersQuestion;
             }
+            room.playersQuestion = playersQuestion;
         }
 
         io.to(player.id).emit('game_start', { 

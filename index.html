@@ -110,6 +110,7 @@
     </div>
     <div id="screen-vote" class="screen hidden">
         <h3><span style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
+        <h4 class="hidden" id="players-question"></h4>
         <div id="vote-display">
         </div>
         <p class="waiting-msg">Oczekiwanie na zakończenie gry przez hosta...</p>
@@ -553,11 +554,14 @@
         showScreen('screen-vote');
         let html = "";
         if(room.category == "Pytania"){
+        document.getElementById("players-question").classList.remove("hidden");
+        document.getElementById("players-question").innerHTML = room.playersQuestion;
         room.players.forEach(p => {
             html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.userId}")'
             style="background-image: url('${p.bot}')"> ${p.name} <br> ${p.answer}</div>`;   
         });
         }else{
+            document.getElementById("players-question").classList.add("hidden");
             room.players.forEach(p => {
             html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.userId}")'
             style="background-image: url('${p.bot}')"> ${p.name} </div>`;   
