@@ -57,6 +57,10 @@
         <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
         <div id="rooms-list"></div>
     </div>
+    <div id="screen-mode">
+        <div>IMPOSTOR</div>
+        <div>PYTANIA</div>
+    </div>
     <div id="screen-lobby" class="screen hidden">
         <h3>Kod pokoju: <span id="room-code-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">----</span></h3>
 
@@ -71,6 +75,7 @@
                 <button class="category-tile" id="Gry" onclick="selectCategory('Gry')">Gry</button>
                 <button class="category-tile" id="Kraje" onclick="selectCategory('Kraje')">Kraje</button>
             </div>
+            <button class="category-tile" id="Pytania" onclick="selectCategory('Pytania')">Pytania</button>
             <p>Liczba Impostorów:</p>
             <div class="select-category">
                 <button class="impostor-tile" id="1" onclick="selectImpostors('1')">1</button>
@@ -78,6 +83,7 @@
                 <button class="impostor-tile" id="3" onclick="selectImpostors('3')">3</button>
                 <button class="impostor-tile" id="4" onclick="selectImpostors('4')">4</button>
             </div>
+            
             <button id="btn-start" class="btn-start" onclick="startGame()">START GRY</button>
         </div>
         <p class="waiting-msg">Oczekiwanie na start przez hosta...</p>
@@ -87,12 +93,15 @@
     <div id="screen-game" class="screen hidden">
         <h3>Kategoria: <span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);"></span></h3>
         <div id="role-display" ontouchstart="this.style.filter = 'brightness(100%)'; " ontouchend="this.style.filter = 'brightness(0%)'">
-            <p>Twoja rola:</p>
-            <h2 id="role-name">---</h2>
-            <hr>
+            <div id="impostor-info" class="hidden">
+                <p>Twoja rola:</p>
+                <h2 id="role-name">---</h2>
+                <hr>
+            </div>
             <p>Twoja informacja:</p>
-            <h1 id="role-data">---</h1>
+            <h2 id="role-data" color="black">---</h2>
         </div>
+        <input id="input-answer" max="20" placeholder="Podaj odpowiedz" onkeyup="socket.emit('send_answer', currentRoomCode, this.value);">
         <p class="waiting-msg">Oczekiwanie na rozpoczęcie głosowania przez hosta...</p>
         <div id="host-vote-controls" class="hidden">
             <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
@@ -294,6 +303,8 @@
         element.classList.add("selected");
     }
 
+    let animacjaAvatara;
+
     function updatePart(element, part, value) {
         botConfig[part] = value;
 
@@ -320,7 +331,15 @@
         localStorage.setItem('botConfig', JSON.stringify(botConfig));
         
         const newUrl = getBotUrl();
+        //document.getElementById('customize-player-avatar').style.top = "-400px";
+
+        // clearTimeout(animacjaAvatara);
+        // animacjaAvatara = setTimeout(()=>{
+        //     document.getElementById('customize-player-avatar').style.top = "0";
+        //     document.getElementById('customize-player-avatar').src = newUrl;
+        // },1000)
         document.getElementById('customize-player-avatar').src = newUrl;
+
         //document.getElementById('customize-options').style.backgroundImage = `url(${newUrl})`;
         changeNick(); 
     }
@@ -384,6 +403,10 @@
     let playerBot = getBotUrl();
     socket.emit('create_room', { playerName: name ,playerBot: playerBot, userId: userId});
     }
+
+    // function gameModePanel(){
+    //     document.getElementById("screen-mode").classList.remove("hidden");
+    // }
 
     function joinRoom(listCode) {
     let name = document.getElementById('input-name').value || randomNick();
@@ -505,11 +528,23 @@
     socket.on('game_start', (data) => {
         showScreen('screen-game');
         const display = document.getElementById('role-display');
+        
+        if(data.gameCat != "Pytania"){
         display.className = data.role === 'IMPOSTOR' ? 'role-impostor' : 'role-citizen';
+        document.getElementById('impostor-info').classList.remove("hidden");
+        document.getElementById('role-data').style.fontSize = "150%";
+        }
+        else{
+        display.className = "role-citizen"
+        document.getElementById('impostor-info').classList.add("hidden");
+        document.getElementById('role-data').style.fontSize = "120%";
+        }
         document.getElementById('role-name').innerText = data.role;
         document.getElementById('role-data').innerText = data.data;
         document.getElementById('category-display').innerText = data.gameCat;
 
+        if(data.gameCat == "Pytania") document.getElementById("input-answer").classList.remove("hidden")
+        else document.getElementById("input-answer").classList.add("hidden")
         socket.emit('check_host', currentRoomCode);
     });
 
@@ -517,10 +552,17 @@
         const screenVote = document.getElementById('vote-display');
         showScreen('screen-vote');
         let html = "";
+        if(room.category == "Pytania"){
         room.players.forEach(p => {
+            html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.userId}")'
+            style="background-image: url('${p.bot}')"> ${p.name} <br> ${p.answer}</div>`;   
+        });
+        }else{
+            room.players.forEach(p => {
             html += `<div class="vote-tile" onclick='voteOn(this, ${room.impostorCount}, "${p.userId}")'
             style="background-image: url('${p.bot}')"> ${p.name} </div>`;   
         });
+        }
         screenVote.innerHTML = html;
     });
 
@@ -533,7 +575,7 @@
             if(hostGameControls) hostGameControls.classList.remove('hidden');
             if(hostEndControls) hostEndControls.classList.remove('hidden');
             if(hostVoteControls) hostVoteControls.classList.remove('hidden');
-
+            
             document.querySelectorAll('.waiting-msg').forEach(el => {
                 el.classList.add('hidden');
             })
@@ -770,6 +812,17 @@ function updateExp(exp){
     localStorage.setItem('playerLVL', playerLVL);
     drawProgressBar();
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    
+    // Jeśli socket jest rozłączony, natychmiast wymuszamy próbę połączenia
+    if (socket.disconnected) {
+      socket.connect(); 
+    }
+  }
+});
+
 
 function getRequiredExp(level) {
     const baseXP = 100;

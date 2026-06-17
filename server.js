@@ -138,27 +138,51 @@ socket.on('start_game', ({ roomCode, category, impostorCount }) => {
         let impostorIds = impostors.map(i => i.id);
 
         // Ustawienia pokoju
+        room.category = category;
         room.status = 'playing';
         room.impostorCount = impostorCount;
         room.results = { 
             impostorNames: impostors,
             word: selected.word 
         };
+    
+    let sharedHint;
+    let impostorsQuestion;
+    let playersQuestion;
 
+    if(category != "Pytania"){
     const sharedHintIndex = Math.floor(Math.random() * selected.hints.length);
-    const sharedHint = selected.hints[sharedHintIndex];
+    sharedHint = selected.hints[sharedHintIndex];
+    }else{
+    let impostorsIndex = Math.floor(Math.random() * selected.questions.length);
+    impostorsQuestion = selected.questions[impostorsIndex];
+
+    selected.questions.splice(impostorsIndex, 1);
+
+    let playersIndex = Math.floor(Math.random() * selected.questions.length);
+    playersQuestion = selected.questions[playersIndex];
+    }
 
     room.players.forEach((player) => {
         const isImpostor = impostorIds.includes(player.id);
         
         player.gameCat = category;
-
-        if (isImpostor) {
-            player.role = 'IMPOSTOR';
-            player.gameData = sharedHint;
-        } else {
-            player.role = 'GRACZ';
-            player.gameData = selected.word;
+            if(category != "Pytania"){
+            if (isImpostor) {
+                player.role = 'IMPOSTOR';
+                player.gameData = sharedHint;
+            } else {
+                player.role = 'GRACZ';
+                player.gameData = selected.word;
+            }
+        }else{
+            if (isImpostor) {
+                player.role = 'IMPOSTOR';
+                player.gameData = impostorsQuestion;
+            } else {
+                player.role = 'GRACZ';
+                player.gameData = playersQuestion;
+            }
         }
 
         io.to(player.id).emit('game_start', { 
@@ -264,6 +288,18 @@ socket.on('send_vote', (roomCode, selectedUserIds) => {
     room.playerChoices[player.userId] = selectedUserIds;
 
     console.log(`Gracz ${player.name} (userId: ${player.userId}) zmienił wybór na:`, selectedUserIds);
+});
+
+socket.on('send_answer', (roomCode, answer) => {
+    const room = rooms[roomCode];
+    if (!room || room.status !== 'playing') return;
+
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+
+    if(player.gameCat =! "Pytania") return;
+
+    player.answer = answer;
 });
 
     socket.on('leave_room', (roomCode) => {

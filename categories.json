@@ -695,5 +695,157 @@
   "Osoby": [
     { "word": "Paryż", "hints": ["Miasto miłości", "Wieża Eiffla", "Stolica Francji"] },
     { "word": "Kino", "hints": ["Miejsce z dużym ekranem", "Popcorn", "Ogląda się tam filmy"] }
-  ]
+  ],
+  "Pytania": [
+  {
+    "cat": "małe liczby (częstotliwość i nawyki)",
+    "questions": [
+      "Ile razy w tygodniu zdarza Ci się intensywnie myśleć o rzuceniu wszystkiego i wyjechaniu na wolne?",
+      "Ile wiadomości tekstowych (SMS/Messenger) wysłałeś wczoraj przez cały dzień?",
+      "Ile minut spędziłeś dziś rano w łazience na szykowaniu się od momentu wstania?",
+      "Ile razy w ciągu ostatniego miesiąca piłeś jakikolwiek alkohol?",
+      "Ile sekund potrafisz realnie wytrzymać na jednym wdechu pod wodą?",
+      "Ile znasz osób, do których bez wahania mógłbyś zadzwonić o 3 w nocy z prośbą o pomoc?",
+      "Ile razy w ciągu typowego dnia sprawdzasz lodówkę, chociaż doskonale wiesz, że jest pusta?",
+      "Ile procent baterii w telefonie sprawia, że zaczynasz odczuwać lekki niepokój?",
+      "Ile par butów, w których chodzisz przynajmniej raz w roku, masz aktualnie w domu?",
+      "Ile razy w tym roku byłeś u lekarza lub w aptece z powodu jakiejś choroby?"
+    ]
+  },
+  {
+    "cat": "kraje (od marzeń do lęków)",
+    "questions": [
+      "W jakim państwie najbardziej chciałbyś spędzić najbliższe, luksusowe wakacje życia?",
+      "W jakim kraju na świecie według Twojej wiedzy panuje obecnie największe niebezpieczeństwo i wojna?",
+      "Z jakiego kraju jedzenie (kuchnia) smakuje Ci najbardziej i mógłbyś je jeść bez przerwy?",
+      "Który kraj na mapie świata uważasz w tym momencie za największe zagrożenie dla pokoju?",
+      "W jakim kraju chciałbyś zamieszkać na stałe, gdybyś został zmuszony do opuszczenia Polski?",
+      "Który kraj kojarzy Ci się z absolutnym mrozem, wiecznym śniegiem i ciężkim klimatem?",
+      "Który kraj produkuje według Ciebie najlepsze, najbardziej bezawaryjne i prestiżowe samochody?",
+      "W jakim państwie panuje według Ciebie największa bieda, głód i kryzys humanitarny?",
+      "Z jakiego kraju muzykę, zespoły lub wokalistów słyszysz najczęściej w swoich głośnikach?",
+      "Który kraj ma według Ciebie najbardziej irytujący brzmieniowo język, jakiego nie chciałbyś się uczyć?"
+    ]
+  },
+  {
+    "cat": "duże kwoty (marzenia vs wydatki)",
+    "questions": [
+      "Ile złotych netto miesięcznie chciałbyś zarabiać, żeby rzucić obecne zajęcia i czuć się bogatym?",
+      "Ile złotych kosztował najdroższy pojedynczy sprzęt elektroniczny (np. PC, telefon), jaki masz w domu?",
+      "Ile pieniędzy musiałby kosztować obiad dla jednej osoby w restauracji, żebyś uznał to za bezczelne zdzierstwo?",
+      "Ile wynoszą w tym momencie Twoje całkowite oszczędności życia (w banku i w gotówce)?",
+      "Za jaką minimalną kwotę zgodziłbyś się teraz ogolić na łyso przed kamerą internetową?",
+      "Ile kosztowały najdroższe pojedyncze buty lub jedno ubranie, jakie wiszą w Twojej szafie?",
+      "Ile pieniędzy chciałbyś wygrać na loterii, żeby uznać, że Twoje życie zmieniło się o 180 stopni?",
+      "Ile maksymalnie złotych wydałeś kiedyś na jedną imprezę, koncert lub jedno wyjście do klubu?",
+      "Jaka kwota zgubiona fizycznie na ulicy sprawiłaby, że płakałbyś lub klął przez cały wieczór?",
+      "Ile kosztował najdroższy prezent, jaki kiedykolwiek w swoim życiu kupiłeś drugiej osobie?"
+    ]
+  },
+  {
+    "cat": "godziny (tryb życia i rutyna)",
+    "questions": [
+      "O której godzinie najchętniej kładziesz się spać w weekendy, kiedy nie musisz rano wstawać?",
+      "O której godzinie wczoraj zjadłeś swój absolutnie ostatni posiłek lub przekąskę przed snem?",
+      "O której godzinie najchętniej wstawałbyś codziennie, gdybyś miał do końca życia wieczne wolne?",
+      "O której godzinie dzwoni Twój pierwszy, nienawidzony budzik w zwykły dzień roboczy?",
+      "O której godzinie najlepiej umówić się ze znajomymi na piwo lub drinka w piątkowy wieczór?",
+      "O której godzinie wczoraj wieczorem ostatecznie odłożyłeś telefon, zgasiłeś światło i zamknąłeś oczy?",
+      "Jaka jest według Ciebie idealna pora w ciągu dnia na zjedzenie porządnego, domowego obiadu?",
+      "O której godzinie najwcześniej zdarzyło Ci się w tym roku obudzić z powodu hałasu lub koszmaru?",
+      "O której godzinie w ciągu dnia masz zazwyczaj najwięcej energii i chęci do działania?",
+      "O której godzinie zaliczyłeś w życiu swoją najbardziej odmóżdżającą i ciężką drzemkę popołudniową?"
+    ]
+  },
+  {
+    "cat": "jedzenie (smaki i obrzydzenia)",
+    "questions": [
+      "Jaki jest Twój ulubiony składnik na pizzy, bez którego rzadko kiedy ją zamawiasz?",
+      "Jaki produkt spożywczy uważasz za najbardziej obrzydliwy pod kątem zapachu lub konsystencji?",
+      "Co najchętniej jesz na śniadanie, kiedy masz mnóstwo czasu i leniwy poranek?",
+      "Co było najgorszą rzeczą, jaką zjadłeś w szkolnej stołówce, szpitalu lub u kogoś w gościach?",
+      "Jaki owoc mógłbyś jeść codziennie do końca życia i nigdy by Ci się nie znudził?",
+      "Które warzywo według Ciebie kompletnie psuje smak każdej potrawy, do której je bezmyślnie dodadzą?",
+      "Jaki smak lodów wybierasz w lodziarni jako pierwszy, sprawdzony i bezpieczny 'pewniak'?",
+      "Czego absolutnie nigdy w życiu nie wziąłbyś do ust, nawet gdyby ktoś płacił Ci za to 1000 złotych?",
+      "Jaki jest Twój ulubiony cheat-meal (fast food), kiedy masz ochotę na totalne obżarstwo?",
+      "Jaki popularny produkt spożywczy wywołuje u Ciebie odruch wymiotny na samą myśl o zjedzeniu?"
+    ]
+  },
+  {
+    "cat": "imiona (sympatie i antypatie)",
+    "questions": [
+      "Jak ma na imię Twoja absolutnie najbliższa w tym momencie osoba (przyjaciel, partner)?",
+      "Jakie jest według Ciebie najbardziej staroświeckie, przedwojenne lub zapomniane imię w Polsce?",
+      "Jakie imię męskie podoba Ci się najbardziej pod kątem brzmienia i charakteru?",
+      "Jak ma na imię osoba, której szczerze i głęboko nie lubisz lub z którą masz najgorszy kontakt?",
+      "Jakie imię żeńskie brzmi według Ciebie najbardziej elegancko, dumnie i z klasą?",
+      "Jakie popularne imię kojarzy Ci się z typowym, memicznym Januszem lub Grażyną z internetu?",
+      "Jak miałby na imię pies lub kot, gdybyś zdecydował się adoptować zwierzaka w tym momencie?",
+      "Jakie imię dla dziecka uważasz w dzisiejszych czasach za totalną przesadę i krzywdę dla malucha?",
+      "Jak ma na imię postać z filmu, serialu lub gry, którą darzysz największą sympatią?",
+      "Jakie imię najczęściej pojawia się u czarnych charakterów (złoczyńców) w kinie i literaturze?"
+    ]
+  },
+  {
+    "cat": "miasta (turystyka vs rzeczywistość)",
+    "questions": [
+      "W jakim polskim mieście najbardziej chciałbyś zamieszkać, gdyby koszty życia nie grały roli?",
+      "W jakim polskim mieście według stereotypów panuje największa nuda, brzydota i nic się nie dzieje?",
+      "Które miasto w Polsce ma według Twojej oceny najładniejszy rynek, starówkę i architekturę?",
+      "Które miasto w Polsce uważasz za najbardziej zakorkowane, rozkopane i frustrujące dla kierowców?",
+      "Gdzie w Polsce zorganizowałbyś swój wymarzony, szalony weekendowy wypad ze znajomymi?",
+      "Gdzie w Polsce według Ciebie jest najgorsze powietrze, potworny smog i smród z kominów zimą?",
+      "Do jakiego polskiego miasta masz największy sentyment i dobre wspomnienia z dzieciństwa?",
+      "Ktöre miasto kojarzy Ci się z najbardziej niebezpiecznymi dzielnicami, dresiarzami i strachem?",
+      "Które polskie miasto chciałbyś odwiedzić jako czysty turysta w ciągu najbliższego roku?",
+      "W jakim mieście w naszym kraju najłatwiej według opinii dostać w twarz w bocznej uliczce po zmroku?"
+    ]
+  },
+  {
+    "cat": "kolory (estetyka i skojarzenia)",
+    "questions": [
+      "Jaki kolor ubrań najchętniej wybierasz, kiedy chcesz wyglądać elegancko i profesjonalnie?",
+      "Jaki kolor ścian w pomieszczeniu najbardziej kojarzy Ci się ze starym, ponurym i smutnym szpitalem?",
+      "Na jaki kolor pomalowałbyś ściany w sypialni, żeby czuć się tam maksymalnie zrelaksowanym?",
+      "Który kolor ubrań uważasz za najbardziej tandetny, kiczowaty, wiejski i odpychający?",
+      "Jaki jest Twój absolutnie ulubiony kolor, który podświadomie wybierasz najczęściej?",
+      "Jaki kolor kojarzy Ci się z niebezpieczeństwem, toksycznymi substancjami, jadem i śmiercią?",
+      "Jaki kolor luksusowego, sportowego auta przyciąga Twój wzrok najbardziej, gdy jedzie ulicą?",
+      "Jaki kolor kojarzy Ci się z totalną nudą, monotonią, rutyną i szarą, smutną codziennością?",
+      "Jaki kolor oczu u drugiej połówki podoba Ci się najbardziej na świecie?",
+      "Jaki kolor włosów u losowej osoby sprawia, że od razu myślisz: 'ta osoba bardzo chce zwrócić na siebie uwagę'?"
+    ]
+  },
+  {
+    "cat": "marki i firmy (prestiż vs porażka)",
+    "questions": [
+      "Sprzęt jakiej firmy technologicznej (np. telefon, PC) uważasz za najlepszy i niezawodny?",
+      "Produkty której znanej firmy uważasz za totalnie przepłacone, przereklamowane i niewarte zakupu?",
+      "Marką jakiego luksusowego samochodu chciałbyś się przejechać chociaż raz po torze wyścigowym?",
+      "Która marka aut kojarzy Ci się w Polsce z najbardziej agresywnymi kierowcami bez wyobraźni?",
+      "W jakim sklepie odzieżowym (znanej sieciówce) najchętniej kupujesz swoje codzienne ubrania?",
+      "Która sieć fast foodów ma według Ciebie najgorsze, najbardziej gumowe i obrzydliwe jedzenie?",
+      "Z jakiej platformy streamingowej (filmy/muzyka) korzystasz najintensywniej w ciągu tygodnia?",
+      "Logo której znanej firmy jest według Ciebie najbrzydsze i wygląda, jakby robił je amator w Paint'cie?",
+      "Buty jakiej marki sportowej są według Twojej opinii najwygodniejsze do codziennego chodzenia?",
+      "Ubrania jakiej znanej marki kojarzą Ci się z największym kiczem, tandetą i szpanem na siłę?"
+    ]
+  },
+  {
+    "cat": "wiek i lata (etapy życia i dojrzałość)",
+    "questions": [
+      "W jakim wieku człowiek osiąga według Ciebie pełną życiową mądrość, spokój i stabilizację?",
+      "Ile lat ma najstarszy członek Twojej najbliższej rodziny, którego znasz osobiście (np. dziadek)?",
+      "Ile lat chciałbyś mieć na zawsze, gdyby istniał eliksir całkowicie zatrzymujący starość?",
+      "W jakim wieku człowiek zaczyna nagle marudzić na hałas i młodzież, stając się typowym 'zgredem'?",
+      "W jakim wieku najlepiej i najbezpieczniej założyć rodzinę lub ustatkować się na swoim?",
+      "Ile lat ma samochód, który według Ciebie nadaje się już tylko i wyłącznie na złomowisko i przetop?",
+      "Ile lat ma Twój absolutnie najbliższy i najlepszy przyjaciel, z którym masz stały kontakt?",
+      "Ile lat więzienia powinna bezwzględnie dostać osoba za najcięższe możliwe oszustwo finansowe?",
+      "W jakim wieku czułeś się w swoim dotychczasowym życiu najbardziej wolny, beztroski i szczęśliwy?",
+      "W jakim wieku według Ciebie bezpowrotnie kończy się młodość, a zaczyna nudna, ciężka dorosłość?"
+    ]
+  }
+]
 }
