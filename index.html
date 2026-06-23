@@ -101,7 +101,7 @@
             <p>Twoja informacja:</p>
             <h2 id="role-data" color="black">---</h2>
         </div>
-        <input id="input-answer" max="20" placeholder="Podaj odpowiedz" onkeyup="socket.emit('send_answer', currentRoomCode, this.value);">
+        <input id="input-answer" maxlength="16" placeholder="Podaj odpowiedz" onkeyup="socket.emit('send_answer', currentRoomCode, this.value);">
         <p class="waiting-msg">Oczekiwanie na rozpoczęcie głosowania przez hosta...</p>
         <div id="host-vote-controls" class="hidden">
             <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
