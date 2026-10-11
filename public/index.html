@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Impostor Game v0.4🕵️‍♂️</title>
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#181818">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/scrollbar.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <canvas id="rippleCanvas"></canvas>
+    <h1 class="hidden" style="color: white; letter-spacing: 12px; margin-top: 0px;">IMPOSTOR</h1>
+
+    <div class="card" id="card">
+        <div class="blood-container">
+            <span class="drop"></span>
+            <span class="drop"></span>
+            <span class="drop"></span>
+            <span class="drop"></span>
+        </div>
+        <div id="error-display"></div>
+
+        <div id="error-blur" style="transition: 0.8s ease-in-out;">
+            <button class="btn-download" id="btn-download">POBIERZ APLIKACJE IMPOSTOR</button>
+            <div class="logo hidden" id="logo"><img src="logo4.png" width="250px"></div>
+
+            <!-- Ekran Logowania -->
+            <div id="screen-login" class="screen">
+                <div id="player-stats">
+                    <img src="icon-192.png" id="main-player-avatar" onclick="customizeAvatar()">
+                    <div id="player-stats-rest">
+                        <span id="exp-counter" style="font-size: 14px; color: var(--secondary); text-shadow: 0 0 20px var(--secondary); transition: 1s;">Exp: 947</span>
+                        <div id="main-exp-wrapper">
+                            <canvas id="progressCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <span id="impostor-thoughts" style="color: var(--danger); text-shadow: 0 0 20px var(--danger); transition: 1s; opacity:0;">Mądrości impostora</span>
+                <div class="input-group">
+                    <input type="text" maxlength="12" id="input-name" placeholder="Twój nick" onchange="changeNick(); saveNick(this.value)">
+                    <span class="symbol" onclick="rollDice(this)">&#9860;</span>
+                </div>
+                <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
+                <div style="margin: 15px 0; color: #999;">— LUB —</div>
+                <input type="text" id="input-code" placeholder="Kod pokoju">
+                <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
+                <div id="rooms-list"></div>
+            </div>
+
+            <div id="screen-mode">
+                <div>IMPOSTOR</div>
+                <div>PYTANIA</div>
+            </div>
+
+            <!-- Ekran Poczekalni -->
+            <div id="screen-lobby" class="screen hidden">
+                <h3>Kod pokoju: <span id="room-code-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">----</span></h3>
+
+                <div id="room-privacy" class="room-privacy" onclick="togglePrivacy()">
+                    <span id="room-privacy-label"></span>
+                    <span class="privacy-switch"><span class="privacy-knob"></span></span>
+                </div>
+
+                <div id="players-list"></div>
+
+                <div id="host-controls" class="hidden">
+                    <p>Tryb:</p>
+                    <div class="select-mode" id="mode-tiles"></div>
+                    <div id="category-select">
+                        <p>Kategoria:</p>
+                        <div id="category-current"></div>
+                    </div>
+                    <p>Liczba Impostorów:</p>
+                    <div class="select-category">
+                        <button class="impostor-tile" id="1" onclick="selectImpostors('1')">1</button>
+                        <button class="impostor-tile" id="2" onclick="selectImpostors('2')">2</button>
+                        <button class="impostor-tile" id="3" onclick="selectImpostors('3')">3</button>
+                        <button class="impostor-tile" id="4" onclick="selectImpostors('4')">4</button>
+                    </div>
+
+                    <button id="btn-start" class="btn-start" onclick="startGame()">START GRY</button>
+                </div>
+                <p id="room-settings" class="waiting-msg room-settings"></p>
+                <p class="waiting-msg">Oczekiwanie na start przez hosta...</p>
+                <button onclick="leaveRoom()">Wyjdź z pokoju</button>
+            </div>
+
+            <!-- Ekran Gry -->
+            <div id="screen-game" class="screen hidden">
+                <h3>Kategoria: <span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);"></span></h3>
+                <p id="starter-display" class="starter-display hidden"></p>
+                <div id="role-display" ontouchstart="this.style.filter = 'brightness(100%)';" ontouchend="this.style.filter = 'brightness(0%)'">
+                    <div id="impostor-info" class="hidden">
+                        <p>Twoja rola:</p>
+                        <h2 id="role-name">---</h2>
+                        <hr>
+                    </div>
+                    <p>Twoja informacja:</p>
+                    <h2 id="role-data" color="black">---</h2>
+                </div>
+                <input id="input-answer" class="hidden" maxlength="16" placeholder="Podaj odpowiedz" onkeyup="sendAnswer(this.value)">
+                <p class="waiting-msg">Oczekiwanie na rozpoczęcie głosowania przez hosta...</p>
+                <div id="host-vote-controls" class="hidden">
+                    <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
+                </div>
+                <button onclick="leaveRoom()">Wyjdź z pokoju</button>
+            </div>
+
+            <!-- Ekran Głosowania -->
+            <div id="screen-vote" class="screen hidden">
+                <h3><span style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
+                <h4 class="hidden" id="players-question"></h4>
+                <div id="vote-display"></div>
+                <p class="waiting-msg">Oczekiwanie na zakończenie gry przez hosta...</p>
+                <div id="host-end-controls" class="hidden">
+                    <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
+                </div>
+                <button onclick="leaveRoom()">Wyjdź z pokoju</button>
+            </div>
+
+            <div id="screen-load" class="hidden">
+                <h3><span id="loading-info">Ładowanie... </span><span id="loading-progress" style="color: var(--danger); text-shadow: 0 0 20px var(--danger);"></span></h3>
+            </div>
+
+            <!-- Ekran Wyników -->
+            <div id="screen-results" class="screen hidden">
+                <div id="res-banner" class="res-banner">
+                    <div id="res-outcome" class="res-outcome"></div>
+                    <div id="res-summary" class="res-summary"></div>
+                    <div id="res-player-status" class="res-player-status"></div>
+                </div>
+
+                <div id="res-mode-sections"></div>
+
+                <div class="res-section">
+                    <div class="res-label">Impostorzy</div>
+                    <div id="res-impostors" class="res-player-display"></div>
+                </div>
+
+                <div class="res-section">
+                    <div class="res-label">Głosy</div>
+                    <div id="res-votes" class="res-votes"></div>
+                </div>
+
+                <div id="res-exp" class="res-exp"></div>
+
+                <button class="btn-join" onclick="playAgain()">Zagraj ponownie</button>
+                <button onclick="leaveRoom()">Powrót do menu</button>
+            </div>
+
+            <!-- Ekran Personalizacji Awatara -->
+            <div id="screen-customize" class="screen hidden">
+                <div class="customize-preview">
+                    <div class="customize-avatar">
+                        <img src="icon-192.png" id="customize-player-avatar">
+                    </div>
+                    <span class="symbol customize-dice" title="Losuj wygląd" onclick="randomizeAvatar(this)">&#9860;</span>
+                </div>
+
+                <div id="customize-categories-panel">
+                    <button class="customize-categories-tile selected" onclick="changeCustomizeCategory(this, 'eyes-customize')">Oczy</button>
+                    <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'mouth-customize')">Buzia</button>
+                    <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'pattern-customize')">Wzór</button>
+                    <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'background-customize')">Tło</button>
+                </div>
+
+                <div id="customize-options">
+                    <div class="customize-category" id="eyes-customize"></div>
+                    <div class="customize-category hidden" id="mouth-customize"></div>
+                    <div class="customize-category hidden" id="background-customize"></div>
+                    <div class="customize-category hidden" id="pattern-customize"></div>
+                </div>
+                <button class="btn-join" onclick="showScreen('screen-login')">Powrót do menu -></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Okno wyboru kategorii -->
+    <div id="category-picker" class="picker-overlay hidden" onclick="if (event.target === this) closeCategoryPicker()">
+        <div class="picker-window">
+            <div class="picker-title">— Wybierz kategorię —</div>
+            <input type="text" id="picker-search" placeholder="Szukaj kategorii" oninput="renderCategoryPicker()">
+            <div id="picker-list" class="picker-list"></div>
+            <button onclick="closeCategoryPicker()">Zamknij</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/modes/shared.js"></script>
+    <script src="js/modes/impostor.js"></script>
+    <script src="js/modes/pytania.js"></script>
+    <script src="js/categories.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/effects.js"></script>
+</body>
+</html>
