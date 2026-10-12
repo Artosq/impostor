@@ -186,12 +186,26 @@
     </div>
 
     <!-- Okno wyboru kategorii -->
-    <div id="category-picker" class="picker-overlay hidden" onclick="if (event.target === this) closeCategoryPicker()">
+    <div id="category-picker" class="picker-overlay hidden" onclick="if (event.target === this) dismissCategoryPicker()">
         <div class="picker-window">
-            <div class="picker-title">— Wybierz kategorię —</div>
-            <input type="text" id="picker-search" placeholder="Szukaj kategorii" oninput="renderCategoryPicker()">
-            <div id="picker-list" class="picker-list"></div>
-            <button onclick="closeCategoryPicker()">Zamknij</button>
+            <div id="picker-view-list" class="picker-view">
+                <div class="picker-title">— Wybierz kategorię —</div>
+                <input type="text" id="picker-search" placeholder="Szukaj kategorii" oninput="renderCategoryPicker()">
+                <div id="picker-list" class="picker-list"></div>
+                <button onclick="closeCategoryPicker()">Zamknij</button>
+            </div>
+
+            <!-- Edytor własnej kategorii -->
+            <div id="picker-view-editor" class="picker-view hidden">
+                <div id="editor-title" class="picker-title"></div>
+                <input type="text" id="editor-name" placeholder="Nazwa kategorii" oninput="updateEditorStatus()">
+                <textarea id="editor-entries" placeholder="Jedno hasło w linii, np.&#10;Pizza&#10;Kebab | Mięso, Sos" oninput="updateEditorStatus()"></textarea>
+                <p class="editor-help">Podpowiedzi dla impostora są opcjonalne: wpisz je po znaku | i oddziel przecinkami.</p>
+                <p id="editor-status" class="editor-status"></p>
+                <button class="btn-join" onclick="saveCategoryEditor()">Zapisz i wybierz</button>
+                <button id="editor-delete" class="btn-end" onclick="deleteCategoryEditor()">Usuń kategorię</button>
+                <button onclick="closeCategoryEditor()">Wróć do listy</button>
+            </div>
         </div>
     </div>
 
@@ -200,6 +214,7 @@
     <script src="js/modes/impostor.js"></script>
     <script src="js/modes/pytania.js"></script>
     <script src="js/categories.js"></script>
+    <script src="js/customCategories.js"></script>
     <script src="js/app.js"></script>
     <script src="js/effects.js"></script>
 </body>

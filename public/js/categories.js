@@ -61,6 +61,20 @@ const categoryArt = {
             <path d="M12 58c0-12 9-18 20-18s20 6 20 18"/>
             <path d="M22 13l4 5 6-8 6 8 4-5v8H22z"/>`)
     },
+    // ołówek - kategoria wpisana przez hosta
+    wlasna: {
+        emoji: '\u270F\uFE0F',
+        svg: categorySvg(`
+            <path d="M44 8l12 12-32 32-16 4 4-16z"/>
+            <path d="M36 16l12 12M12 40l12 12"/>`)
+    },
+    // plus - tworzenie nowej kategorii
+    nowa: {
+        emoji: '\u2795',
+        svg: categorySvg(`
+            <circle cx="32" cy="32" r="24"/>
+            <path d="M32 20v24M20 32h24"/>`)
+    },
     // metka
     default: {
         emoji: '\u{1F3F7}️',

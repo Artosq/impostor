@@ -56,6 +56,7 @@ let currentRoomCode = "";
 let myPlayerId = null;
 let selectedPlayers = [];
 let availableModes = [];    // tryby i ich kategorie przysłane przez serwer
+let roomCustom = null;      // własna kategoria wybrana w pokoju: { id, name, count }
 let gameMode;
 let category;
 let impostors;
@@ -371,13 +372,16 @@ function applySettings(settings) {
         gameMode = settings.mode;
         category = settings.category;
         impostors = String(settings.impostorCount);
+        roomCustom = settings.custom;
     }
 
     // Lista trybów albo ustawienia pokoju mogły jeszcze nie dotrzeć
     const mode = findMode(gameMode);
     if (!mode) return;
 
-    const selectedCategory = mode.categories.find(c => c.id === category);
+    // Własną kategorię zna tylko przeglądarka hosta - reszta dostaje jej nazwę z ustawień pokoju
+    const selectedCategory = mode.categories.find(c => c.id === category)
+        || (roomCustom && { id: category, name: roomCustom.name });
 
     markSelectedTile('mode-tile', gameMode);
     document.querySelectorAll('.impostor-tile').forEach(tile => {
@@ -404,27 +408,42 @@ function normalizeText(text) {
     return text.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/ł/g, 'l');
 }
 
+function isCustomCategorySelected(customId) {
+    return Boolean(roomCustom) && roomCustom.id === customId;
+}
+
 function renderCategoryPicker() {
+    const mode = findMode(gameMode);
     const query = normalizeText(byId('picker-search').value);
-    const matching = findMode(gameMode).categories.filter(c => normalizeText(c.name).includes(query));
+    const matches = c => normalizeText(c.name).includes(query);
     const list = byId('picker-list');
 
-    list.replaceChildren(...matching.map(c => {
+    const tiles = mode.categories.filter(matches).map(c => {
         const description = c.random ? 'Inna przy każdej grze' : `${c.count} haseł`;
         const tile = createCategoryTile(c, description, () => selectCategory(c.id));
         tile.classList.toggle('selected', c.id === category);
         return tile;
-    }));
+    });
 
-    if (matching.length === 0) {
+    // Własne kategorie hosta i kafelek do tworzenia nowej
+    if (mode.custom) {
+        loadCustomCategories().filter(matches).forEach(c => {
+            tiles.push(createCustomCategoryTile(c, isCustomCategorySelected(c.id)));
+        });
+    }
+
+    list.replaceChildren(...tiles);
+    if (tiles.length === 0) {
         list.append(createElement('p', 'picker-empty', 'Brak takiej kategorii'));
     }
+    if (mode.custom) list.append(createNewCategoryTile());
 }
 
 const PICKER_CLOSE_MS = 250;    // długość animacji wyjścia w style.css
 
 function openCategoryPicker() {
     byId('picker-search').value = "";
+    showPickerView('picker-view-list');
     renderCategoryPicker();
 
     // Kafelki wjeżdżają po kolei tylko przy otwarciu, nie przy każdym wyszukiwaniu
@@ -450,8 +469,13 @@ function closeCategoryPicker() {
     }, PICKER_CLOSE_MS);
 }
 
+// Kliknięcie w tło i Escape zamykają tylko listę - w edytorze łatwo byłoby stracić wpisane hasła
+function dismissCategoryPicker() {
+    if (!isCategoryEditorOpen()) closeCategoryPicker();
+}
+
 document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeCategoryPicker();
+    if (event.key === 'Escape') dismissCategoryPicker();
 });
 
 function createElement(tag, className, text) {

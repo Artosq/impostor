@@ -97,7 +97,7 @@ function defaultCategory(mode) {
 
 function defaultSettings() {
     const mode = getMode(listModes()[0].id);
-    return { mode: mode.id, category: defaultCategory(mode), impostorCount: 1 };
+    return { mode: mode.id, category: defaultCategory(mode), impostorCount: 1, custom: null };
 }
 
 function gameView(room, player) {
@@ -349,7 +349,7 @@ io.on('connection', (socket) => {
     });
 
     // Host zmienia ustawienia w poczekalni; nieprawidłowe wartości wracają do domyślnych
-    handle('set_room_settings', ({ roomCode, mode: modeId, category, impostorCount } = {}) => {
+    handle('set_room_settings', ({ roomCode, mode: modeId, category, impostorCount, custom } = {}) => {
         const room = rooms.get(roomCode);
         const player = room && findBySocket(room, socket);
         if (!player || room.host !== player.userId || room.status !== 'waiting') return;
@@ -358,10 +358,26 @@ io.on('connection', (socket) => {
         const mode = getMode(modeId) || getMode(room.settings.mode);
         const count = Number(impostorCount);
 
+        // Własna kategoria hosta: nowa treść przychodzi w "custom", bez niej zostaje dotychczasowa.
+        // Hasła zostają na serwerze - do graczy trafia tylko nazwa i liczba haseł.
+        let customCategory = null;
+        if (mode.customCategoryId && category === mode.customCategoryId) {
+            customCategory = custom ? mode.cleanCustomCategory(custom) : room.customCategory;
+            if (!customCategory) socket.emit('error', 'Własna kategoria jest nieprawidłowa!');
+        }
+        room.customCategory = customCategory;
+
+        let selectedCategory = defaultCategory(mode);
+        if (customCategory) selectedCategory = mode.customCategoryId;
+        else if (mode.categories.some(c => c.id === category)) selectedCategory = category;
+
         room.settings = {
             mode: mode.id,
-            category: mode.categories.some(c => c.id === category) ? category : defaultCategory(mode),
-            impostorCount: Number.isInteger(count) && count >= 1 && count < MAX_PLAYERS ? count : room.settings.impostorCount
+            category: selectedCategory,
+            impostorCount: Number.isInteger(count) && count >= 1 && count < MAX_PLAYERS ? count : room.settings.impostorCount,
+            custom: customCategory
+                ? { id: customCategory.id, name: customCategory.name, count: customCategory.entries.length }
+                : null
         };
         emitLobby(room);
     });
@@ -378,7 +394,7 @@ io.on('connection', (socket) => {
         // Kto nie wrócił z ekranu wyników, nie gra w rewanżu
         ejectAwayPlayers(room);
 
-        const error = mode.start(room, room.settings);
+        const error = mode.start(room, { ...room.settings, customCategory: room.customCategory });
         if (error) return socket.emit('error', error);
 
         room.mode = mode;

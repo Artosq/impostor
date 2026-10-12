@@ -7,7 +7,11 @@
 //   categories            [{ id, name, count, random }] do wyboru w poczekalni (może być puste);
 //                         count = liczba haseł, random = pozycja "losowa", nie wybierana domyślnie
 //   start(room, options)  przygotowuje rundę: ustawia room.round i role graczy;
-//                         zwraca komunikat błędu albo null. options: { category, impostorCount }
+//                         zwraca komunikat błędu albo null.
+//                         options: { category, impostorCount, customCategory }
+//   customCategoryId, customLimits, cleanCustomCategory(input)
+//                         (opcjonalne) tryb przyjmuje kategorię wpisaną przez hosta: sprawdza ją
+//                         i zwraca { id, name, entries } albo null. Gościom trafia tylko nazwa i liczba.
 //   playerView(room, player)                to, co gracz widzi w trakcie gry
 //   onAction(room, player, type, payload)   akcje gracza specyficzne dla trybu
 //   voteView(room)                          dane ekranu głosowania
@@ -36,7 +40,12 @@ function getMode(id) {
 
 // Lista dla klienta: z niej budują się kafelki trybów i kategorii
 function listModes() {
-    return modes.map(({ id, name, categories }) => ({ id, name, categories }));
+    return modes.map(mode => ({
+        id: mode.id,
+        name: mode.name,
+        categories: mode.categories,
+        custom: mode.customCategoryId ? { id: mode.customCategoryId, limits: mode.customLimits } : null
+    }));
 }
 
 module.exports = { getMode, listModes };
