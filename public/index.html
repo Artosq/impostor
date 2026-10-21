@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostor Game v0.4🕵️‍♂️</title>
+    <title>Impostor Game v1🕵️‍♂️</title>
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="manifest" href="manifest.json">
 
@@ -12,10 +12,7 @@
 
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/scrollbar.css">
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/fonts.css">
 </head>
 <body>
     <canvas id="rippleCanvas"></canvas>
@@ -30,14 +27,39 @@
         </div>
         <div id="error-display"></div>
 
+        <!-- Lewy róg: wyjście z pokoju -->
+        <button class="corner-btn corner-left hidden" id="btn-leave" onclick="leaveClick()" title="Wyjdź z pokoju" aria-label="Wyjdź z pokoju">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4H6v16h8"/><path d="M10 12h11M17 8l4 4-4 4"/></svg>
+            <span class="corner-label">Na pewno?</span>
+        </button>
+        <!-- Prawy róg: dźwięk, zasady (tylko menu), instalacja (tylko menu) -->
+        <div class="corner-group">
+            <button class="corner-btn corner-help" id="btn-sound" onclick="toggleSound()" title="Wycisz" aria-label="Wycisz">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="sound-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="sound-off" d="M16 9l5 6M21 9l-5 6"/></svg>
+            </button>
+            <button class="corner-btn corner-help hidden" id="btn-rules" onclick="openRules()" title="Jak grać?" aria-label="Jak grać?">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 9a3 3 0 1 1 4 2.8c-.7.3-1 .9-1 1.7V14"/><path d="M12 18h.01"/></svg>
+            </button>
+            <button class="corner-btn corner-install hidden" id="btn-download" onclick="installApp()" title="Zainstaluj aplikację" aria-label="Zainstaluj aplikację">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>
+            </button>
+        </div>
+        <div id="install-help" class="install-help hidden" onclick="this.classList.add('hidden')">
+            Na iPhonie: <b>Udostępnij</b> &rarr; <b>Do ekranu początkowego</b>
+        </div>
+
         <div id="error-blur" style="transition: 0.8s ease-in-out;">
-            <button class="btn-download" id="btn-download">POBIERZ APLIKACJE IMPOSTOR</button>
             <div class="logo hidden" id="logo"><img src="logo4.png" width="250px"></div>
 
             <!-- Ekran Logowania -->
             <div id="screen-login" class="screen">
                 <div id="player-stats">
-                    <img src="icon-192.png" id="main-player-avatar" onclick="customizeAvatar()">
+                    <div class="main-avatar" onclick="customizeAvatar()" title="Zmień wygląd">
+                        <img src="icon-192.png" id="main-player-avatar" alt="Twój awatar">
+                        <span class="edit-badge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
+                        </span>
+                    </div>
                     <div id="player-stats-rest">
                         <span id="exp-counter" style="font-size: 14px; color: var(--secondary); text-shadow: 0 0 20px var(--secondary); transition: 1s;">Exp: 947</span>
                         <div id="main-exp-wrapper">
@@ -92,7 +114,6 @@
                 </div>
                 <p id="room-settings" class="waiting-msg room-settings"></p>
                 <p class="waiting-msg">Oczekiwanie na start przez hosta...</p>
-                <button onclick="leaveRoom()">Wyjdź z pokoju</button>
             </div>
 
             <!-- Ekran Gry -->
@@ -113,7 +134,6 @@
                 <div id="host-vote-controls" class="hidden">
                     <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
                 </div>
-                <button onclick="leaveRoom()">Wyjdź z pokoju</button>
             </div>
 
             <!-- Ekran Głosowania -->
@@ -125,7 +145,6 @@
                 <div id="host-end-controls" class="hidden">
                     <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
                 </div>
-                <button onclick="leaveRoom()">Wyjdź z pokoju</button>
             </div>
 
             <div id="screen-load" class="hidden">
@@ -154,8 +173,16 @@
 
                 <div id="res-exp" class="res-exp"></div>
 
+                <div id="install-offer" class="install-offer hidden">
+                    <div>Spodobało się? Zainstaluj Impostora</div>
+                    <div class="install-offer-actions">
+                        <button class="install-offer-yes" onclick="installApp()">Zainstaluj</button>
+                        <button class="install-offer-no" onclick="byId('install-offer').classList.add('hidden')">Nie teraz</button>
+                    </div>
+                </div>
+
                 <button class="btn-join" onclick="playAgain()">Zagraj ponownie</button>
-                <button onclick="leaveRoom()">Powrót do menu</button>
+                <button class="btn-secondary" onclick="leaveRoom()">Powrót do menu</button>
             </div>
 
             <!-- Ekran Personalizacji Awatara -->
@@ -167,20 +194,25 @@
                     <span class="symbol customize-dice" title="Losuj wygląd" onclick="randomizeAvatar(this)">&#9860;</span>
                 </div>
 
-                <div id="customize-categories-panel">
-                    <button class="customize-categories-tile selected" onclick="changeCustomizeCategory(this, 'eyes-customize')">Oczy</button>
-                    <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'mouth-customize')">Buzia</button>
-                    <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'pattern-customize')">Wzór</button>
-                    <button class="customize-categories-tile" onclick="changeCustomizeCategory(this, 'background-customize')">Tło</button>
-                </div>
+                <div id="customize-categories-panel"></div>
 
                 <div id="customize-options">
-                    <div class="customize-category" id="eyes-customize"></div>
-                    <div class="customize-category hidden" id="mouth-customize"></div>
-                    <div class="customize-category hidden" id="background-customize"></div>
-                    <div class="customize-category hidden" id="pattern-customize"></div>
+                    <div class="customize-category" id="customize-list"></div>
                 </div>
                 <button class="btn-join" onclick="showScreen('screen-login')">Powrót do menu -></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zasady gry w 3 obrazkach -->
+    <div id="rules" class="picker-overlay hidden" onclick="if (event.target === this) closeRules()">
+        <div class="picker-window rules-window">
+            <div class="picker-title">— Jak grać —</div>
+            <div id="rules-slide" class="rules-slide"></div>
+            <div id="rules-dots" class="rules-dots"></div>
+            <div class="rules-nav">
+                <button id="rules-prev" class="btn-secondary" onclick="changeRulesSlide(-1)">Wstecz</button>
+                <button id="rules-next" class="btn-join" onclick="changeRulesSlide(1)">Dalej</button>
             </div>
         </div>
     </div>
@@ -215,7 +247,10 @@
     <script src="js/modes/pytania.js"></script>
     <script src="js/categories.js"></script>
     <script src="js/customCategories.js"></script>
+    <script src="js/sounds.js"></script>
+    <script src="js/nicks.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/rules.js"></script>
     <script src="js/effects.js"></script>
 </body>
 </html>

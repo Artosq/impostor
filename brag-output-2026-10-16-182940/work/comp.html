@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="pl"><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--danger:#e74c3c;--secondary:#2ecc71;--primary:#3498db}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#161616}
+body{font-family:"Silkscreen",sans-serif;color:#eee;position:relative}
+#grid{position:absolute;inset:-140px;
+  background-image:linear-gradient(0deg,transparent 24%,rgba(255,255,255,.07) 25%,rgba(255,255,255,.07) 27%,transparent 28%,transparent 74%,rgba(255,255,255,.07) 75%,rgba(255,255,255,.07) 77%,transparent 78%,transparent),
+  linear-gradient(90deg,transparent 24%,rgba(255,255,255,.07) 25%,rgba(255,255,255,.07) 27%,transparent 28%,transparent 74%,rgba(255,255,255,.07) 75%,rgba(255,255,255,.07) 77%,transparent 78%,transparent);
+  background-size:70px 70px}
+#glow{position:absolute;width:1500px;height:1500px;border-radius:50%;left:-210px;top:210px;filter:blur(40px)}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.78) 100%);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+#stage{position:absolute;inset:0}
+.clip{position:absolute;inset:0;display:none}
+.abs{position:absolute}
+.crop{position:absolute;overflow:hidden;border-radius:26px;background:#1f1f1f;box-shadow:0 30px 70px rgba(0,0,0,.85)}
+.crop img{position:absolute;left:0;display:block}
+.h1{font-weight:700;font-size:88px;letter-spacing:8px;white-space:nowrap;line-height:1.25}
+.side{font-weight:700;font-size:72px;letter-spacing:6px;white-space:nowrap}
+.h2{font-size:40px;letter-spacing:4px;white-space:nowrap}
+.red{color:var(--danger);text-shadow:0 0 30px var(--danger)}
+.green{color:var(--secondary);text-shadow:0 0 26px var(--secondary)}
+.blue{color:var(--primary);text-shadow:0 0 26px var(--primary)}
+.center{left:0;right:0;text-align:center}
+.name{font-size:30px;letter-spacing:4px;color:#999;text-align:center}
+.tap{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:6px solid #fff;opacity:0;box-shadow:0 0 30px #fff}
+.hold{position:absolute;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.08) 70%);border:5px solid rgba(255,255,255,.9);opacity:0}
+.bubble{position:absolute;background:#f0f0f0;color:#161616;font-weight:700;font-size:44px;letter-spacing:4px;padding:18px 30px;border-radius:22px;white-space:nowrap;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.bubble:after{content:"";position:absolute;left:50%;bottom:-22px;margin-left:-16px;border:16px solid transparent;border-top:22px solid #f0f0f0;border-bottom:0}
+.bubble.bad{background:var(--danger);color:#fff;box-shadow:0 0 40px rgba(231,76,60,.8)}
+.bubble.bad:after{border-top-color:var(--danger)}
+.av{position:absolute;border-radius:18px;border:8px solid #000;box-shadow:0 20px 50px rgba(0,0,0,.7)}
+.stamp{position:absolute;font-weight:700;white-space:nowrap}
+.spark{position:absolute;width:20px;height:20px;background:var(--secondary);box-shadow:0 0 16px var(--secondary)}
+</style></head><body>
+<div id="grid"></div><div id="glow"></div>
+<div id="stage"></div>
+<div id="vig"></div><div id="flash"></div>
+<script>
+const W = 1080, H = 1920;
+const B = 60 / 128;                       // one beat
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => cl((t - a) / (b - a));
+const oC = x => 1 - Math.pow(1 - x, 3);
+const oB = x => { const c = 1.7, c3 = c + 1; return 1 + c3 * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const stage = $('stage');
+
+function el(parent, tag, cls, style, html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (style) e.style.cssText = style;
+  if (html !== undefined) e.innerHTML = html;
+  parent.append(e); return e;
+}
+// Crop of a screenshot: source rows y0..y1, shown w px wide at (x, y); x defaults to centred.
+function crop(parent, srcs, { srcW = 1152, y0, y1, w, x = (W - w) / 2, y, rot = 0 }) {
+  const s = w / srcW;
+  const box = el(parent, 'div', 'crop', `left:${x}px;top:${y}px;width:${w}px;height:${(y1 - y0) * s}px`);
+  box.imgs = [].concat(srcs).map(src => { const i = el(box, 'img', '', `width:${w}px;top:${-y0 * s}px`); i.src = 'shots/' + src + '.png'; return i; });
+  box.rot = rot; box.s = s;
+  box.at = (sx, sy) => [x + sx * s, y + (sy - y0) * s];
+  return box;
+}
+function swap(box, t, times) { box.imgs.forEach((im, k) => im.style.opacity = k === 0 || t >= times[k] ? 1 : 0); }
+function pop(t, at, amt = 0.05, len = 0.2) { return 1 + Math.sin(seg(t, at, at + len) * Math.PI) * amt; }
+function tapEl(root, box, sx, sy) { const e = el(root, 'div', 'tap'); const [x, y] = box.at(sx, sy); e.style.left = x + 'px'; e.style.top = y + 'px'; return e; }
+function tapAt(e, t, at) {
+  const p = seg(t, at - 0.12, at + 0.3);
+  e.style.opacity = p > 0 && p < 1 ? 1 - p : 0;
+  e.style.transform = `scale(${0.4 + p * 0.9})`;
+}
+function show(e, t, at, dy = 30, d = 0.3) {
+  const p = oC(seg(t, at, at + d));
+  e.style.opacity = t >= at ? p : 0; e.style.transform = `translateY(${(1 - p) * dy}px)`;
+}
+function slam(e, t, at, from = 1.5, d = 0.2) {
+  const p = oC(seg(t, at, at + d));
+  e.style.opacity = t >= at ? 1 : 0; e.style.transform = `scale(${from - (from - 1) * p})`;
+}
+
+const clips = [];
+function clip(a, b, build, glow = 'green', punch = true) {
+  const root = el(stage, 'div', 'clip');
+  clips.push({ a: a * B, b: b * B, root, upd: build(root), glow, punch });
+}
+
+// (1) HOOK b0-12: four covered cards, held and revealed one by one; Ola is the impostor
+const REV = { Kasia: 2, Tomek: 4, Maciek: 6, Ola: 8.5 };
+Object.keys(REV).forEach(k => REV[k] *= B);
+clip(0, 12, root => {
+  const h1 = el(root, 'div', 'abs h1 center', 'top:190px', 'WSZYSCY<br>ZNAJĄ HASŁO.');
+  const h2 = el(root, 'div', 'abs h1 center red', 'top:190px', 'OPRÓCZ<br>JEDNEGO.');
+  const cards = ['Kasia', 'Tomek', 'Ola', 'Maciek'].map((n, i) => {
+    const wrap = el(root, 'div', 'abs', `left:${70 + (i % 2) * 500}px;top:${560 + Math.floor(i / 2) * 560}px;width:440px`);
+    const c = crop(wrap, [`game-${n}-hidden`, `game-${n}-shown`], { y0: 560, y1: 1600, w: 440, x: 0, y: 0 });
+    c.style.position = 'relative';
+    const fl = el(c, 'div', '', `position:absolute;left:34px;right:34px;top:${245 * c.s}px;height:${770 * c.s}px;border-radius:10px;background:#fff;opacity:0`);
+    const nm = el(wrap, 'div', 'name', 'margin-top:22px', n);
+    const hold = el(wrap, 'div', 'hold', `left:220px;top:${(1190 - 560) * c.s}px`);
+    return { n, wrap, c, fl, nm, hold, r: REV[n] };
+  });
+  return t => {
+    h1.style.opacity = t < REV.Ola ? oC(seg(t, 0.05, 0.35)) : 0;
+    slam(h2, t, REV.Ola, 1.3);
+    cards.forEach((k, i) => {
+      const imp = k.n === 'Ola';
+      const enter = oC(seg(t, 0.06 * i, 0.06 * i + 0.45));
+      const shake = imp && t > k.r && t < k.r + 0.5 ? Math.sin(t * 95) * 12 * (1 - seg(t, k.r, k.r + 0.5)) : 0;
+      k.wrap.style.transform = `translate(${shake}px, ${(1 - enter) * 200}px) scale(${pop(t, k.r, imp ? 0.1 : 0.05, imp ? 0.35 : 0.25)})`;
+      k.wrap.style.opacity = enter;
+      swap(k.c, t, [0, k.r]);
+      k.fl.style.opacity = t >= k.r ? 0.85 * (1 - seg(t, k.r, k.r + 0.3)) : 0;
+      const hp = seg(t, k.r - 0.55, k.r);    // finger held on the card, released on reveal
+      k.hold.style.opacity = hp > 0 && t < k.r + 0.15 ? (t < k.r ? 0.4 + hp * 0.6 : 1 - seg(t, k.r, k.r + 0.15)) : 0;
+      k.hold.style.transform = `scale(${0.7 + hp * 0.4})`;
+      k.c.style.filter = `brightness(${!imp && t > REV.Ola ? 1 - 0.55 * seg(t, REV.Ola, REV.Ola + 0.3) : 1})`;
+      k.c.style.boxShadow = imp && t >= k.r ? `0 0 ${70 + 30 * Math.sin(t * 7)}px rgba(231,76,60,.75), 0 30px 70px rgba(0,0,0,.85)` : '';
+      k.nm.style.color = imp && t >= k.r ? '#e74c3c' : '#999';
+    });
+  };
+}, 'green', false);
+
+// (2) TWÓJ ROBOT b12-24: the customization menu, one part per tab
+const STEPS = [
+  { label: 'OCZY', tab: [206, 814], tile: [294, 1414] },
+  { label: 'BUZIA', tab: [453, 814], tile: [294, 1696] },
+  { label: 'WZÓR', tab: [699, 814], tile: [294, 1414] },
+  { label: 'TŁO', tab: [946, 814], tile: [576, 1414] },
+];
+const STEP0 = 1.75, STEP_LEN = 2.25;          // beats, relative to clip start
+clip(12, 24, root => {
+  const srcs = ['cs-start'];
+  STEPS.forEach((_, i) => srcs.push(`cs-${i}-tab`, `cs-${i}-scroll`, `cs-${i}-pick`));
+  const c = crop(root, srcs, { y0: 0, y1: 1960, w: 700, y: 600 });
+  const times = [0];
+  STEPS.forEach((_, i) => { const s = (STEP0 + i * STEP_LEN) * B; times.push(s, s + 0.6 * B, s + 1.25 * B); });
+  const tapTab = STEPS.map(s => tapEl(root, c, ...s.tab));
+  const tapTile = STEPS.map(s => tapEl(root, c, ...s.tile));
+  const intro = el(root, 'div', 'abs side center', 'top:230px', 'TWÓJ ROBOT.');
+  const labels = STEPS.map((s, i) => el(root, 'div', 'abs h1 center', 'top:250px;font-size:120px', s.label));
+  const n = el(root, 'div', 'abs h2 center', 'top:420px;color:#999', '');
+  const done = el(root, 'div', 'abs h1 center green', 'top:250px;font-size:120px', 'GOTOWE!');
+  return (t, lt) => {
+    swap(c, lt, times);
+    const firstStep = times[1];
+    slam(intro, lt, 0, 1.3);
+    if (lt >= firstStep) intro.style.opacity = 0;
+    let p = 1;
+    STEPS.forEach((s, i) => {
+      const ts = times[1 + i * 3], tp = times[3 + i * 3], next = times[4 + i * 3] ?? 10.5 * B;
+      tapAt(tapTab[i], lt, ts); tapAt(tapTile[i], lt, tp);
+      labels[i].style.display = lt >= ts && lt < next ? 'block' : 'none';
+      if (lt >= ts && lt < next) slam(labels[i], lt, ts, 1.3);
+      p *= pop(lt, tp, 0.025, 0.2);
+    });
+    const end = 10.5 * B;
+    slam(done, lt, end, 1.4);
+    const step = STEPS.findIndex((s, i) => lt >= times[1 + i * 3] && lt < (times[4 + i * 3] ?? end));
+    n.textContent = step >= 0 ? `${step + 1} / 4` : '';
+    n.style.opacity = step >= 0 ? 1 : 0;
+    c.style.transform = `scale(${p})`;
+  };
+});
+
+// (3) POKÓJ b24-38
+clip(24, 29, root => {
+  const c = crop(root, ['lobby1', 'lobby2', 'lobby3', 'lobby4'], { y0: 480, y1: 1400, w: 900, y: 760, rot: -1.5 });
+  const a = el(root, 'div', 'abs side center', 'top:220px', 'STWÓRZ POKÓJ.');
+  const k = el(root, 'div', 'abs side center red', 'top:340px', 'KOD: 2970');
+  const b = el(root, 'div', 'abs h2 center green', 'top:480px', 'Ekipa dołącza z telefonów.');
+  return (t, lt) => {
+    slam(a, lt, 0, 1.3); slam(k, lt, B, 1.4); show(b, lt, 2 * B);
+    swap(c, lt, [0, B, 2 * B, 3 * B]);
+    c.style.transform = `rotate(-1.5deg) scale(${pop(lt, B, .04) * pop(lt, 2 * B, .04) * pop(lt, 3 * B, .04)})`;
+  };
+});
+clip(29, 32, root => {
+  const c = crop(root, 'roomlist', { y0: 1440, y1: 2110, w: 960, y: 700, rot: 1.5 });
+  const a = el(root, 'div', 'abs side center', 'top:300px', 'LISTA POKOI.');
+  const b = el(root, 'div', 'abs h2 center green', 'top:420px', 'Dołącz jednym kliknięciem.');
+  return (t, lt) => { slam(a, lt, 0, 1.3); show(b, lt, B); c.style.transform = `rotate(1.5deg) translateY(${-lt * 25}px)`; };
+});
+clip(32, 35, root => {
+  const c = crop(root, ['lobby-troll', 'lobby-private'], { y0: 480, y1: 820, w: 1000, y: 820 });
+  const tp = tapEl(root, c, 791, 747);
+  const a = el(root, 'div', 'abs h1 center red', 'top:340px;font-size:84px', 'PRYWATNY.');
+  return (t, lt) => { const k = B; swap(c, lt, [0, k]); tapAt(tp, lt, k); slam(a, lt, k, 1.4); c.style.transform = `scale(${pop(lt, k, .03)})`; };
+}, 'red');
+clip(35, 38, root => {
+  const c = crop(root, ['lobby-private', 'lobby-kicked'], { y0: 700, y1: 1400, w: 1000, y: 700 });
+  const tp = tapEl(root, c, 783, 1163);
+  const [tx, ty] = c.at(650, 1100);
+  const poof = el(root, 'div', 'abs', `left:${tx - 170}px;top:${ty - 170}px;width:340px;height:340px;border-radius:50%;background:radial-gradient(circle,rgba(231,76,60,.9),transparent 65%)`);
+  const a = el(root, 'div', 'abs side center red', 'top:280px', 'TROLL?');
+  const b = el(root, 'div', 'abs side center', 'top:400px', 'WYRZUĆ.');
+  return (t, lt) => {
+    const k = 1.3 * B;
+    swap(c, lt, [0, k]); tapAt(tp, lt, k - 0.1);
+    poof.style.opacity = lt >= k ? 1 - seg(lt, k, k + 0.4) : 0;
+    poof.style.transform = `scale(${0.5 + seg(lt, k, k + 0.4)})`;
+    slam(a, lt, 0, 1.3); slam(b, lt, k, 1.5);
+    c.style.transform = `scale(${pop(lt, k, .03)})`;
+  };
+}, 'red');
+
+// (4) KATEGORIE b38-48
+clip(38, 42.5, root => {
+  const c = crop(root, 'picker', { srcW: 1140, y0: 0, y1: 2136, w: 620, x: 400, y: 640, rot: 1.5 });
+  const tp = tapEl(root, c, 400, 1765);
+  const a = el(root, 'div', 'abs side', 'left:70px;top:180px', 'PONAD');
+  const n = el(root, 'div', 'abs h1 green', 'left:70px;top:270px;font-size:170px', '1300');
+  const b = el(root, 'div', 'abs side', 'left:70px;top:480px', 'HASEŁ.');
+  return (t, lt) => {
+    const p = oC(seg(lt, 0, 0.35));
+    c.style.transform = `translateY(${(1 - p) * 1200}px) rotate(1.5deg)`;
+    c.style.clipPath = `inset(0 0 ${(1 - seg(lt, 0.1, 0.9)) * 100}% 0 round 26px)`;
+    slam(a, lt, B, 1.3); slam(n, lt, B * 1.5, 1.6); slam(b, lt, B * 2, 1.3);
+    tapAt(tp, lt, B * 4);
+  };
+});
+clip(42.5, 48, root => {
+  const c = crop(root, ['editor1', 'editor2', 'editor3', 'editor4'], { srcW: 1140, y0: 0, y1: 1446, w: 860, y: 640, rot: -1.5 });
+  const a = el(root, 'div', 'abs side center green', 'top:250px', 'NASZE ŻARTY.');
+  const b = el(root, 'div', 'abs h2 center', 'top:370px', 'Własna kategoria w minutę.');
+  return (t, lt) => {
+    const ts = [0, 0.5, 1.5, 2.5].map(x => x * B + 0.25);
+    swap(c, lt, ts);
+    c.style.transform = `rotate(-1.5deg) scale(${(0.92 + 0.08 * oB(seg(lt, 0, 0.3))) * pop(lt, ts[2], .02) * pop(lt, ts[3], .02)})`;
+    slam(a, lt, 0, 1.3); show(b, lt, B * 1.5);
+  };
+});
+
+// (5) ROZGRYWKA b48-59
+clip(48, 50, root => {
+  const c = crop(root, 'game-Kasia-shown', { y0: 560, y1: 780, w: 1060, y: 820 });
+  c.style.background = 'transparent'; c.style.boxShadow = 'none';
+  return (t, lt) => { c.style.transform = `scale(${1.25 - 0.25 * oC(seg(lt, 0, 0.2)) + lt * 0.03})`; };
+});
+clip(50, 59, root => {
+  const names = ['Kasia', 'Tomek', 'Ola', 'Maciek'];
+  const pos = names.map((n, i) => [150 + (i % 2) * 520, 980 + Math.floor(i / 2) * 470]);   // avatar top-left, 260px
+  const avs = names.map((n, i) => { const a = el(root, 'img', 'av', `left:${pos[i][0]}px;top:${pos[i][1]}px;width:260px;height:260px`); a.src = `av/${n}.svg`; return a; });
+  const nm = names.map((n, i) => el(root, 'div', 'abs name', `left:${pos[i][0]}px;top:${pos[i][1] + 280}px;width:260px`, n));
+  const head = el(root, 'div', 'abs h2 center', 'top:220px', 'KATEGORIA: <span class="red">FILMY</span>');
+  const bub = [['Tomek', 'LÓD', 0], ['Kasia', 'ORKIESTRA', 1.5], ['Maciek', 'DRZWI', 3]].map(([n, w, k]) => {
+    const i = names.indexOf(n);
+    return { e: el(root, 'div', 'bubble', `left:${pos[i][0] + 130}px;top:${pos[i][1] - 120}px;transform-origin:50% 120%`, w), at: k * B, i };
+  });
+  const hint = crop(root, 'game-Ola-shown', { y0: 800, y1: 1575, w: 600, y: 330 });
+  const ob = el(root, 'div', 'bubble bad', `left:${pos[2][0] + 130}px;top:${pos[2][1] - 120}px;transform-origin:50% 120%`, 'WULKAN?');
+  const q = names.map((n, i) => el(root, 'div', 'stamp red', `left:${pos[i][0] + 200}px;top:${pos[i][1] - 70}px;font-size:72px`, '?!'));
+  return (t, lt) => {
+    const wb = 6.5 * B;
+    bub.forEach(b => {
+      b.e.style.marginLeft = -b.e.offsetWidth / 2 + 'px';
+      b.e.style.opacity = lt >= b.at && lt < 4.5 * B ? 1 : 0;
+      b.e.style.transform = `scale(${oB(seg(lt, b.at, b.at + 0.2))})`;
+      avs[b.i].style.transform = `translateY(${-Math.sin(seg(lt, b.at, b.at + 0.25) * Math.PI) * 30}px)`;
+    });
+    const hp = seg(lt, 4.5 * B, 4.5 * B + 0.25), hout = seg(lt, 6.3 * B, 6.3 * B + 0.15);
+    hint.style.opacity = oC(hp) * (1 - hout);
+    hint.style.transform = `translateY(${(1 - oC(hp)) * 200}px) scale(${0.9 + 0.1 * oC(hp)})`;
+    ob.style.marginLeft = -ob.offsetWidth / 2 + 'px';
+    ob.style.opacity = lt >= wb ? 1 : 0;
+    ob.style.transform = `scale(${oB(seg(lt, wb, wb + 0.2))}) rotate(${lt > wb ? Math.sin(lt * 40) * 2 : 0}deg)`;
+    if (lt > wb) avs[2].style.transform = `translateX(${Math.sin(lt * 70) * 5}px)`;
+    avs[2].style.boxShadow = lt > wb ? '0 0 60px rgba(231,76,60,.9)' : '';
+    nm[2].style.color = lt > wb ? '#e74c3c' : '#999';
+    q.forEach((e, i) => { if (i === 2) { e.style.opacity = 0; return; } slam(e, lt, 8 * B + i * 0.05, 1.8, 0.15); });
+    head.style.opacity = (1 - hp) * oC(seg(lt, 0, 0.3)) + hout * (lt > 6 * B ? 1 : 0);
+  };
+});
+
+// (6) ZWROT AKCJI b59-68
+clip(59, 61, root => {
+  const a = el(root, 'div', 'abs h1 center', 'top:700px', 'ZWROT AKCJI:');
+  const b = el(root, 'div', 'abs h1 center blue', 'top:860px;font-size:120px;line-height:1.15', 'TRYB<br>PYTANIA');
+  return (t, lt) => {
+    slam(a, lt, 0, 1.3); slam(b, lt, B, 1.6);
+    if (lt > B && lt < B + 0.2) b.style.transform += ` translateX(${Math.sin(lt * 200) * 14}px)`;
+  };
+}, 'blue');
+clip(61, 68, root => {
+  const c = crop(root, 'pyt-vote', { y0: 700, y1: 1995, w: 680, y: 700, rot: 1.5 });
+  const [hx, hy] = c.at(105, 1542);
+  const hl = el(root, 'div', 'abs', `left:${hx - 8}px;top:${hy - 8}px;width:${440 * c.s + 16}px;height:${440 * c.s + 16}px;border:8px solid #e74c3c;border-radius:20px;box-shadow:0 0 50px #e74c3c, inset 0 0 40px rgba(231,76,60,.6)`);
+  const qa = el(root, 'div', 'abs h2 center', 'top:170px', 'ILE PAR BUTÓW MASZ?');
+  const ans = [['3', 1], ['4', 1.5], ['2', 2], ['40', 2.5]].map(([v, b], i) => ({
+    e: el(root, 'div', 'stamp ' + (v === '40' ? 'red' : ''), `left:${110 + i * 190}px;top:250px;font-size:${v === '40' ? 170 : 130}px`, v), at: b * B }));
+  const sus = el(root, 'div', 'abs side center red', 'top:500px', '40?! SERIO?');
+  return (t, lt) => {
+    const h = 4 * B;
+    c.style.transform = `rotate(1.5deg) scale(${pop(lt, h, 0.03)})`;
+    show(qa, lt, 0);
+    ans.forEach(a => slam(a.e, lt, a.at, 1.8, 0.15));
+    hl.style.opacity = lt >= h ? 0.7 + 0.3 * Math.sin(lt * 14) : 0;
+    hl.style.transform = `rotate(1.5deg) scale(${pop(lt, h, .08)})`;
+    slam(sus, lt, h, 1.4);
+  };
+}, 'red');
+
+// (7) FINAŁ b68-76
+clip(68, 70, root => {
+  const c = crop(root, ['pyt-vote', 'pyt-vote-picked'], { y0: 560, y1: 1995, w: 760, y: 500, rot: -1.5 });
+  const tp = tapEl(root, c, 325, 1760);
+  const a = el(root, 'div', 'abs side center', 'top:240px', 'GŁOSUJCIE.');
+  return (t, lt) => { swap(c, lt, [0, 0.6 * B]); tapAt(tp, lt, 0.6 * B); slam(a, lt, 0, 1.3); c.style.transform = `rotate(-1.5deg) scale(${pop(lt, .6 * B, .03)})`; };
+});
+clip(70, 73, root => {
+  const ok = el(root, 'img', 'av', 'left:290px;top:760px;width:500px;height:500px');
+  const dead = el(root, 'img', 'av', 'left:290px;top:760px;width:500px;height:500px;box-shadow:0 0 90px rgba(231,76,60,.9)');
+  ok.src = 'av/Ola.svg'; dead.src = 'av/Ola-dead.svg';
+  const w = el(root, 'div', 'abs h1 center green', 'top:420px;font-size:116px', 'WYGRANA');
+  const s = el(root, 'div', 'abs h2 center', 'top:1360px;line-height:1.5', 'IMPOSTOR<br>ZOSTAŁ ZŁAPANY');
+  const sparks = [...Array(48)].map((_, i) => {
+    const e = el(root, 'div', 'spark'); const ang = i * 2.399, sp = 300 + (i * 97) % 520;
+    e.style.background = ['#e74c3c', '#2ecc71', '#fff'][i % 3];
+    return { e, dx: Math.cos(ang) * sp, dy: Math.sin(ang) * sp };
+  });
+  return (t, lt) => {
+    const hit = B;
+    dead.style.opacity = lt >= hit ? 1 : 0;
+    ok.style.transform = dead.style.transform = `scale(${pop(lt, hit, 0.12, 0.3)}) rotate(${lt >= hit ? -6 * seg(lt, hit, hit + 0.2) : 0}deg)`;
+    slam(w, lt, hit, 1.7); show(s, lt, hit + 0.3);
+    const sp = seg(lt, hit, hit + 1.1);
+    sparks.forEach(k => {
+      k.e.style.opacity = lt >= hit ? 1 - sp : 0;
+      k.e.style.left = 540 - 10 + k.dx * oC(sp) + 'px';
+      k.e.style.top = 1010 - 10 + k.dy * oC(sp) + 300 * sp * sp + 'px';
+    });
+  };
+});
+clip(73, 76, root => {
+  const r = crop(root, 'pyt-results', { y0: 2050, y1: 2380, w: 1000, y: 800 });
+  const tp = tapEl(root, r, 577, 2320);
+  const l = crop(root, 'lobby-again', { y0: 480, y1: 1420, w: 860, y: 600 });
+  const a = el(root, 'div', 'abs h1 center green', 'top:300px;font-size:80px', 'I JESZCZE<br>RAZ!');
+  return (t, lt) => {
+    const k = 1.2 * B;
+    tapAt(tp, lt, k - 0.1);
+    r.style.display = lt < k ? 'block' : 'none';
+    r.style.transform = `scale(${pop(lt, k - 0.1, .04)})`;
+    const w = oC(seg(lt, k, k + 0.25));
+    l.style.display = lt >= k ? 'block' : 'none';
+    l.style.transform = `translateX(${(1 - w) * 1100}px) rotate(${(1 - w) * 8}deg)`;
+    slam(a, lt, k + 0.1, 1.4);
+  };
+});
+
+// (8) OUTRO b76-80
+clip(76, 81, root => {
+  const logo = el(root, 'img', 'abs', 'width:820px;left:130px;top:520px;filter:drop-shadow(0 0 40px rgba(255,255,255,.22))');
+  logo.src = '../../public/logo4.png';
+  const a = el(root, 'div', 'abs h1 center red', 'top:1080px;font-size:110px;line-height:1.15', 'KTO<br>KŁAMIE?');
+  return (t, lt) => {
+    const p = seg(lt, 0, 0.3);
+    logo.style.opacity = oC(p); logo.style.transform = `scale(${0.85 + 0.15 * oB(p)})`;
+    slam(a, lt, B, 1.4);
+  };
+}, 'red');
+
+const GLOW = { green: 'rgba(46,204,113,.11)', red: 'rgba(231,76,60,.16)', blue: 'rgba(52,152,219,.14)' };
+const HITS = [8.5, 36.3, 59, 71, 76].map(b => b * B);
+window.render = function (t) {
+  let active = null;
+  clips.forEach(c => { const on = t >= c.a && t < c.b; c.root.style.display = on ? 'block' : 'none'; if (on) active = c; });
+  if (active) {
+    const lt = t - active.a;
+    active.upd(t, lt);
+    const p = active.punch ? oC(seg(lt, 0, 0.18)) : 1;
+    active.root.style.transform = `scale(${1.06 - 0.06 * p})`;
+    active.root.querySelectorAll('.crop').forEach(c => { if (c.rot && !c.style.transform) c.style.transform = `rotate(${c.rot}deg)`; });
+    const g = active.a === 0 && t >= REV.Ola ? 'red' : active.glow;
+    $('glow').style.background = `radial-gradient(circle, ${GLOW[g]} 0%, transparent 60%)`;
+  }
+  $('flash').style.opacity = HITS.reduce((m, h) => Math.max(m, t >= h ? 0.35 * (1 - seg(t, h, h + 0.15)) : 0), 0);
+  $('grid').style.transform = `translate(${(t * 20) % 70}px, ${(t * 12) % 70}px)`;
+};
+window.ready = Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode().catch(() => {}))]);
+render(0);
+</script></body></html>

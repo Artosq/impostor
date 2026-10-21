@@ -5,7 +5,8 @@ const crypto = require('crypto');
 const { Server } = require('socket.io');
 const { cleanText, publicPlayer } = require('./utils');
 const { getMode, listModes } = require('./modes');
-const { cleanAvatar, sendAvatar } = require('./avatars');
+const avatars = require('./avatars');
+const nicks = require('./public/js/nicks');
 
 // USTAWIENIA
 const PORT = process.env.PORT || 10000;
@@ -26,7 +27,7 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.get('/avatar/:eyes/:mouth/:pattern/:background', sendAvatar);
+avatars.register(app);
 
 const io = new Server(server, {
     cors: { origin: "*" }
@@ -59,9 +60,19 @@ function createPlayer(socket, { userId, playerName, avatar, level }) {
         socketId: socket.id,
         connected: true,
         name: cleanText(playerName, MAX_NAME_LENGTH) || 'Gracz',
-        avatar: cleanAvatar(avatar),
+        avatar: avatars.cleanAvatar(avatar),
         level: cleanLevel(level)
     };
+}
+
+// Pusty nick albo wylosowany, który już jest w pokoju, zamienia się na inny losowy.
+// Nick wpisany ręcznie zostaje, nawet jeśli ktoś ma taki sam.
+function roomNickname(room, playerName, randomName) {
+    const name = cleanText(playerName, MAX_NAME_LENGTH);
+    const taken = room ? room.players.map(p => p.name) : [];
+    const isTaken = taken.some(other => other.toLowerCase() === name.toLowerCase());
+    if (name && !(randomName === true && isTaken)) return name;
+    return nicks.randomNick(nicks.NICK_LANGUAGE, taken);
 }
 
 function findBySocket(room, socket) {
@@ -256,13 +267,13 @@ io.on('connection', (socket) => {
     socket.emit('room_list', roomListView());
 
     // Tworzenie pokoju
-    handle('create_room', ({ playerName, avatar, level, userId } = {}) => {
+    handle('create_room', ({ playerName, randomName, avatar, level, userId } = {}) => {
         if (!isValidUserId(userId)) return socket.emit('error', 'Nieprawidłowy identyfikator gracza!');
         if (rooms.size >= MAX_ROOMS) return socket.emit('error', 'Zbyt wiele pokoi, spróbuj później!');
 
         leaveCurrentRoom(socket);
 
-        const player = createPlayer(socket, { userId, playerName, avatar, level });
+        const player = createPlayer(socket, { userId, playerName: roomNickname(null, playerName, randomName), avatar, level });
         const room = {
             code: generateRoomCode(),
             host: userId,
@@ -281,7 +292,7 @@ io.on('connection', (socket) => {
     });
 
     // Dołączanie do pokoju
-    handle('join_room', ({ playerName, roomCode, avatar, level, userId } = {}) => {
+    handle('join_room', ({ playerName, randomName, roomCode, avatar, level, userId } = {}) => {
         if (!isValidUserId(userId)) return socket.emit('error', 'Nieprawidłowy identyfikator gracza!');
 
         const room = rooms.get(roomCode);
@@ -301,7 +312,7 @@ io.on('connection', (socket) => {
         if (socket.data.roomCode !== room.code) leaveCurrentRoom(socket);
 
         if (!player) {
-            player = createPlayer(socket, { userId, playerName, avatar, level });
+            player = createPlayer(socket, { userId, playerName: roomNickname(room, playerName, randomName), avatar, level });
             room.players.push(player);
         }
 

@@ -1,0 +1,61 @@
+{
+ "steps": [
+  {
+   "tab": 0,
+   "part": "eyes",
+   "value": "happy",
+   "label": "OCZY",
+   "tabPos": [
+    205.875,
+    814.171875
+   ],
+   "tilePos": [
+    294,
+    1414.171875
+   ]
+  },
+  {
+   "tab": 1,
+   "part": "mouth",
+   "value": "smile02",
+   "label": "BUZIA",
+   "tabPos": [
+    452.625,
+    814.171875
+   ],
+   "tilePos": [
+    294,
+    1696.171875
+   ]
+  },
+  {
+   "tab": 2,
+   "part": "pattern",
+   "value": "circuits",
+   "label": "WZÓR",
+   "tabPos": [
+    699.375,
+    814.171875
+   ],
+   "tilePos": [
+    294,
+    1414.171875
+   ]
+  },
+  {
+   "tab": 3,
+   "part": "background",
+   "value": "red",
+   "label": "TŁO",
+   "tabPos": [
+    946.125,
+    814.171875
+   ],
+   "tilePos": [
+    576,
+    1414.171875
+   ]
+  }
+ ],
+ "h": 2203.171875
+}

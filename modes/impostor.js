@@ -90,13 +90,13 @@ module.exports = {
             entries = customCategory.entries;
         } else {
             // "Losowa" wybiera inną kategorię przy każdym starcie
-            category = selectedCategory === RANDOM_CATEGORY ? randomItem([...categories.keys()]) : selectedCategory;
+            category = selectedCategory === RANDOM_CATEGORY ? shared.pickFresh(room, 'category', [...categories.keys()]) : selectedCategory;
             if (!categories.has(category)) return 'Nie znaleziono wybranej kategorii!';
             entries = categories.get(category);
         }
 
-        // Losowanie hasła z kategorii
-        const selected = randomItem(entries);
+        // Losowanie hasła z kategorii (bez tych, które pokój ostatnio miał)
+        const selected = shared.pickFresh(room, 'word:' + category, entries, entry => entry.word);
 
         room.round = {
             category: category,

@@ -1,7 +1,7 @@
 // TRYB PYTANIA: wszyscy odpowiadają na pytanie, ale impostor dostał inne z tego samego zestawu.
 // Dane: data/pytania.json - [{ "cat": "nazwa zestawu", "questions": ["...", ...] }]
 
-const { randomItem, shuffle, cleanText, isText, publicPlayer, loadData } = require('../utils');
+const { cleanText, isText, publicPlayer, loadData } = require('../utils');
 const shared = require('./shared');
 
 const MAX_ANSWER_LENGTH = 16;
@@ -31,8 +31,10 @@ module.exports = {
         const error = shared.checkImpostorCount(room, impostorCount);
         if (error) return error;
 
-        // Dwa różne pytania z jednego losowego zestawu
-        const [impostorsQuestion, playersQuestion] = shuffle(randomItem(questionSets).questions);
+        // Dwa różne pytania z jednego zestawu - za każdym razem inna para, bez pytań, które pokój ostatnio miał
+        const set = shared.pickFresh(room, 'questionSet', questionSets, s => s.cat);
+        const playersQuestion = shared.pickFresh(room, 'question:' + set.cat, set.questions);
+        const impostorsQuestion = shared.pickFresh(room, 'question:' + set.cat, set.questions.filter(q => q !== playersQuestion));
 
         room.round = {
             impostorsQuestion: impostorsQuestion,

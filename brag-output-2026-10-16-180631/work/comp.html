@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="pl"><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--danger:#e74c3c;--secondary:#2ecc71;--primary:#3498db}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:1920px;height:1080px;overflow:hidden;background:#161616}
+body{font-family:"Silkscreen",sans-serif;color:#eee;position:relative}
+#grid{position:absolute;inset:-140px;
+  background-image:linear-gradient(0deg,transparent 24%,rgba(255,255,255,.07) 25%,rgba(255,255,255,.07) 27%,transparent 28%,transparent 74%,rgba(255,255,255,.07) 75%,rgba(255,255,255,.07) 77%,transparent 78%,transparent),
+  linear-gradient(90deg,transparent 24%,rgba(255,255,255,.07) 25%,rgba(255,255,255,.07) 27%,transparent 28%,transparent 74%,rgba(255,255,255,.07) 75%,rgba(255,255,255,.07) 77%,transparent 78%,transparent);
+  background-size:70px 70px}
+#glow{position:absolute;width:1500px;height:1500px;border-radius:50%;left:210px;top:-210px;filter:blur(40px)}
+#vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.78) 100%);pointer-events:none}
+#flash{position:absolute;inset:0;background:#fff;opacity:0}
+#stage{position:absolute;inset:0}
+.clip{position:absolute;inset:0;display:none}
+.abs{position:absolute}
+.crop{position:absolute;overflow:hidden;border-radius:22px;background:#1f1f1f;box-shadow:0 30px 70px rgba(0,0,0,.85)}
+.crop img{position:absolute;left:0;display:block}
+.h1{font-weight:700;font-size:96px;letter-spacing:10px;white-space:nowrap}
+.side{font-weight:700;font-size:64px;letter-spacing:6px;white-space:nowrap}
+.h2{font-size:40px;letter-spacing:4px;white-space:nowrap}
+.red{color:var(--danger);text-shadow:0 0 30px var(--danger)}
+.green{color:var(--secondary);text-shadow:0 0 26px var(--secondary)}
+.blue{color:var(--primary);text-shadow:0 0 26px var(--primary)}
+.center{left:0;right:0;text-align:center}
+.name{font-size:30px;letter-spacing:4px;color:#999;text-align:center}
+.tap{position:absolute;width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:6px solid #fff;opacity:0;box-shadow:0 0 30px #fff}
+.hold{position:absolute;width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,.08) 70%);border:5px solid rgba(255,255,255,.9);opacity:0}
+.bubble{position:absolute;background:#f0f0f0;color:#161616;font-weight:700;font-size:40px;letter-spacing:4px;padding:18px 30px;border-radius:22px;white-space:nowrap;box-shadow:0 14px 40px rgba(0,0,0,.6)}
+.bubble:after{content:"";position:absolute;left:50%;bottom:-22px;margin-left:-16px;border:16px solid transparent;border-top:22px solid #f0f0f0;border-bottom:0}
+.bubble.bad{background:var(--danger);color:#fff;box-shadow:0 0 40px rgba(231,76,60,.8)}
+.bubble.bad:after{border-top-color:var(--danger)}
+.av{position:absolute;border-radius:18px;border:8px solid #000;box-shadow:0 20px 50px rgba(0,0,0,.7)}
+.stamp{position:absolute;font-weight:700;white-space:nowrap}
+.spark{position:absolute;width:18px;height:18px;background:var(--secondary);box-shadow:0 0 16px var(--secondary)}
+</style></head><body>
+<div id="grid"></div><div id="glow"></div>
+<div id="stage"></div>
+<div id="vig"></div><div id="flash"></div>
+<script>
+const B = 60 / 128;                       // one beat
+const $ = id => document.getElementById(id);
+const cl = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const seg = (t, a, b) => cl((t - a) / (b - a));
+const oC = x => 1 - Math.pow(1 - x, 3);
+const oB = x => { const c = 1.7, c3 = c + 1; return 1 + c3 * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const stage = $('stage');
+
+function el(parent, tag, cls, style, html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (style) e.style.cssText = style;
+  if (html !== undefined) e.innerHTML = html;
+  parent.append(e); return e;
+}
+// Crop of a screenshot: source rows y0..y1, shown w px wide at (x, y). Several srcs stack for swaps.
+function crop(parent, srcs, { srcW = 1152, y0, y1, w, x, y, rot = 0 }) {
+  const s = w / srcW;
+  const box = el(parent, 'div', 'crop', `left:${x}px;top:${y}px;width:${w}px;height:${(y1 - y0) * s}px`);
+  const imgs = [].concat(srcs).map(src => el(box, 'img', '', `width:${w}px;top:${-y0 * s}px`));
+  [].concat(srcs).forEach((src, i) => imgs[i].src = 'shots/' + src + '.png');
+  box.rot = rot; box.imgs = imgs; box.s = s; box.ox = x; box.oy = y; box.y0 = y0;
+  box.at = (sx, sy) => [x + sx * s, y + (sy - y0) * s];   // screenshot px -> stage px
+  return box;
+}
+function swap(box, t, times) { box.imgs.forEach((im, k) => im.style.opacity = k === 0 || t >= times[k] ? 1 : 0); }
+function pop(t, at, amt = 0.05, len = 0.2) { return 1 + Math.sin(seg(t, at, at + len) * Math.PI) * amt; }
+function tapAt(tapEl, t, at) {
+  const p = seg(t, at - 0.12, at + 0.3);
+  tapEl.style.opacity = p > 0 && p < 1 ? 1 - p : 0;
+  tapEl.style.transform = `scale(${0.4 + p * 0.9})`;
+}
+function show(e, t, at, dy = 30, d = 0.25) {
+  const p = oC(seg(t, at, at + d));
+  e.style.opacity = t >= at ? p : 0; e.style.transform = `translateY(${(1 - p) * dy}px)`;
+}
+function slam(e, t, at, from = 1.5, d = 0.18) {   // text hits the screen on the beat
+  const p = oC(seg(t, at, at + d));
+  e.style.opacity = t >= at ? 1 : 0; e.style.transform = `scale(${from - (from - 1) * p})`;
+}
+
+// ---------- clips (times in beats) ----------
+const clips = [];
+function clip(a, b, build, glow = 'green', punch = true) {
+  const root = el(stage, 'div', 'clip');
+  const upd = build(root);
+  clips.push({ a: a * B, b: b * B, root, upd, glow, punch });
+}
+
+// (1) HOOK: four covered cards, held and revealed; Ola is the impostor
+const REV = [2, 3, 4, 6].map(x => x * B);
+clip(0, 8, root => {
+  const h1 = el(root, 'div', 'abs h1 center', 'top:130px', 'WSZYSCY ZNAJĄ HASŁO.');
+  const h2 = el(root, 'div', 'abs h1 center red', 'top:130px', 'OPRÓCZ JEDNEGO.');
+  const order = ['Kasia', 'Tomek', 'Maciek', 'Ola'];
+  const cards = ['Kasia', 'Tomek', 'Ola', 'Maciek'].map((n, i) => {
+    const wrap = el(root, 'div', 'abs', `left:${100 + i * 440}px;top:330px;width:400px`);
+    const c = crop(wrap, [`game-${n}-hidden`, `game-${n}-shown`], { y0: 560, y1: 1600, w: 400, x: 0, y: 0 });
+    c.style.position = 'relative';
+    const fl = el(c, 'div', '', `position:absolute;left:31px;right:31px;top:${245 * c.s}px;height:${770 * c.s}px;border-radius:10px;background:#fff;opacity:0`);
+    const nm = el(wrap, 'div', 'name', 'margin-top:26px', n);
+    const hold = el(wrap, 'div', 'hold', `left:200px;top:${(1190 - 560) * c.s}px`);
+    return { n, wrap, c, fl, nm, hold, r: REV[order.indexOf(n)] };
+  });
+  return t => {
+    h1.style.opacity = t < REV[3] ? oC(seg(t, 0.05, 0.3)) : 0;
+    slam(h2, t, REV[3], 1.35);
+    cards.forEach((k, i) => {
+      const imp = k.n === 'Ola';
+      const enter = oC(seg(t, 0.04 * i, 0.04 * i + 0.4));
+      const shake = imp && t > k.r && t < k.r + 0.5 ? Math.sin(t * 95) * 12 * (1 - seg(t, k.r, k.r + 0.5)) : 0;
+      const p = pop(t, k.r, imp ? 0.1 : 0.05, imp ? 0.35 : 0.22);
+      k.wrap.style.transform = `translate(${shake}px, ${(1 - enter) * 160}px) scale(${p})`;
+      k.wrap.style.opacity = enter;
+      swap(k.c, t, [0, k.r]);
+      k.fl.style.opacity = t >= k.r ? 0.85 * (1 - seg(t, k.r, k.r + 0.25)) : 0;
+      // finger press: grows while held, releases on reveal
+      const hp = seg(t, k.r - 0.4, k.r);
+      k.hold.style.opacity = hp > 0 && t < k.r + 0.15 ? (t < k.r ? 0.4 + hp * 0.6 : 1 - seg(t, k.r, k.r + 0.15)) : 0;
+      k.hold.style.transform = `scale(${0.7 + hp * 0.4})`;
+      const dim = !imp && t > REV[3] ? 1 - 0.55 * seg(t, REV[3], REV[3] + 0.3) : 1;
+      k.c.style.filter = `brightness(${dim})`;
+      k.c.style.boxShadow = imp && t >= k.r ? `0 0 ${70 + 30 * Math.sin(t * 7)}px rgba(231,76,60,.75), 0 30px 70px rgba(0,0,0,.85)` : '';
+      k.nm.style.color = imp && t >= k.r ? '#e74c3c' : '#999';
+    });
+  };
+}, 'green', false);
+
+// (2) TWÓJ ROBOT
+clip(8, 10, root => {
+  const c = crop(root, ['custom0', 'custom-tab1'], { y0: 0, y1: 1900, w: 470, x: 1180, y: 110, rot: 2 });
+  const tp = el(root, 'div', 'tap'); const [tx, ty] = c.at(452, 815);
+  tp.style.left = tx + 'px'; tp.style.top = ty + 'px';
+  const a = el(root, 'div', 'abs side', 'left:170px;top:400px', 'TWÓJ ROBOT.');
+  const b = el(root, 'div', 'abs h2 green', 'left:174px;top:510px', 'Oczy, buzia, wzór, tło.');
+  return (t, lt) => { slam(a, lt, 0, 1.3); show(b, lt, 0.3); swap(c, lt, [0, B * 1]); tapAt(tp, lt, B * 1); };
+});
+const ROLLS = [10, 11, 12, 13, 14];
+clip(10, 15, root => {
+  const c = crop(root, ['custom-tab1', 'custom-roll1', 'custom-roll2', 'custom-roll3', 'custom-roll4', 'custom-final'], { y0: 60, y1: 720, w: 980, x: 470, y: 260 });
+  const tp = el(root, 'div', 'tap'); const [tx, ty] = c.at(994, 393);
+  tp.style.left = tx + 'px'; tp.style.top = ty + 'px';
+  const l = el(root, 'div', 'abs h1 green', `left:${tx - 140}px;top:110px`, 'LOSUJ!');
+  return (t, lt) => {
+    const times = [0, ...ROLLS.map(b => (b - 10) * B)];
+    swap(c, lt, times);
+    let p = 1, last = 0;
+    times.slice(1).forEach(x => { p *= pop(lt, x, 0.04, 0.16); tapAt(tp, lt, x); if (lt >= x) last = x; });
+    tapAt(tp, lt, [0, B, 2 * B, 3 * B, 4 * B].find(x => lt >= x - 0.12 && lt < x + 0.3) ?? -9);
+    c.style.transform = `scale(${p})`;
+    l.style.opacity = lt >= 0 ? 1 : 0;
+    l.style.transform = `rotate(${-6 + 12 * ((Math.round(last / B)) % 2)}deg) scale(${pop(lt, last, 0.15, 0.2)})`;
+  };
+});
+
+// (3) POKÓJ
+clip(15, 19, root => {
+  const c = crop(root, ['lobby1', 'lobby2', 'lobby3', 'lobby4'], { y0: 480, y1: 1400, w: 720, x: 1060, y: 230, rot: -1.5 });
+  const a = el(root, 'div', 'abs side', 'left:170px;top:380px', 'STWÓRZ POKÓJ.');
+  const k = el(root, 'div', 'abs side red', 'left:170px;top:490px', 'KOD: 2970');
+  const b = el(root, 'div', 'abs h2 green', 'left:174px;top:610px', 'Ekipa dołącza z telefonów.');
+  return (t, lt) => {
+    slam(a, lt, 0, 1.3); slam(k, lt, B, 1.4); show(b, lt, 2 * B);
+    swap(c, lt, [0, B, 2 * B, 3 * B]);
+    c.style.transform = `rotate(-1.5deg) scale(${pop(lt, B, .04) * pop(lt, 2 * B, .04) * pop(lt, 3 * B, .04)})`;
+  };
+});
+clip(19, 21, root => {
+  const c = crop(root, 'roomlist', { y0: 1440, y1: 2110, w: 900, x: 900, y: 290, rot: 1.5 });
+  const a = el(root, 'div', 'abs side', 'left:170px;top:430px', 'LISTA POKOI.');
+  return (t, lt) => { slam(a, lt, 0, 1.3); c.style.transform = `rotate(1.5deg) translateY(${-lt * 30}px)`; };
+});
+clip(21, 23, root => {
+  const c = crop(root, ['lobby-troll', 'lobby-private'], { y0: 480, y1: 820, w: 1300, x: 310, y: 330 });
+  const tp = el(root, 'div', 'tap'); const [tx, ty] = c.at(791, 747);
+  tp.style.left = tx + 'px'; tp.style.top = ty + 'px';
+  const a = el(root, 'div', 'abs h1 center red', 'top:150px', 'PRYWATNY.');
+  return (t, lt) => { swap(c, lt, [0, B * 0.75]); tapAt(tp, lt, B * 0.75); slam(a, lt, B * 0.75, 1.4); c.style.transform = `scale(${pop(lt, B * .75, .03)})`; };
+}, 'red');
+clip(23, 26, root => {
+  const c = crop(root, ['lobby-private', 'lobby-kicked'], { y0: 700, y1: 1400, w: 1100, x: 760, y: 170 });
+  const tp = el(root, 'div', 'tap'); const [tx, ty] = c.at(783, 1163);
+  tp.style.left = tx + 'px'; tp.style.top = ty + 'px';
+  const poof = el(root, 'div', 'abs', `left:${tx - 300}px;top:${ty - 30}px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(231,76,60,.9),transparent 65%)`);
+  const a = el(root, 'div', 'abs side red', 'left:150px;top:400px', 'TROLL?');
+  const b = el(root, 'div', 'abs side', 'left:150px;top:500px', 'WYRZUĆ.');
+  return (t, lt) => {
+    const k = B * 1.2;
+    swap(c, lt, [0, k]); tapAt(tp, lt, k - 0.1);
+    poof.style.opacity = lt >= k ? 1 - seg(lt, k, k + 0.35) : 0;
+    poof.style.transform = `scale(${0.5 + seg(lt, k, k + 0.35)})`;
+    slam(a, lt, 0, 1.3); slam(b, lt, k, 1.5);
+    c.style.transform = `scale(${pop(lt, k, .03)})`;
+  };
+}, 'red');
+
+// (4) KATEGORIE
+clip(26, 29.5, root => {
+  const c = crop(root, 'picker', { srcW: 1140, y0: 0, y1: 2136, w: 470, x: 1260, y: 80, rot: 1.5 });
+  const tp = el(root, 'div', 'tap'); const [tx, ty] = c.at(400, 1765);
+  tp.style.left = tx + 'px'; tp.style.top = ty + 'px';
+  const a = el(root, 'div', 'abs side', 'left:150px;top:330px', 'PONAD');
+  const n = el(root, 'div', 'abs h1 green', 'left:150px;top:420px;font-size:150px', '1300');
+  const b = el(root, 'div', 'abs side', 'left:150px;top:600px', 'HASEŁ.');
+  return (t, lt) => {
+    const p = oC(seg(lt, 0, 0.35));
+    c.style.transform = `translateY(${(1 - p) * 900}px) rotate(1.5deg)`;
+    c.style.clipPath = `inset(0 0 ${(1 - seg(lt, 0.1, 0.9)) * 100}% 0 round 22px)`;
+    slam(a, lt, B, 1.3); slam(n, lt, B * 1.5, 1.6); slam(b, lt, B * 2, 1.3);
+    tapAt(tp, lt, B * 3.2);
+  };
+});
+clip(29.5, 34, root => {
+  const c = crop(root, ['editor1', 'editor2', 'editor3', 'editor4'], { srcW: 1140, y0: 0, y1: 1446, w: 640, x: 1120, y: 150, rot: -1.5 });
+  const a = el(root, 'div', 'abs side green', 'left:150px;top:400px', 'NASZE ŻARTY.');
+  const b = el(root, 'div', 'abs h2', 'left:154px;top:510px', 'Własna kategoria w minutę.');
+  return (t, lt) => {
+    const ts = [0, 0.5, 1.5, 2.5].map(x => x * B);
+    swap(c, lt, ts);
+    c.style.transform = `rotate(-1.5deg) scale(${(0.92 + 0.08 * oB(seg(lt, 0, 0.3))) * pop(lt, ts[2], .02) * pop(lt, ts[3], .02)})`;
+    slam(a, lt, 0, 1.3); show(b, lt, B * 1.5);
+  };
+});
+
+// (5) ROZGRYWKA
+clip(34, 36, root => {
+  const c = crop(root, 'game-Kasia-shown', { y0: 560, y1: 780, w: 1500, x: 210, y: 440 });
+  c.style.background = 'transparent'; c.style.boxShadow = 'none';
+  return (t, lt) => { c.style.transform = `scale(${1.25 - 0.25 * oC(seg(lt, 0, 0.2)) + lt * 0.03})`; };
+});
+clip(36, 43, root => {
+  const names = ['Kasia', 'Tomek', 'Ola', 'Maciek'];
+  const avs = names.map((n, i) => el(root, 'img', 'av', `left:${250 + i * 400}px;top:640px;width:220px;height:220px`));
+  avs.forEach((a, i) => a.src = `av/${names[i]}.svg`);
+  const nm = names.map((n, i) => el(root, 'div', 'abs name', `left:${250 + i * 400}px;top:880px;width:220px`, n));
+  const head = el(root, 'div', 'abs h2 center', 'top:90px', 'KATEGORIA: <span class="red">FILMY</span>');
+  const bub = [['Tomek', 'LÓD', 0], ['Kasia', 'ORKIESTRA', 1], ['Maciek', 'DRZWI', 2]].map(([n, w, k]) => {
+    const i = names.indexOf(n);
+    const e = el(root, 'div', 'bubble', `left:${360 + i * 400}px;top:480px;transform-origin:50% 120%`, w);
+    return { e, at: k * B, i };
+  });
+  // Ola peeks at her card, then bluffs
+  const hint = crop(root, 'game-Ola-shown', { y0: 800, y1: 1575, w: 520, x: 700, y: 170 });
+  const ob = el(root, 'div', 'bubble bad', 'left:1050px;top:480px;transform-origin:50% 120%', 'WULKAN?');
+  const q = names.map((n, i) => el(root, 'div', 'stamp red', `left:${330 + i * 400}px;top:560px;font-size:64px`, '?!'));
+  return (t, lt) => {
+    bub.forEach(b => {
+      b.e.style.marginLeft = -b.e.offsetWidth / 2 + 'px';
+      const p = oB(seg(lt, b.at, b.at + 0.2));
+      b.e.style.opacity = lt >= b.at && lt < 3 * B ? 1 : 0;
+      b.e.style.transform = `scale(${p})`;
+      avs[b.i].style.transform = `translateY(${-Math.sin(seg(lt, b.at, b.at + 0.25) * Math.PI) * 30}px)`;
+    });
+    const hp = seg(lt, 3 * B, 3 * B + 0.25), hout = seg(lt, 4.4 * B, 4.4 * B + 0.15);
+    hint.style.opacity = oC(hp) * (1 - hout);
+    hint.style.transform = `translateY(${(1 - oC(hp)) * 200}px) scale(${0.9 + 0.1 * oC(hp)})`;
+    const wb = 4.5 * B, pb = oB(seg(lt, wb, wb + 0.2));
+    ob.style.marginLeft = -ob.offsetWidth / 2 + 'px';
+    ob.style.opacity = lt >= wb ? 1 : 0;
+    ob.style.transform = `scale(${pb}) rotate(${lt > wb ? Math.sin(lt * 40) * 2 : 0}deg)`;
+    avs[2].style.transform = lt > wb ? `translateX(${Math.sin(lt * 70) * 5}px)` : avs[2].style.transform;
+    avs[2].style.boxShadow = lt > wb ? '0 0 60px rgba(231,76,60,.9)' : '';
+    nm[2].style.color = lt > wb ? '#e74c3c' : '#999';
+    q.forEach((e, i) => { if (i === 2) { e.style.opacity = 0; return; } slam(e, lt, 5.7 * B + i * 0.05, 1.8, 0.15); });
+    head.style.opacity = oC(seg(lt, 0, 0.3));
+  };
+});
+
+// (6) ZWROT AKCJI: tryb PYTANIA
+clip(43, 45, root => {
+  const a = el(root, 'div', 'abs h1 center', 'top:300px', 'ZWROT AKCJI:');
+  const b = el(root, 'div', 'abs h1 center blue', 'top:460px;font-size:150px', 'TRYB PYTANIA');
+  return (t, lt) => {
+    slam(a, lt, 0, 1.3); slam(b, lt, B, 1.6);
+    const g = lt > B && lt < B + 0.2 ? (Math.random() < 2 ? Math.sin(lt * 200) * 14 : 0) : 0;
+    b.style.transform += ` translateX(${g}px)`;
+  };
+}, 'blue');
+clip(45, 51, root => {
+  const c = crop(root, 'pyt-vote', { y0: 700, y1: 1995, w: 650, x: 1150, y: 80, rot: 1.5 });
+  const [hx, hy] = c.at(105, 1542);
+  const hl = el(root, 'div', 'abs', `left:${hx - 8}px;top:${hy - 8}px;width:${440 * c.s + 16}px;height:${440 * c.s + 16}px;border:8px solid #e74c3c;border-radius:20px;box-shadow:0 0 50px #e74c3c, inset 0 0 40px rgba(231,76,60,.6)`);
+  const qa = el(root, 'div', 'abs h2', 'left:150px;top:230px', 'ILE PAR BUTÓW MASZ?');
+  const ans = [['3', 1], ['4', 1.5], ['2', 2], ['40', 2.5]].map(([v, b], i) => ({
+    e: el(root, 'div', 'stamp ' + (v === '40' ? 'red' : ''), `left:${150 + i * 200}px;top:380px;font-size:${v === '40' ? 170 : 130}px`, v), at: b * B }));
+  const sus = el(root, 'div', 'abs side red', 'left:150px;top:640px', '40?! SERIO?');
+  return (t, lt) => {
+    c.style.transform = `rotate(1.5deg) scale(${pop(lt, 3.5 * B, 0.03)})`;
+    show(qa, lt, 0);
+    ans.forEach(a => slam(a.e, lt, a.at, 1.8, 0.15));
+    const h = 3.5 * B;
+    hl.style.opacity = lt >= h ? 0.7 + 0.3 * Math.sin(lt * 14) : 0;
+    hl.style.transform = `rotate(1.5deg) scale(${pop(lt, h, .08)})`;
+    slam(sus, lt, h, 1.4);
+  };
+}, 'red');
+
+// (7) FINAŁ
+clip(51, 53, root => {
+  const c = crop(root, ['pyt-vote', 'pyt-vote-picked'], { y0: 560, y1: 1995, w: 640, x: 1160, y: 60, rot: -1.5 });
+  const tp = el(root, 'div', 'tap'); const [tx, ty] = c.at(325, 1760);
+  tp.style.left = tx + 'px'; tp.style.top = ty + 'px';
+  const a = el(root, 'div', 'abs side', 'left:150px;top:420px', 'GŁOSUJCIE.');
+  return (t, lt) => { swap(c, lt, [0, 0.5 * B]); tapAt(tp, lt, 0.5 * B); slam(a, lt, 0, 1.3); c.style.transform = `rotate(-1.5deg) scale(${pop(lt, .5 * B, .03)})`; };
+});
+clip(53, 56, root => {
+  const ok = el(root, 'img', 'av', 'left:770px;top:300px;width:380px;height:380px');
+  const dead = el(root, 'img', 'av', 'left:770px;top:300px;width:380px;height:380px;box-shadow:0 0 80px rgba(231,76,60,.9)');
+  ok.src = 'av/Ola.svg'; dead.src = 'av/Ola-dead.svg';
+  const w = el(root, 'div', 'abs h1 center green', 'top:90px;font-size:150px', 'WYGRANA');
+  const s = el(root, 'div', 'abs h2 center', 'top:750px', 'IMPOSTOR ZOSTAŁ ZŁAPANY');
+  const sparks = [...Array(40)].map((_, i) => {
+    const e = el(root, 'div', 'spark'); const ang = i * 2.399, sp = 300 + (i * 97) % 500;
+    e.style.background = i % 3 === 0 ? '#e74c3c' : i % 3 === 1 ? '#2ecc71' : '#fff';
+    return { e, dx: Math.cos(ang) * sp, dy: Math.sin(ang) * sp };
+  });
+  return (t, lt) => {
+    const hit = B;
+    dead.style.opacity = lt >= hit ? 1 : 0;
+    const p = pop(lt, hit, 0.12, 0.3);
+    ok.style.transform = dead.style.transform = `scale(${p}) rotate(${lt >= hit ? -6 * seg(lt, hit, hit + 0.2) : 0}deg)`;
+    slam(w, lt, hit, 1.7, 0.2); show(s, lt, hit + 0.3);
+    const sp = seg(lt, hit, hit + 1.0);
+    sparks.forEach(k => {
+      k.e.style.opacity = lt >= hit ? 1 - sp : 0;
+      k.e.style.left = 960 - 9 + k.dx * oC(sp) + 'px';
+      k.e.style.top = 490 - 9 + k.dy * oC(sp) + 300 * sp * sp + 'px';
+    });
+  };
+});
+clip(56, 60, root => {
+  const r = crop(root, 'pyt-results', { y0: 2050, y1: 2380, w: 1100, x: 410, y: 300 });
+  const tp = el(root, 'div', 'tap'); const [tx, ty] = r.at(577, 2320);
+  tp.style.left = tx + 'px'; tp.style.top = ty + 'px';
+  const l = crop(root, 'lobby-again', { y0: 480, y1: 1420, w: 700, x: 610, y: 110 });
+  const a = el(root, 'div', 'abs h1 center green', 'top:900px;font-size:72px', 'I JESZCZE RAZ!');
+  return (t, lt) => {
+    const k = 1.2 * B;
+    tapAt(tp, lt, k - 0.1);
+    r.style.display = lt < k ? 'block' : 'none';
+    r.style.transform = `scale(${pop(lt, k - 0.1, .04)})`;
+    const w = oC(seg(lt, k, k + 0.25));
+    l.style.display = lt >= k ? 'block' : 'none';
+    l.style.transform = `translateX(${(1 - w) * 1400}px) rotate(${(1 - w) * 8}deg)`;
+    slam(a, lt, k + 0.1, 1.4);
+  };
+});
+
+// (8) OUTRO
+clip(60, 64.5, root => {
+  const logo = el(root, 'img', 'abs', 'width:720px;left:600px;top:120px;filter:drop-shadow(0 0 40px rgba(255,255,255,.22))');
+  logo.src = '../../public/logo4.png';
+  const a = el(root, 'div', 'abs h1 center red', 'top:620px;font-size:120px', 'KTO KŁAMIE?');
+  return (t, lt) => {
+    const p = seg(lt, 0, 0.3);
+    logo.style.opacity = oC(p); logo.style.transform = `scale(${0.85 + 0.15 * oB(p)})`;
+    slam(a, lt, B, 1.4, 0.2);
+  };
+}, 'red');
+
+const GLOW = { green: 'rgba(46,204,113,.11)', red: 'rgba(231,76,60,.16)', blue: 'rgba(52,152,219,.14)' };
+const HITS = [6, 24.2, 43, 54, 60].map(b => b * B);   // big moments get a white flash
+window.render = function (t) {
+  let active = null;
+  clips.forEach(c => {
+    const on = t >= c.a && t < c.b;
+    c.root.style.display = on ? 'block' : 'none';
+    if (on) active = c;
+  });
+  if (active) {
+    const lt = t - active.a;
+    active.upd(t, lt);
+    // hard cut punch-in
+    const p = active.punch ? oC(seg(lt, 0, 0.18)) : 1;
+    active.root.style.transform = `scale(${1.06 - 0.06 * p})`;
+    [...active.root.querySelectorAll('.crop')].forEach(c => { if (c.rot && !c.style.transform) c.style.transform = `rotate(${c.rot}deg)`; });
+    let g = active.glow; if (active.a === 0 && t >= REV[3]) g = 'red';
+    $('glow').style.background = `radial-gradient(circle, ${GLOW[g]} 0%, transparent 60%)`;
+  }
+  const f = HITS.reduce((m, h) => Math.max(m, t >= h ? 0.35 * (1 - seg(t, h, h + 0.15)) : 0), 0);
+  $('flash').style.opacity = f;
+  $('grid').style.transform = `translate(${(t * 20) % 70}px, ${(t * 12) % 70}px)`;
+};
+window.ready = Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode().catch(() => {}))]);
+render(0);
+</script></body></html>
