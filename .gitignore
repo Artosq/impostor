@@ -1,1 +1,22 @@
+# Zależności
 node_modules/
+
+# Wygenerowane filmy promocyjne (/brag) - setki MB
+brag-output/
+brag-output-*/
+
+# Szkice i próbki awatarów (propozycje, nie część gry)
+propozycje-awatarow/
+
+# Logi
+*.log
+npm-debug.log*
+
+# Zmienne środowiskowe i sekrety (np. klucze Supabase w przyszłości)
+.env
+.env.*
+
+# Pliki systemowe i OneDrive
+.DS_Store
+Thumbs.db
+desktop.ini
