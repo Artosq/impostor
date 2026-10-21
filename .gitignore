@@ -20,3 +20,6 @@ npm-debug.log*
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Roboczy szkic haseł (gra używa data/impostor.json)
+kategorie.txt
