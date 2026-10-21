@@ -303,6 +303,80 @@ body {
     to { opacity: 1; transform: translateX(0); }
 }
 
+/* ZASADY GRY */
+.rules-window{
+    max-width: 400px;
+}
+.rules-slide{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 370px;   /* stała wysokość - okno nie podskakuje między obrazkami */
+}
+.rules-enter{
+    animation: pickerItemIn 0.35s ease-out;
+}
+.rules-art{
+    width: 100%;
+    margin: 10px 0 5px;
+    border: 5px solid black;
+    border-radius: 12px;
+    background: #2a2a2a;
+    box-shadow: inset 0 -20px 20px -10px rgba(0, 0, 0, 0.6);
+    line-height: 0;
+}
+.rules-art svg{
+    width: 100%;
+    height: auto;
+}
+.rules-step{
+    margin-top: 10px;
+    font-size: 0.75em;
+    color: #999;
+}
+.rules-heading{
+    margin: 4px 0 8px;
+    font-size: 1.25em;
+    font-weight: 700;
+    color: var(--secondary);
+    text-shadow: 0 0 20px var(--secondary);
+}
+.rules-text{
+    margin: 0;
+    font-size: 0.85em;
+    line-height: 1.5;
+    color: #ddd;
+}
+.rules-red{
+    color: var(--danger);
+}
+.rules-dots{
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 12px 0 6px;
+}
+.rules-dot{
+    width: 10px;
+    height: 10px;
+    border: 2px solid black;
+    border-radius: 50%;
+    background: #444;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.rules-dot.active{
+    background: var(--secondary);
+    box-shadow: 0 0 10px var(--secondary);
+}
+.rules-nav{
+    display: flex;
+    gap: 8px;
+}
+.rules-nav .invisible{
+    visibility: hidden;
+}
+
 .picker-title{
     margin-bottom: 5px;
     text-transform: uppercase;
@@ -420,6 +494,13 @@ body {
     transform: translateX(-50%);
     pointer-events: none;
     filter: drop-shadow(0 0 5px #f1c40f);
+    /* spada na awatar chwilę po nim (fadeIn nadpisałby translateX, stąd osobna animacja) */
+    animation: crownIn 0.6s ease-out 0.2s backwards;
+}
+@keyframes crownIn {
+    0% { opacity: 0; transform: translate(-50%, -14px) rotate(-15deg); }
+    60% { opacity: 1; transform: translate(-50%, 2px) rotate(6deg); }
+    100% { opacity: 1; transform: translate(-50%, 0) rotate(0); }
 }
 .host-crown svg{
     display: block;
@@ -597,25 +678,145 @@ button {
     box-shadow: 0 0 20px var(--danger); 
     transform: scale(1.05);
 }
-.btn-download{
-    display: none;
-    border: 5px solid var(--secondary); 
-    color: var(--secondary); 
-    background-color: transparent;
-    font-size: 1.1em; 
-    margin-bottom: 20px;
+/* PRZYCISKI W ROGACH KARTY: wyjście z pokoju (lewy), instalacja aplikacji (prawy) */
+.corner-btn{
+    position: absolute;
+    top: 12px;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    height: 40px;
+    min-width: 40px;
+    margin: 0;
+    padding: 0 8px;
+    background: transparent;
+    border: 3px solid #444;
+    border-radius: 8px;
+    color: #aaa;
+    transition: 0.3s;
 }
-.btn-download:hover{
-    border: 5px solid transparent; 
-    color: white; 
-    background-color: var(--secondary);
-    transform: scale(1.05);
+.corner-btn.hidden{
+    display: none;
+}
+.corner-btn svg{
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+.corner-left{
+    left: 12px;
+}
+/* prawy róg: przyciski obok siebie */
+.corner-group{
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+    display: flex;
+    gap: 8px;
+}
+.corner-group .corner-btn{
+    position: static;
+}
+.corner-install{
+    border-color: var(--secondary);
+    color: var(--secondary);
+}
+.corner-install:hover{
+    background: var(--secondary);
+    color: white;
     box-shadow: 0 0 20px var(--secondary);
 }
-@media (display-mode: standalone) {
-    .btn-download{
+/* głośnik: fale gdy włączony, krzyżyk gdy wyciszony */
+#btn-sound .sound-off,
+#btn-sound.muted .sound-on{
     display: none;
 }
+#btn-sound.muted .sound-off{
+    display: inline;
+}
+#btn-sound.muted{
+    color: #666;
+}
+/* szare przyciski w rogu (dźwięk, zasady) */
+.corner-help{
+    border-color: #444;
+    color: #aaa;
+}
+.corner-help:hover{
+    background: transparent;
+    border-color: #777;
+    color: white;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.12);
+}
+#btn-leave:hover{
+    border-color: var(--danger);
+    color: var(--danger);
+    box-shadow: 0 0 12px var(--danger);
+}
+.corner-label{
+    display: none;
+    font-size: 0.75em;
+}
+#btn-leave.confirm{
+    border-color: var(--danger);
+    background: var(--danger);
+    color: white;
+    box-shadow: 0 0 20px var(--danger);
+}
+#btn-leave.confirm .corner-label{
+    display: inline;
+}
+@media (display-mode: standalone) {
+    #btn-download, .install-offer{
+        display: none;
+    }
+}
+.install-help{
+    position: absolute;
+    top: 60px;
+    right: 12px;
+    z-index: 6;
+    max-width: 220px;
+    padding: 10px 12px;
+    background: #161616;
+    border: 3px solid var(--secondary);
+    border-radius: 8px;
+    color: white;
+    font-size: 0.8em;
+    text-align: left;
+    animation: fadeIn 0.3s;
+    cursor: pointer;
+}
+.install-help.hidden{
+    display: none;
+}
+.install-offer{
+    margin: 5px 0 15px;
+    padding: 12px;
+    border: 3px solid var(--secondary);
+    border-radius: 8px;
+    color: var(--secondary);
+    animation: fadeIn 0.5s;
+}
+.install-offer.hidden{
+    display: none;
+}
+.install-offer-actions{
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+.install-offer-yes{
+    background: var(--secondary);
+    color: white;
+}
+.install-offer-no{
+    background: transparent;
+    border: 3px solid #444;
+    color: #aaa;
 }
 .avatar-container {
     display: inline-flex;
@@ -737,9 +938,41 @@ animation: fadeIn 0.5s ease-in;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-#main-player-avatar:hover{
-    box-shadow: 0 0 20px black;
+/* Awatar w menu: kliknięcie otwiera panel wyglądu, ołówek w rogu to podpowiada */
+.main-avatar{
+    position: relative;
+    flex-shrink: 0;
+    line-height: 0;
+    cursor: pointer;
+    transition: 0.5s;
+}
+.main-avatar:hover{
     transform: scale(1.05);
+}
+.main-avatar:hover #main-player-avatar{
+    box-shadow: 0 0 20px black;
+}
+/* sam ołówek w rogu awatara: biały z czarnym obrysem, żeby był czytelny na każdym kolorze */
+.edit-badge{
+    position: absolute;
+    right: 9px;
+    bottom: 9px;
+    z-index: 2;
+    width: 16px;
+    height: 16px;
+    color: white;
+    opacity: 0.8;
+    filter: drop-shadow(0 0 1px black) drop-shadow(0 0 1px black) drop-shadow(0 0 3px rgba(0, 0, 0, 0.6));
+    pointer-events: none;
+    transition: 0.3s;
+}
+.edit-badge svg{
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+.main-avatar:hover .edit-badge{
+    opacity: 1;
 }
 
 #main-exp-wrapper:hover{
@@ -823,7 +1056,7 @@ animation: fadeIn 0.5s ease-in;
     box-sizing: border-box;
     margin-bottom: 10px;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(var(--tabs, 4), 1fr);
     gap: 5px; 
     width: 100%;
 }
@@ -872,6 +1105,16 @@ animation: fadeIn 0.5s ease-in;
     background-color: rgba(163, 163, 163,0.5);
     border: 5px solid black;
     transition: all 0.5s;
+}
+/* Rzadkość części: zwykła (czarna ramka), rzadka, epicka, legendarna */
+.customize-tile.rarity-rare{
+    border-color: #3498db;
+}
+.customize-tile.rarity-epic{
+    border-color: #9b59b6;
+}
+.customize-tile.rarity-legendary{
+    border-color: #f1c40f;
 }
 .customize-tile.selected{
     box-shadow: 0 0 20px var(--secondary);
@@ -1059,6 +1302,18 @@ animation: fadeIn 0.5s ease-in;
     color: var(--danger);
     text-shadow: 0 0 20px var(--danger);
 }
+/* Odkryty impostor zrzuca przebranie: krótkie wstrząśnięcie i błysk */
+.unmask{
+    animation: unmask 0.7s ease-out;
+}
+@keyframes unmask {
+    0% { transform: scale(1) rotate(0); filter: brightness(1); }
+    20% { transform: scale(1.18) rotate(-6deg); filter: brightness(2.2); }
+    45% { transform: scale(1.18) rotate(6deg); filter: brightness(1.6); }
+    70% { transform: scale(1.05) rotate(-2deg); filter: brightness(1.2); }
+    100% { transform: scale(1) rotate(0); filter: brightness(1); }
+}
+
 .res-player-tile img{
     box-sizing: border-box;
     width: 70px;
@@ -1130,6 +1385,34 @@ animation: fadeIn 0.5s ease-in;
 .res-vote-count{
     flex: 0 0 20px;
     text-align: right;
+}
+
+/* Przyciski ekranu wyników: główna akcja z lekkim neonem, powrót do menu jako szary przycisk drugorzędny */
+#screen-results button{
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.25s, transform 0.15s;
+}
+#screen-results button:active{
+    transform: scale(0.97);
+    filter: brightness(0.88);
+}
+#screen-results .btn-join{
+    text-shadow: 0 0 8px rgba(46, 204, 113, 0.45);
+}
+#screen-results .btn-join:hover{
+    border-color: var(--secondary);
+    transform: scale(1.03);
+    text-shadow: none;
+    box-shadow: 0 0 6px var(--secondary), 0 0 22px rgba(46, 204, 113, 0.55);
+}
+.btn-secondary{
+    background: transparent;
+    border: 3px solid #444;
+    color: #bbb;
+}
+.btn-secondary:hover{
+    border-color: #777;
+    color: white;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.12);
 }
 
 .res-exp{

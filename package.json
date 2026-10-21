@@ -1,7 +1,6 @@
 {
   "dependencies": {
     "@dicebear/core": "^10.7.0",
-    "@dicebear/styles": "^10.6.0",
     "express": "^5.2.1",
     "socket.io": "^4.8.3"
   },

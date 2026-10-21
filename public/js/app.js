@@ -1,31 +1,18 @@
-const KICKED_EYES = 'dizzy';
+const REVEAL_DELAY_MS = 1200;    // po tylu ms odkryty impostor zrzuca przebranie na ekranie wyników
 const HOST_CROWN_SVG = '<svg viewBox="0 0 26 20" fill="#f1c40f" stroke="black" stroke-width="2" stroke-linejoin="round">'
     + '<path d="M3 17L2 5l6 5 5-8 5 8 6-5-1 12z"/>'
     + '<circle cx="13" cy="13" r="1.6" fill="#e74c3c" stroke="none"/></svg>';
 const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results'];
 const SCREENS_WITH_STATS = ['screen-login', 'screen-customize', 'screen-results'];
 
-const botAssets = {
-    eyes: [
-        "bulging", "dizzy", "eva", "frame1", "frame2",
-        "glow", "happy", "hearts", "robocop", "round",
-        "roundFrame01", "roundFrame02", "sensor", "shade01"
-    ],
-    mouth: [
-        "bite", "diagram", "grill01", "grill02", "grill03",
-        "smile01", "smile02", "square01", "square02"
-    ],
-    pattern: [
-        "grunge02", "camo01", "camo02", "circuits",
-        "dirty01", "dirty02", "dots", "grunge01"
-    ],
-    background: [
-        "f44336", "e91e63", "9c27b0", "673ab7", "3f51b5",
-        "2196f3", "009688", "4caf50",
-        "8bc34a", "cddc39", "ffeb3b", "ffc107", "ff9800",
-        "ff5722", "795548", "9e9e9e", "607d8b", "263238"
-    ]
+// Kolejność części w adresie awatara - taka sama jak w avatars/*.js na serwerze
+const AVATAR_ORDER = {
+    impostor: ['background', 'pattern', 'eyes', 'mouth', 'gear'],
+    agent: ['bg', 'body', 'head', 'gear', 'eyes', 'mouth', 'mask', 'extra', 'accent'],
+    bottts: ['eyes', 'mouth', 'pattern', 'background']
 };
+// Gdzie zapisany jest wygląd gracza w każdym zestawie (botConfig to zapis z poprzednich wersji)
+const AVATAR_STORAGE = { impostor: 'impostorConfig', agent: 'agentConfig', bottts: 'botConfig' };
 
 function byId(id) {
     return document.getElementById(id);
@@ -44,7 +31,9 @@ if (!userId) {
     localStorage.setItem('userId', userId);
 }
 
-let botConfig = loadBotConfig();
+let avatarCatalog = null;    // zestawy awatarów, ich części i rzadkości (z serwera: /avatar-catalog)
+let avatarStyle = null;      // aktywny zestaw, ustalany przez serwer
+let botConfig = {};          // wygląd gracza w aktywnym zestawie (razem z nazwą zestawu w polu style)
 
 let playerExp = parseInt(localStorage.getItem('playerExp'));
 if (!playerExp || playerExp <= 0) playerExp = 0;
@@ -66,29 +55,12 @@ function generateUID() {
     return 'uid-' + Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
 }
 
-function loadBotConfig() {
-    const defaultConfig = {
-        eyes: randomItem(botAssets.eyes),
-        mouth: randomItem(botAssets.mouth),
-        background: '555555',
-        pattern: "camo01"
-    };
-
-    const savedBotConfig = localStorage.getItem('botConfig');
-    if (!savedBotConfig) return defaultConfig;
-
-    try {
-        const parsed = JSON.parse(savedBotConfig);
-        if (parsed && parsed.eyes && parsed.mouth && parsed.pattern) return parsed;
-    } catch (e) {
-        localStorage.removeItem('botConfig');
-    }
-    return defaultConfig;
-}
-
 // ===== EKRANY =====
 
+let currentScreen = 'screen-login';    // ekran widoczny zaraz po wczytaniu strony
+
 function showScreen(screenId) {
+    currentScreen = screenId;
     SCREENS.forEach(id => {
         byId(id).classList.add('hidden');
     });
@@ -97,6 +69,7 @@ function showScreen(screenId) {
     const showStats = SCREENS_WITH_STATS.includes(screenId);
     byId('logo').classList.toggle('hidden', showStats);
     byId('player-stats').classList.toggle('hidden', !showStats);
+    updateCornerButtons();
 }
 
 function showError(msg) {
@@ -125,17 +98,77 @@ function impostorWisdom(text) {
 
 // ===== AWATAR =====
 
-// Awatary generuje serwer gry; "-" w adresie oznacza awatar bez tej części
-function avatarUrl({ eyes, mouth, pattern, background }, overrides = {}) {
-    const parts = { eyes, mouth, pattern, background, ...overrides };
-    return `/avatar/${parts.eyes || '-'}/${parts.mouth || '-'}/${parts.pattern || '-'}/${parts.background || '-'}`;
+// Osoby z włączonym "ogranicz ruch" w systemie dostają awatary bez animacji
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+// Awatary rysuje serwer gry. Adres: /avatar/<zestaw>/<części po kolei>[?state=kicked|revealed][&motion=off]
+function avatarUrl(avatar, state) {
+    const style = avatar && AVATAR_ORDER[avatar.style] ? avatar.style : avatarStyle;
+    if (!style) return 'icon-192.png';
+
+    const parts = AVATAR_ORDER[style].map(part => encodeURIComponent((avatar && avatar[part]) || '-')).join('/');
+    const query = [];
+    if (state) query.push(`state=${state}`);
+    if (reducedMotion.matches) query.push('motion=off');
+    return `/avatar/${style}/${parts}${query.length ? `?${query.join('&')}` : ''}`;
 }
 
-let customizeRendered = false;
+function loadAvatarConfig(style) {
+    try {
+        const saved = JSON.parse(localStorage.getItem(AVATAR_STORAGE[style]));
+        if (saved && typeof saved === 'object') return { ...saved, style };
+    } catch (e) {
+        localStorage.removeItem(AVATAR_STORAGE[style]);
+    }
+    return { style };
+}
+
+function saveAvatarConfig() {
+    const { style, ...parts } = botConfig;
+    localStorage.setItem(AVATAR_STORAGE[style], JSON.stringify(parts));
+}
+
+function activeCatalog() {
+    return avatarCatalog.styles[avatarStyle];
+}
+
+// Losowa część; nowy gracz i braki w zapisanym wyglądzie dostają zwykłe części
+function randomPart(slot, onlyCommon) {
+    const items = activeCatalog().parts[slot.id];
+    const common = items.filter(item => item.rarity === 'common');
+    return randomItem(onlyCommon && common.length ? common : items).id;
+}
+
+// Części spoza katalogu (np. usunięte albo z innego zestawu) zamieniamy na zwykłe
+function completeAvatarConfig() {
+    activeCatalog().slots.forEach(slot => {
+        if (!activeCatalog().parts[slot.id].some(item => item.id === botConfig[slot.id])) {
+            botConfig[slot.id] = randomPart(slot, true);
+        }
+    });
+    saveAvatarConfig();
+}
+
+async function loadAvatarCatalog() {
+    try {
+        avatarCatalog = await (await fetch('/avatar-catalog')).json();
+        avatarStyle = avatarCatalog.active;
+        botConfig = loadAvatarConfig(avatarStyle);
+        completeAvatarConfig();
+        changeNick();
+    } catch (e) {
+        console.error('Nie udało się wczytać katalogu awatarów', e);
+    }
+}
+
+// ===== PANEL PERSONALIZACJI (zakładki i kafelki powstają z katalogu) =====
+
+let customizeSlot = null;    // aktywna zakładka panelu
 
 function customizeAvatar() {
-    // Podglądy części powstają dopiero przy pierwszym otwarciu panelu
-    if (!customizeRendered) renderCustomizeOptions();
+    if (!avatarCatalog) return;     // katalog jeszcze się wczytuje
+
+    renderCustomizeTabs();
     updateCustomizePreview();
     showScreen('screen-customize');
 }
@@ -144,11 +177,63 @@ function updateCustomizePreview() {
     byId('customize-player-avatar').src = avatarUrl(botConfig);
 }
 
-function randomizeAvatar(element) {
-    Object.keys(botAssets).forEach(part => {
-        botConfig[part] = randomItem(botAssets[part]);
+function renderCustomizeTabs() {
+    const { slots } = activeCatalog();
+    if (!slots.some(slot => slot.id === customizeSlot)) customizeSlot = slots[0].id;
+
+    const panel = byId('customize-categories-panel');
+    panel.style.setProperty('--tabs', slots.length <= 5 ? slots.length : 3);
+    panel.replaceChildren(...slots.map(slot => {
+        const tab = createElement('button', 'customize-categories-tile', slot.name);
+        tab.dataset.slot = slot.id;
+        tab.classList.toggle('selected', slot.id === customizeSlot);
+        tab.onclick = () => {
+            customizeSlot = slot.id;
+            renderCustomizeTabs();
+        };
+        return tab;
+    }));
+    renderCustomizeOptions();
+}
+
+// Kafelek części: kolory jako próbka, reszta jako cały awatar z tą częścią. Ramka pokazuje rzadkość.
+function createCustomizeTile(slot, item) {
+    const isSwatch = slot.kind === 'swatch';
+    const tile = createElement(isSwatch ? 'div' : 'img', `customize-tile rarity-${item.rarity || 'common'}`);
+
+    if (isSwatch) tile.style.background = item.css;
+    else tile.src = avatarUrl({ style: botConfig.style, [slot.id]: item.id });   // sama ta część, bez reszty wyglądu
+
+    tile.title = item.name || '';
+    tile.dataset.part = item.id;
+    tile.classList.toggle('selected', botConfig[slot.id] === item.id);
+    tile.onclick = () => updatePart(slot.id, item.id);
+    return tile;
+}
+
+// Rysujemy tylko aktywną zakładkę; każdy kafelek pokazuje jedną część, niezależnie od reszty wyglądu
+function renderCustomizeOptions() {
+    const slot = activeCatalog().slots.find(s => s.id === customizeSlot);
+    byId('customize-list').replaceChildren(...activeCatalog().parts[slot.id].map(item => createCustomizeTile(slot, item)));
+}
+
+function updatePart(slotId, value) {
+    botConfig[slotId] = value;
+    saveAvatarConfig();
+
+    // Kafelki się nie zmieniają - przestawiamy tylko zaznaczenie
+    byId('customize-list').querySelectorAll('.customize-tile').forEach(tile => {
+        tile.classList.toggle('selected', tile.dataset.part === value);
     });
-    localStorage.setItem('botConfig', JSON.stringify(botConfig));
+    updateCustomizePreview();
+    changeNick();
+}
+
+function randomizeAvatar(element) {
+    activeCatalog().slots.forEach(slot => {
+        botConfig[slot.id] = randomPart(slot, false);
+    });
+    saveAvatarConfig();
 
     renderCustomizeOptions();
     updateCustomizePreview();
@@ -156,66 +241,32 @@ function randomizeAvatar(element) {
     spinDice(element);
 }
 
-function renderCustomizeOptions() {
-    ['eyes', 'mouth', 'pattern'].forEach(part => {
-        byId(`${part}-customize`).innerHTML = botAssets[part].map(name => {
-            return `<img class="customize-tile ${part}-custom ${botConfig[part] === name ? 'selected' : ''}"
-                        src="${avatarUrl({ [part]: name })}"
-                        onclick="updatePart(this, '${part}', '${name}')">`;
-        }).join('');
-    });
-
-    byId('background-customize').innerHTML = botAssets.background.map(color => {
-        return `<div class="customize-tile background-custom ${botConfig.background === color ? 'selected' : ''}"
-                    style="background-color: #${color}"
-                    onclick="updatePart(this, 'background', '${color}')"></div>`;
-    }).join('');
-
-    customizeRendered = true;
-}
-
-function changeCustomizeCategory(element, categoryId) {
-    document.querySelectorAll(".customize-category").forEach(el => {
-        el.classList.add("hidden");
-    });
-    byId(categoryId).classList.remove("hidden");
-
-    document.querySelectorAll(".customize-categories-tile").forEach(el => {
-        el.classList.remove("selected");
-    });
-    element.classList.add("selected");
-}
-
-function updatePart(element, part, value) {
-    botConfig[part] = value;
-
-    // Obsługa wizualna zaznaczenia (ramki)
-    document.querySelectorAll(`.${part}-custom`).forEach(t => t.classList.remove('selected'));
-    if (element) element.classList.add('selected');
-
-    localStorage.setItem('botConfig', JSON.stringify(botConfig));
-
-    updateCustomizePreview();
-    changeNick();
-}
-
 // ===== NICK =====
 
 function changeNick() {
-    byId('main-player-avatar').src = avatarUrl(botConfig);
+    if (avatarStyle) byId('main-player-avatar').src = avatarUrl(botConfig);
 }
 
+// Czy nick w polu jest wylosowany (kostka) - taki serwer może podmienić, gdy jest już w pokoju
+let nickIsRandom = false;
+
 function saveNick(newNick) {
+    nickIsRandom = false;
     localStorage.setItem('savedNick', newNick);
     if (newNick.length <= 3) {
         impostorWisdom("Nick krótki jak twój...");
     }
 }
 
+// Słowa i wersja językowa są w js/nicks.js
 function randomNick() {
-    const prefix = ['Basil', 'Chili', 'Ginger', 'Olive', 'Clover'];
-    const rest = ['Sprout', 'Berry', 'Mint', 'Bean', 'Radish'];
-    return randomItem(prefix) + randomItem(rest);
+    return Nicks.randomNick();
+}
+
+// Nick do wysłania na serwer; pusty pole = losowy
+function nickToSend() {
+    const typed = byId('input-name').value.trim();
+    return { playerName: typed || randomNick(), randomName: !typed || nickIsRandom };
 }
 
 let diceRotation = 0;
@@ -231,6 +282,7 @@ function spinDice(element) {
 
 function rollDice(element) {
     byId('input-name').value = randomNick();
+    nickIsRandom = true;
     changeNick();
     spinDice(element);
 }
@@ -298,8 +350,7 @@ function drawProgressBar() {
 const socket = io();
 
 function createRoom() {
-    let name = byId('input-name').value || randomNick();
-    socket.emit('create_room', { playerName: name, avatar: botConfig, level: playerLVL, userId: userId });
+    socket.emit('create_room', { ...nickToSend(), avatar: botConfig, level: playerLVL, userId: userId });
 }
 
 // function gameModePanel(){
@@ -307,9 +358,92 @@ function createRoom() {
 // }
 
 function joinRoom(listCode) {
-    let name = byId('input-name').value || randomNick();
     let code = listCode || byId('input-code').value.trim().toUpperCase();
-    socket.emit('join_room', { playerName: name, roomCode: code, avatar: botConfig, level: playerLVL, userId: userId });
+    socket.emit('join_room', { ...nickToSend(), roomCode: code, avatar: botConfig, level: playerLVL, userId: userId });
+}
+
+// ===== PRZYCISKI W ROGACH KARTY =====
+
+const ROOM_SCREENS = ['screen-lobby', 'screen-game', 'screen-vote'];
+const CONFIRM_LEAVE_SCREENS = ['screen-game', 'screen-vote'];   // w trakcie rundy wyjście trzeba potwierdzić
+const LEAVE_CONFIRM_MS = 3000;
+let leaveConfirmTimer = null;
+
+function updateCornerButtons() {
+    resetLeaveConfirm();
+    byId('btn-leave').classList.toggle('hidden', !ROOM_SCREENS.includes(currentScreen));
+    byId('btn-rules').classList.toggle('hidden', currentScreen !== 'screen-login');
+    byId('btn-sound').classList.toggle('hidden', currentScreen === 'screen-results');   // na wynikach zasłaniałby napis
+    byId('btn-download').classList.toggle('hidden', !(canInstall() && currentScreen === 'screen-login'));
+    byId('install-help').classList.add('hidden');
+}
+
+function resetLeaveConfirm() {
+    clearTimeout(leaveConfirmTimer);
+    byId('btn-leave').classList.remove('confirm');
+}
+
+// W trakcie rundy pierwsze kliknięcie pyta "Na pewno?", drugie (w ciągu 3 s) wychodzi
+function leaveClick() {
+    const button = byId('btn-leave');
+    if (CONFIRM_LEAVE_SCREENS.includes(currentScreen) && !button.classList.contains('confirm')) {
+        button.classList.add('confirm');
+        leaveConfirmTimer = setTimeout(resetLeaveConfirm, LEAVE_CONFIRM_MS);
+        return;
+    }
+    resetLeaveConfirm();
+    leaveRoom();
+}
+
+// ===== INSTALACJA APLIKACJI (PWA) =====
+// Ikona w rogu menu głównego i jednorazowa propozycja po pierwszej grze.
+// Safari na iPhonie nie ma okna instalacji - zamiast niego pokazujemy krótką instrukcję.
+
+const INSTALL_OFFER_KEY = 'installOfferShown';
+const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+let installPrompt = null;
+
+function isInstalled() {
+    return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+}
+
+function canInstall() {
+    return !isInstalled() && (installPrompt !== null || isIos);
+}
+
+window.addEventListener('beforeinstallprompt', event => {
+    event.preventDefault();
+    installPrompt = event;
+    updateCornerButtons();
+});
+
+window.addEventListener('appinstalled', () => {
+    installPrompt = null;
+    byId('install-offer').classList.add('hidden');
+    updateCornerButtons();
+});
+
+async function installApp() {
+    if (!installPrompt) {
+        byId('install-help').classList.toggle('hidden');
+        return;
+    }
+    installPrompt.prompt();
+    await installPrompt.userChoice;
+    installPrompt = null;
+    byId('install-offer').classList.add('hidden');
+    updateCornerButtons();
+}
+
+// Propozycja na ekranie wyników pojawia się tylko raz
+function showInstallOffer() {
+    let shown = false;
+    try { shown = localStorage.getItem(INSTALL_OFFER_KEY) === '1'; } catch (e) { /* bez pamięci: pokaż */ }
+    const show = canInstall() && !shown;
+    byId('install-offer').classList.toggle('hidden', !show);
+    if (show) {
+        try { localStorage.setItem(INSTALL_OFFER_KEY, '1'); } catch (e) { /* bez pamięci */ }
+    }
 }
 
 function leaveRoom() {
@@ -741,17 +875,33 @@ function setHostControls(isHost) {
 
 // ===== WYNIKI =====
 
-// Wyrzucony gracz ma na ekranie wyników oczy z krzyżykami
-function resultAvatarUrl(player, kickedIds) {
-    return avatarUrl(player.avatar, kickedIds.includes(player.id) ? { eyes: KICKED_EYES } : {});
+// Wyrzucony gracz ma na ekranie wyników wersję "po wpadce", a odkryty impostor zrzuca przebranie
+function resultAvatarState(player, results) {
+    if (results.impostors.some(i => i.id === player.id)) return 'revealed';
+    return results.kickedPlayers.some(k => k.id === player.id) ? 'kicked' : undefined;
 }
 
-function createResultTile(player, kickedIds) {
+function setResultAvatar(img, player, results) {
+    const state = resultAvatarState(player, results);
+    img.src = avatarUrl(player.avatar, state === 'kicked' ? state : undefined);
+
+    if (state === 'revealed') {
+        // Najpierw wygląda jak zwykle, po chwili zrzuca przebranie (obraz czeka już w pamięci)
+        const revealed = avatarUrl(player.avatar, state);
+        new Image().src = revealed;
+        setTimeout(() => {
+            img.src = revealed;
+            img.classList.add('unmask');
+        }, REVEAL_DELAY_MS);
+    }
+}
+
+function createResultTile(player, results) {
     const tile = document.createElement('div');
     tile.className = 'res-player-tile';
 
     const avatar = document.createElement('img');
-    avatar.src = resultAvatarUrl(player, kickedIds);
+    setResultAvatar(avatar, player, results);
 
     const name = document.createElement('span');
     name.textContent = player.name;
@@ -760,9 +910,9 @@ function createResultTile(player, kickedIds) {
     return tile;
 }
 
-function renderResultPlayers(containerId, players, kickedIds, emptyText) {
+function renderResultPlayers(containerId, players, results, emptyText) {
     const container = byId(containerId);
-    container.replaceChildren(...players.map(player => createResultTile(player, kickedIds)));
+    container.replaceChildren(...players.map(player => createResultTile(player, results)));
 
     if (players.length === 0) {
         const empty = document.createElement('span');
@@ -785,7 +935,7 @@ function renderResultVotes(results) {
         if (impostorIds.includes(p.id)) row.classList.add('res-vote-impostor');
 
         const avatar = createElement('img');
-        avatar.src = resultAvatarUrl(p, kickedIds);
+        setResultAvatar(avatar, p, results);
 
         const who = createElement('div', 'res-vote-who');
         who.append(createElement('div', 'res-vote-name', p.name));
@@ -817,12 +967,15 @@ function showResults(results) {
 
     byId('res-banner').className = `res-banner ${won ? 'res-win' : 'res-lose'}`;
     byId('res-outcome').textContent = won ? 'WYGRANA' : 'PRZEGRANA';
+    sfx.play(won ? 'win' : 'lose');
+    // ten sam moment co zrzucenie przebrania przez impostora na awatarze
+    if (results.impostors.length > 0) setTimeout(() => sfx.play('reveal'), REVEAL_DELAY_MS);
     byId('res-summary').textContent = mode.resultSummary(results);
     byId('res-player-status').textContent = wasIKicked ? 'Zostałeś zabity!' : 'Przeżyłeś!';
 
     byId('res-mode-sections').replaceChildren(...mode.resultSections(results));
 
-    renderResultPlayers('res-impostors', results.impostors, results.kickedPlayers.map(k => k.id), 'Brak impostorów');
+    renderResultPlayers('res-impostors', results.impostors, results, 'Brak impostorów');
     renderResultVotes(results);
 
     let gainedExp = 0;
@@ -835,6 +988,7 @@ function showResults(results) {
     gainedExp = Math.floor(gainedExp);
 
     byId('res-exp').textContent = `+${gainedExp} EXP`;
+    showInstallOffer();
     updateExp(playerExp + gainedExp);
 }
 
@@ -881,13 +1035,28 @@ socket.on('room_update', (room) => {
     byId('input-answer').value = "";
     showScreen('screen-lobby');
 
+    playLobbySounds(room);
     renderLobby(room);
 });
+
+// Dźwięki poczekalni: ktoś wszedł / wyszedł, host zmienił ustawienia. Pierwsza lista po wejściu jest cicha.
+let lobbySnapshot = null;
+function playLobbySounds(room) {
+    const ids = room.players.map(p => p.id);
+    const settings = JSON.stringify([room.settings, room.isPrivate]);
+    if (lobbySnapshot && lobbySnapshot.code === room.code) {
+        if (ids.some(id => !lobbySnapshot.ids.includes(id))) sfx.play('join');
+        else if (lobbySnapshot.ids.some(id => !ids.includes(id))) sfx.play('leave');
+        else if (settings !== lobbySnapshot.settings && !amIHost) sfx.play('settings');
+    }
+    lobbySnapshot = { code: room.code, ids, settings };
+}
 
 socket.on('left_room_success', () => {
     console.log("Pomyślnie opuszczono pokój.");
     closeCategoryPicker();
     currentRoomCode = "";
+    lobbySnapshot = null;
     localStorage.removeItem('lastRoomCode');
     showScreen('screen-login');
 });
@@ -896,18 +1065,21 @@ socket.on('is_host', setHostControls);
 
 socket.on('game_start', (data) => {
     showScreen('screen-game');
+    sfx.play('roundStart');
     showGame(data);
     socket.emit('check_host', currentRoomCode);
 });
 
 socket.on('start_vote', (vote) => {
     showScreen('screen-vote');
+    sfx.play('voteStart');
     renderVoteTiles(vote);
 });
 
 socket.on('game_over', showResults);
 
 socket.on('receive_fuck', (data) => {
+    sfx.play('reaction');
     showFuck(data.playerId);
 });
 
@@ -927,7 +1099,11 @@ document.addEventListener('visibilitychange', () => {
 
 byId('input-name').value = localStorage.getItem('savedNick') || "";
 changeNick();
+loadAvatarCatalog();
 updateExp(playerExp);
 
 console.log("EXP: " + playerExp);
 console.log('Twoje UID: ' + userId);
+
+// Przyciski w rogach od razu po wczytaniu strony (później odświeża je showScreen)
+updateCornerButtons();

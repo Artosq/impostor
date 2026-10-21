@@ -17,13 +17,27 @@ function checkImpostorCount(room, impostorCount) {
     return null;
 }
 
-// Losuje impostorów i nadaje role wszystkim graczom
+// Losuje impostorów i nadaje role wszystkim graczom. Każda runda jest losowana od nowa,
+// bez pamięci poprzednich: przy 3 graczach każdy ma 33% szans, przy 5 - 20% itd.
 function assignImpostors(room, impostorCount) {
     const impostors = shuffle(room.players).slice(0, impostorCount);
     room.players.forEach(player => {
         player.role = impostors.includes(player) ? ROLE_IMPOSTOR : ROLE_PLAYER;
     });
     return impostors;
+}
+
+// Losuje element, którego pokój ostatnio nie widział. Pamięta połowę puli (ale nie więcej niż 100),
+// więc przy małej puli elementy też się zmieniają, a po wyczerpaniu najstarsze wracają.
+function pickFresh(room, key, items, idOf = item => item) {
+    room.recentPicks = room.recentPicks || new Map();
+    const recent = room.recentPicks.get(key) || [];
+    const fresh = items.filter(item => !recent.includes(idOf(item)));
+    const picked = randomItem(fresh.length > 0 ? fresh : items);
+
+    recent.push(idOf(picked));
+    room.recentPicks.set(key, recent.slice(-Math.min(100, Math.floor(items.length / 2))));
+    return picked;
 }
 
 // Rozmowa toczy się na żywo - gra rozstrzyga tylko, kto mówi pierwszy
@@ -88,6 +102,7 @@ module.exports = {
     ROLE_IMPOSTOR,
     checkImpostorCount,
     assignImpostors,
+    pickFresh,
     pickStarter,
     voteView,
     huntResults,
