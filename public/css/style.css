@@ -1267,6 +1267,7 @@ animation: fadeIn 0.5s ease-in;
     );
     
     transform: skewX(-25deg); /* Pochylenie błysku */
+    will-change: transform;
     
     /* GŁÓWNA ANIMACJA: Przesunięcie błysku */
     animation: shine-effect 10s infinite;
@@ -1587,12 +1588,14 @@ animation: fadeIn 0.5s ease-in;
 }
 
 /* DEFINICJA RUCHU BŁYSKU */
+/* Przesunięcie przez transform liczy karta graficzna - bez przeliczania układu strony.
+   300% szerokości błysku = z -150% na 150%, jak wcześniej */
 @keyframes shine-effect {
     0% {
-        left: -150%; /* Start poza ekranem */
+        transform: translateX(0) skewX(-25deg); /* Start poza kartą */
     }
     30%, 100% {
-        left: 150%; /* Szybkie przejście na prawą stronę i długie czekanie */
+        transform: translateX(300%) skewX(-25deg); /* Szybkie przejście na prawą stronę i długie czekanie */
     }
 }
 
