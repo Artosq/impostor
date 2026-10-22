@@ -141,9 +141,10 @@
                 <h3><span style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);">Kto jest impostorem?</span></h3>
                 <h4 class="hidden" id="players-question"></h4>
                 <div id="vote-display"></div>
+                <p id="vote-status" class="vote-status"></p>
                 <p class="waiting-msg">Oczekiwanie na zakończenie gry przez hosta...</p>
                 <div id="host-end-controls" class="hidden">
-                    <button class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
+                    <button id="btn-end-game" class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
                 </div>
             </div>
 
@@ -231,12 +232,27 @@
             <div id="picker-view-editor" class="picker-view hidden">
                 <div id="editor-title" class="picker-title"></div>
                 <input type="text" id="editor-name" placeholder="Nazwa kategorii" oninput="updateEditorStatus()">
-                <textarea id="editor-entries" placeholder="Jedno hasło w linii, np.&#10;Pizza&#10;Kebab | Mięso, Sos" oninput="updateEditorStatus()"></textarea>
-                <p class="editor-help">Podpowiedzi dla impostora są opcjonalne: wpisz je po znaku | i oddziel przecinkami.</p>
-                <p id="editor-status" class="editor-status"></p>
-                <button class="btn-join" onclick="saveCategoryEditor()">Zapisz i wybierz</button>
-                <button id="editor-delete" class="btn-end" onclick="deleteCategoryEditor()">Usuń kategorię</button>
-                <button onclick="closeCategoryEditor()">Wróć do listy</button>
+
+                <div id="editor-main" class="picker-view">
+                    <div id="editor-list" class="picker-list editor-list"></div>
+                    <div class="editor-add">
+                        <input type="text" id="editor-new-word" placeholder="Nowe hasło" enterkeyhint="done" onkeydown="if (event.key === 'Enter') addEditorEntry()">
+                        <button class="editor-add-button" title="Dodaj hasło" onclick="addEditorEntry()">+</button>
+                    </div>
+                    <button class="editor-paste-button" onclick="showEditorPaste(true)">Wklej listę haseł</button>
+                    <p id="editor-status" class="editor-status"></p>
+                    <button class="btn-join" onclick="saveCategoryEditor()">Zapisz i wybierz</button>
+                    <button id="editor-delete" class="btn-end" onclick="deleteCategoryEditor()">Usuń kategorię</button>
+                    <button onclick="closeCategoryEditor()">Wróć do listy</button>
+                </div>
+
+                <!-- Wklejanie wielu haseł naraz -->
+                <div id="editor-paste" class="picker-view hidden">
+                    <textarea id="editor-paste-text" placeholder="Jedno hasło w linii, np.&#10;Pizza&#10;Kebab&#10;Sushi"></textarea>
+                    <p class="editor-help">Każda linia to osobne hasło. Podpowiedzi dodasz potem przy każdym haśle.</p>
+                    <button class="btn-join" onclick="importEditorPaste()">Dodaj hasła</button>
+                    <button onclick="showEditorPaste(false)">Anuluj</button>
+                </div>
             </div>
         </div>
     </div>

@@ -17,6 +17,7 @@ const MAX_LEVEL = 999;
 
 const LIST_AVATARS = 5;                     // ilu graczy (poza hostem) widać na liście pokoi
 
+const MIN_VOTE_MS = 5 * 1000;               // host może zakończyć głosowanie dopiero po tym czasie
 const RESULTS_VISIBLE_MS = 60 * 1000;       // czas na kliknięcie "Zagraj ponownie" po wynikach
 const DISCONNECT_GRACE_MS = 2 * 60 * 1000;  // czas na powrót rozłączonego gracza
 const ROOM_IDLE_MS = 10 * 60 * 1000;        // pokój, w którym nikt nie jest połączony
@@ -115,8 +116,29 @@ function gameView(room, player) {
     return { mode: room.mode.id, ...room.mode.playerView(room, player) };
 }
 
-function voteView(room) {
-    return { mode: room.mode.id, ...room.mode.voteView(room) };
+function voteView(room, player) {
+    return {
+        mode: room.mode.id,
+        ...room.mode.voteView(room),
+        ...voteStatus(room, player),
+        endLockMs: Math.max(0, room.voteStartedAt + MIN_VOTE_MS - Date.now())
+    };
+}
+
+// Ile osób już kogoś wskazało. Kto to był, wie tylko host (na kogo głosował - nikt do wyników).
+function voteStatus(room, player) {
+    const voted = room.players.filter(p => (room.playerChoices.get(p.userId) || []).length > 0);
+    return {
+        count: voted.length,
+        total: room.players.length,
+        voted: player.userId === room.host ? voted.map(p => p.publicId) : []
+    };
+}
+
+function emitVoteStatus(room) {
+    room.players.forEach(p => {
+        io.to(p.socketId).emit('vote_status', voteStatus(room, p));
+    });
 }
 
 // Publiczne pokoje: najpierw te, do których da się wejść, potem pełne, na końcu gry w toku
@@ -162,6 +184,7 @@ function deleteRoom(roomCode) {
 function assignHost(room, player) {
     room.host = player.userId;
     io.to(player.socketId).emit('is_host', true);
+    if (room.status === 'voting') emitVoteStatus(room);    // nowy host dostaje listę głosujących
     console.log(`Nowy host w pokoju ${room.code}: ${player.name}`);
 }
 
@@ -192,6 +215,8 @@ function removePlayer(room, player) {
         }
         if (room.status === 'waiting') {
             emitLobby(room);
+        } else if (room.status === 'voting') {
+            emitVoteStatus(room);
         }
     }
     broadcastRoomList();
@@ -353,7 +378,7 @@ io.on('connection', (socket) => {
 
             case 'voting':
                 socket.emit('game_start', gameView(room, player));
-                socket.emit('start_vote', voteView(room));
+                socket.emit('start_vote', voteView(room, player));
                 break;
         }
         socket.emit('rejoin_failed', false);
@@ -437,9 +462,12 @@ io.on('connection', (socket) => {
         if (requester && room.host === requester.userId) {
             if (room.status === 'playing') {
                 room.status = 'voting';
+                room.voteStartedAt = Date.now();
                 console.log(`Głosowanie rozpoczęte przez hosta: ${requester.name}`);
 
-                io.to(room.code).emit('start_vote', voteView(room));
+                room.players.forEach(p => {
+                    io.to(p.socketId).emit('start_vote', voteView(room, p));
+                });
                 broadcastRoomList();
             }
         } else {
@@ -461,6 +489,7 @@ io.on('connection', (socket) => {
 
         room.playerChoices.set(player.userId, choice);
         console.log(`Gracz ${player.name} zmienił wybór (${choice.length} głosów)`);
+        emitVoteStatus(room);
     });
 
     // Akcje specyficzne dla trybu (np. odpowiedź na pytanie)
@@ -482,6 +511,9 @@ io.on('connection', (socket) => {
 
         const requester = findBySocket(room, socket);
         if (!requester || room.host !== requester.userId || room.status !== 'voting') return;
+        if (Date.now() - room.voteStartedAt < MIN_VOTE_MS) {
+            return socket.emit('error', 'Daj graczom chwilę na głosowanie!');
+        }
 
         const results = room.mode.finish(room);
         room.status = 'finished';
