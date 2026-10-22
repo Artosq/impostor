@@ -10,6 +10,12 @@
     <meta name="theme-color" content="#181818">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
+    <!-- Fonty pobierane od razu, równolegle ze stylami - bez mignięcia zastępczej czcionki -->
+    <link rel="preload" href="fonts/silkscreen-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/silkscreen-400-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/silkscreen-700-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
+
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/scrollbar.css">
     <link rel="stylesheet" href="css/fonts.css">
@@ -49,7 +55,7 @@
         </div>
 
         <div id="error-blur" style="transition: 0.8s ease-in-out;">
-            <div class="logo hidden" id="logo"><img src="logo4.png" width="250px"></div>
+            <div class="logo hidden" id="logo"><picture><source srcset="logo.webp" type="image/webp"><img src="logo.png" width="250" height="131" alt="Impostor"></picture></div>
 
             <!-- Ekran Logowania -->
             <div id="screen-login" class="screen">
@@ -257,7 +263,7 @@
         </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="vendor/socket.io.min.js"></script>
     <script src="js/modes/shared.js"></script>
     <script src="js/modes/impostor.js"></script>
     <script src="js/modes/pytania.js"></script>

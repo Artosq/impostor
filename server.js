@@ -6,6 +6,7 @@ const { Server } = require('socket.io');
 const { cleanText, publicPlayer } = require('./utils');
 const { getMode, listModes } = require('./modes');
 const avatars = require('./avatars');
+const assets = require('./assets');
 const nicks = require('./public/js/nicks');
 
 // USTAWIENIA
@@ -27,11 +28,20 @@ const CLEANUP_INTERVAL_MS = 30 * 1000;
 const app = express();
 const server = http.createServer(app);
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Strona i jej pliki: skompresowane z góry i z długim cache (zob. assets.js)
+app.use(assets.serve);
 avatars.register(app);
 
+// Lekki adres do sprawdzania, czy serwer żyje (używa go też budzik poniżej)
+app.get('/health', (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    res.send('ok');
+});
+
+// Klienta Socket.IO podaje assets.js (wersja zminifikowana, skompresowana, z cache)
 const io = new Server(server, {
-    cors: { origin: "*" }
+    cors: { origin: "*" },
+    serveClient: false
 });
 
 const rooms = new Map();
@@ -623,4 +633,27 @@ setInterval(() => {
 
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Serwer działa na porcie ${PORT}`);
+    if (process.env.RENDER) assets.warmUp();
+    startKeepAlive();
 });
+
+// BUDZIK: darmowy Render usypia serwer po 15 minutach bez ruchu z zewnątrz, a pierwsze wejście
+// po uśpieniu trwa kilkadziesiąt sekund. Co 10 minut serwer odpytuje sam siebie przez publiczny adres
+// (RENDER_EXTERNAL_URL ustawia Render), co liczy się jako ruch. Lokalnie budzik się nie włącza.
+const KEEP_ALIVE_MS = 10 * 60 * 1000;
+
+function startKeepAlive() {
+    const baseUrl = process.env.KEEP_ALIVE_URL || process.env.RENDER_EXTERNAL_URL;
+    if (!baseUrl) return;
+
+    const url = baseUrl.replace(/\/+$/, '') + '/health';
+    setInterval(async () => {
+        try {
+            const response = await fetch(url, { signal: AbortSignal.timeout(15000) });
+            if (!response.ok) console.warn(`Budzik: ${url} odpowiedział ${response.status}`);
+        } catch (error) {
+            console.warn(`Budzik: brak odpowiedzi z ${url} (${error.message})`);
+        }
+    }, KEEP_ALIVE_MS).unref();
+    console.log(`Budzik: co 10 min odpytuję ${url}`);
+}

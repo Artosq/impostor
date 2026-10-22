@@ -69,6 +69,7 @@ function showScreen(screenId) {
     const showStats = SCREENS_WITH_STATS.includes(screenId);
     byId('logo').classList.toggle('hidden', showStats);
     byId('player-stats').classList.toggle('hidden', !showStats);
+    if (showStats) refreshProgressBar();
     updateCornerButtons();
 }
 
@@ -320,9 +321,15 @@ function updateExp(exp) {
     drawProgressBar();
 }
 
+let lastExpText = '';
+
+// Rysuje pasek klatka po klatce tylko do chwili, gdy dojedzie do celu - potem nic nie obciąża telefonu
 function drawProgressBar() {
-    pCanvas.width = pCanvas.clientWidth;
-    pCanvas.height = pCanvas.clientHeight;
+    // Zmiana rozmiaru czyści płótno i wymusza przeliczenie układu, więc tylko gdy naprawdę się zmienił
+    if (pCanvas.width !== pCanvas.clientWidth || pCanvas.height !== pCanvas.clientHeight) {
+        pCanvas.width = pCanvas.clientWidth;
+        pCanvas.height = pCanvas.clientHeight;
+    }
 
     const w = pCanvas.width;
     const h = pCanvas.height;
@@ -332,22 +339,39 @@ function drawProgressBar() {
     let targetWidth = w * (progress / 100);
     currentWidth += (targetWidth - currentWidth) * 0.05;
 
-    pCtx.fillStyle = colorSecondary;
-    pCtx.fillRect(0, 0, currentWidth, h);
-
     if (progress < targetProgress) {
         progress = Math.min(progress + 0.5, targetProgress); // Prędkość ładowania
     }
-    byId('exp-counter').innerHTML = `
+
+    // Koniec animacji: pasek stoi dokładnie na celu
+    const finished = progress >= targetProgress && Math.abs(w * (targetProgress / 100) - currentWidth) < 0.5;
+    if (finished) currentWidth = w * (targetProgress / 100);
+
+    pCtx.fillStyle = colorSecondary;
+    pCtx.fillRect(0, 0, currentWidth, h);
+
+    const text = `
     LVL: ${playerLVL || 0} <br>
     EXP: ${Math.floor((playerExp * progress / targetProgress) || 0)} / ${getRequiredExp(playerLVL) || 0}
 `;
-    progressAnimation = requestAnimationFrame(drawProgressBar);
+    if (text !== lastExpText) {
+        byId('exp-counter').innerHTML = text;
+        lastExpText = text;
+    }
+
+    progressAnimation = finished ? null : requestAnimationFrame(drawProgressBar);
 }
+
+// Ponowne narysowanie paska (np. po powrocie do menu albo zmianie rozmiaru okna)
+function refreshProgressBar() {
+    if (progressAnimation === null) progressAnimation = requestAnimationFrame(drawProgressBar);
+}
+window.addEventListener('resize', refreshProgressBar);
 
 // ===== POKOJE =====
 
-const socket = io();
+// Od razu WebSocket - oszczędza kilka wymian z serwerem przy łączeniu. Gdy sieć go blokuje, zostaje odpytywanie.
+const socket = io({ transports: ['websocket', 'polling'], tryAllTransports: true });
 
 function createRoom() {
     socket.emit('create_room', { ...nickToSend(), avatar: botConfig, level: playerLVL, userId: userId });

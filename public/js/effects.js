@@ -52,6 +52,9 @@ class Ripple {
     }
 }
 
+// Pętla działa tylko, dopóki jakaś fala jest widoczna - bez fal płótno stoi i nie zużywa baterii
+let rippleLoop = null;
+
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -62,12 +65,12 @@ function animate() {
         r.draw();
     });
 
-    requestAnimationFrame(animate);
+    rippleLoop = ripples.length > 0 ? requestAnimationFrame(animate) : null;
 }
-animate();
 
 window.addEventListener('mousedown', (e) => {
     const card = document.getElementById('card');
     if (card && card.contains(e.target)) return;
     ripples.push(new Ripple(e.clientX, e.clientY));
+    if (rippleLoop === null) rippleLoop = requestAnimationFrame(animate);
 });
