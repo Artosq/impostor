@@ -850,7 +850,8 @@ function renderVoteTiles(vote) {
     vote.players.forEach(p => {
         const tile = document.createElement('div');
         tile.className = 'vote-tile';
-        tile.style.backgroundImage = `url("${avatarUrl(p.avatar)}")`;
+        tile.dataset.id = p.id;
+        tile.style.setProperty('--avatar', `url("${avatarUrl(p.avatar)}")`);
         tile.onclick = () => voteOn(tile, vote.maxVotes, p.id);
 
         tile.append(` ${p.name} `);
@@ -861,6 +862,37 @@ function renderVoteTiles(vote) {
         }
         voteDisplay.append(tile);
     });
+
+    renderVoteStatus(vote);
+    lockEndButton(vote.endLockMs);
+}
+
+// Licznik widzą wszyscy; znaczki na kafelkach tych, którzy już zagłosowali - tylko host
+function renderVoteStatus({ count, voted, total }) {
+    document.querySelectorAll('.vote-tile').forEach(tile => {
+        tile.classList.toggle('voted', voted.includes(tile.dataset.id));
+    });
+    byId('vote-status').textContent = `Zagłosowało: ${count}/${total}`;
+}
+
+// Przez pierwsze sekundy głosowania host nie może go zakończyć - przycisk odlicza
+const END_BUTTON_TEXT = 'ZAKOŃCZ I POKAŻ WYNIKI';
+let endLockTimer = null;
+
+function lockEndButton(lockMs) {
+    const button = byId('btn-end-game');
+    const unlockAt = Date.now() + lockMs;
+
+    const tick = () => {
+        const secondsLeft = Math.ceil((unlockAt - Date.now()) / 1000);
+        button.disabled = secondsLeft > 0;
+        button.textContent = secondsLeft > 0 ? `ZAKOŃCZ ZA ${secondsLeft}...` : END_BUTTON_TEXT;
+        if (secondsLeft <= 0) clearInterval(endLockTimer);
+    };
+
+    clearInterval(endLockTimer);
+    endLockTimer = setInterval(tick, 200);
+    tick();
 }
 
 function setHostControls(isHost) {
@@ -1075,6 +1107,8 @@ socket.on('start_vote', (vote) => {
     sfx.play('voteStart');
     renderVoteTiles(vote);
 });
+
+socket.on('vote_status', renderVoteStatus);
 
 socket.on('game_over', showResults);
 

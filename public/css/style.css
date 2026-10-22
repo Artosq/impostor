@@ -421,10 +421,133 @@ body {
     transform: translateY(-50%) scale(1.15);
 }
 
-/* Edytor własnej kategorii */
-#editor-entries{
+/* Edytor własnej kategorii: wiersz na hasło, podpowiedzi jako żetony */
+.editor-list{
+    min-height: 150px;
+    margin-bottom: 5px;
+}
+.editor-entry{
+    padding: 6px 8px 8px;
+    margin-bottom: 8px;
+    border: 3px solid black;
+    border-radius: 10px;
+    background-color: rgba(0, 0, 0, 0.3);
+    text-align: left;
+    animation: pickerItemIn 0.25s ease-out;
+}
+.editor-entry-head{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.editor-entry input{
+    padding: 6px 4px;
+    margin: 0;
+    background-color: transparent;
+}
+.editor-entry input:focus{
+    background-color: rgba(255, 255, 255, 0.1);
+}
+.editor-entry .editor-word{
     flex: 1;
-    min-height: 170px;
+    min-width: 0;
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+    font-size: 1em;
+}
+.editor-remove,
+.editor-chip-remove{
+    flex: none;
+    width: auto;
+    padding: 0;
+    margin: 0;
+    background: none;
+    color: #999;
+    line-height: 1;
+}
+.editor-remove{
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+}
+.editor-remove:hover,
+.editor-chip-remove:hover{
+    color: var(--danger);
+    text-shadow: 0 0 10px var(--danger);
+}
+.editor-hints{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+}
+.editor-chip{
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    padding: 3px 6px 3px 9px;
+    border: 2px solid black;
+    border-radius: 12px;
+    background-color: #2f2f2f;
+    color: #ddd;
+    font-size: 0.7em;
+    overflow-wrap: anywhere;
+}
+.editor-chip-remove{
+    font-size: 10px;
+}
+.editor-entry .editor-hint-input{
+    flex: 1 1 110px;
+    min-width: 110px;
+    border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+    font-size: 0.7em;
+}
+.editor-hint-input::placeholder{
+    color: #777;
+}
+.editor-add{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.editor-add input{
+    flex: 1;
+    min-width: 0;
+    margin: 5px 0;
+}
+.editor-add-button{
+    flex: none;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0;
+    border: 4px solid var(--secondary);
+    background: none;
+    color: var(--secondary);
+    font-size: 1.4em;
+    line-height: 1;
+}
+.editor-add-button:hover{
+    background-color: var(--secondary);
+    box-shadow: 0 0 20px var(--secondary);
+    color: black;
+}
+.editor-paste-button{
+    padding: 6px;
+    margin: 0 0 8px;
+    background: none;
+    color: #999;
+    font-size: 0.7em;
+    text-decoration: underline;
+}
+.editor-paste-button:hover{
+    color: white;
+}
+
+#editor-paste-text{
+    flex: 1;
+    min-height: 220px;
     box-sizing: border-box;
     width: 100%;
     padding: 12px;
@@ -439,11 +562,11 @@ body {
     resize: none;
     transition: all 0.5s;
 }
-#editor-entries:focus{
+#editor-paste-text:focus{
     background-color: rgba(255, 255, 255, 0.2);
     outline: none;
 }
-#editor-entries::placeholder{
+#editor-paste-text::placeholder{
     color: #999;
 }
 .editor-help{
@@ -1192,6 +1315,8 @@ animation: fadeIn 0.5s ease-in;
     margin-bottom: 20px;
 }
 .vote-tile{
+    position: relative;
+    isolation: isolate;     /* awatar (::before) leży pod nickiem, ale nad tłem kafelka */
     aspect-ratio: 1 / 1;
     padding: 5px;
     background-color: #2b2b2b;
@@ -1201,7 +1326,6 @@ animation: fadeIn 0.5s ease-in;
     border-radius: 10px;
     transition: 0.5s;
     border: 5px solid #141414;
-    filter: saturate(0%);
     user-select: none;
     font-size: small;
     box-sizing: border-box;
@@ -1209,9 +1333,48 @@ animation: fadeIn 0.5s ease-in;
     overflow: hidden;       /* Wszystko co wystaje, zostanie ukryte */
     white-space: nowrap;    /* Nick zawsze będzie w jednej linii */
 }
+/* Szary jest tylko awatar, żeby znaczek głosu zostawał zielony */
+.vote-tile::before{
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--avatar);
+    filter: saturate(0%);
+    transition: filter 0.5s;
+}
 .vote-tile.selected{
-    filter: saturate(100%);
     box-shadow: 0 0 20px var(--secondary);
+}
+.vote-tile.selected::before{
+    filter: saturate(100%);
+}
+/* Gracz już zagłosował (na kogo - nie wiadomo do wyników): zakładka wtopiona w róg ramki */
+.vote-tile.voted::after{
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30px;
+    height: 30px;
+    border-bottom-left-radius: 10px;
+    background: #141414 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232ecc71' stroke-linecap='square'%3E%3Cfilter id='g'%3E%3CfeGaussianBlur stdDeviation='1.5'/%3E%3C/filter%3E%3Cpath d='M4 12l5 5L20 6' stroke-width='5' filter='url(%23g)'/%3E%3Cpath d='M4 12l5 5L20 6' stroke-width='4'/%3E%3C/svg%3E") 55% 45% / 62% no-repeat;
+    animation: votedIn 0.35s ease-out;
+}
+/* Zakładka zostaje w rogu ramki - pojawia się, a znaczek w niej lekko rośnie */
+@keyframes votedIn {
+    from { opacity: 0; background-size: 30%; }
+    to { opacity: 1; background-size: 62%; }
+}
+.vote-status{
+    margin: -10px 0 15px;
+    font-size: 0.85em;
+    color: #999;
+}
+#btn-end-game:disabled{
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
 }
 
 .names-list {
