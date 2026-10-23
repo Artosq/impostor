@@ -130,6 +130,7 @@ function isOpen(id) {
 // Zwraca true, gdy "wstecz" zostało obsłużone w grze
 function handleBack() {
     if (isOpen('rules')) return closeRules(), true;
+    if (isOpen('invite')) return closeInvite(), true;
     if (isOpen('category-picker')) return closeCategoryPicker(), true;
     if (!byId('install-help').classList.contains('hidden')) return byId('install-help').classList.add('hidden'), true;
 

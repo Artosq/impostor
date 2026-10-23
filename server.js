@@ -32,6 +32,9 @@ const server = http.createServer(app);
 app.use(assets.serve);
 avatars.register(app);
 
+// Link zaproszenia: /1234 otwiera menu z wpisanym kodem pokoju
+app.get(/^\/(\d{4})$/, (req, res) => res.redirect(302, `/?kod=${req.params[0]}`));
+
 // Lekki adres do sprawdzania, czy serwer żyje (używa go też budzik poniżej)
 app.get('/health', (req, res) => {
     res.set('Cache-Control', 'no-store');
@@ -53,6 +56,34 @@ const rooms = new Map();
 function isValidUserId(userId) {
     return typeof userId === 'string' && userId.length >= 8 && userId.length <= 64;
 }
+
+// LIMIT ZŁYCH KODÓW: kody mają 4 cyfry, więc bez limitu dałoby się zgadywać prywatne pokoje skryptem.
+// Liczymy tylko nietrafione kody, na adres IP (zza serwera pośredniczącego Rendera - z x-forwarded-for).
+const JOIN_FAIL_LIMIT = 10;
+const JOIN_FAIL_WINDOW_MS = 60 * 1000;
+const joinFailures = new Map();    // ip -> { count, resetAt }
+
+function clientIp(socket) {
+    const forwarded = socket.handshake.headers['x-forwarded-for'];
+    return (forwarded ? forwarded.split(',')[0] : socket.handshake.address || '').trim();
+}
+
+function tooManyJoinFailures(ip) {
+    const entry = joinFailures.get(ip);
+    return Boolean(entry && entry.resetAt > Date.now() && entry.count >= JOIN_FAIL_LIMIT);
+}
+
+function noteJoinFailure(ip) {
+    const now = Date.now();
+    const entry = joinFailures.get(ip);
+    if (!entry || entry.resetAt <= now) joinFailures.set(ip, { count: 1, resetAt: now + JOIN_FAIL_WINDOW_MS });
+    else entry.count++;
+}
+
+setInterval(() => {
+    const now = Date.now();
+    joinFailures.forEach((entry, ip) => { if (entry.resetAt <= now) joinFailures.delete(ip); });
+}, JOIN_FAIL_WINDOW_MS).unref();
 
 function generateRoomCode() {
     let roomCode;
@@ -333,7 +364,13 @@ io.on('connection', (socket) => {
     handle('join_room', ({ playerName, randomName, roomCode, avatar, level, userId } = {}) => {
         if (!isValidUserId(userId)) return socket.emit('error', 'Nieprawidłowy identyfikator gracza!');
 
+        const ip = clientIp(socket);
+        if (tooManyJoinFailures(ip)) {
+            return socket.emit('error', 'Zbyt wiele prób z błędnym kodem. Spróbuj za minutę.');
+        }
+
         const room = rooms.get(roomCode);
+        if (!room) noteJoinFailure(ip);
         if (!room || room.status !== 'waiting') {
             return socket.emit('error', 'Pokój nie istnieje lub gra już trwa!');
         }

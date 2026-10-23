@@ -303,6 +303,84 @@ body {
     to { opacity: 1; transform: translateX(0); }
 }
 
+/* ZAPROSZENIE: przycisk w poczekalni i okno z kodem QR */
+/* kafelek "Zaproś +" na końcu listy graczy - jak gracz, ale z ikoną udostępniania zamiast awatara */
+.invite-slot-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    box-sizing: border-box;
+    border: 3px dashed #666;
+    border-radius: 5px;
+    color: #999;
+    transition: 0.3s;
+}
+.invite-slot-icon svg{
+    width: 22px;
+    height: 22px;
+}
+.invite-slot .invite-slot-tag{
+    background: #444;
+    color: #ddd;
+    font-style: normal;
+}
+.invite-slot:hover .invite-slot-icon{
+    border-color: var(--primary);
+    color: var(--primary);
+    box-shadow: 0 0 14px rgba(52, 152, 219, 0.5);
+}
+.invite-slot:hover .invite-slot-tag{
+    background: var(--primary);
+    color: white;
+}
+.invite-window{
+    max-width: 340px;
+}
+.invite-qr{
+    width: 220px;
+    aspect-ratio: 1 / 1;
+    margin: 12px auto;
+    padding: 0;
+    border: 5px solid black;
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+    line-height: 0;
+}
+.invite-qr svg{
+    width: 100%;
+    height: 100%;
+}
+.invite-code{
+    font-size: 1.1em;
+    font-weight: 700;
+}
+.invite-code span{
+    color: var(--danger);
+    text-shadow: 0 0 20px rgb(252, 81, 81);
+    letter-spacing: 2px;
+}
+.invite-link{
+    margin: 4px 0 10px;
+    font-size: 0.7em;
+    color: #999;
+    word-break: break-all;
+}
+#invite-copy.copied{
+    background: var(--secondary);
+    color: white;
+}
+/* przycisk "Dołącz" po wejściu z linku zaproszenia */
+.invite-highlight{
+    animation: inviteGlow 1.4s ease-in-out infinite;
+}
+@keyframes inviteGlow {
+    0%, 100% { box-shadow: 0 0 0 rgba(46, 204, 113, 0); }
+    50% { box-shadow: 0 0 22px var(--secondary); }
+}
+
 /* ZASADY GRY */
 .rules-window{
     max-width: 400px;
@@ -959,6 +1037,7 @@ button {
 }
 .avatar-container {
     display: inline-flex;
+    vertical-align: top;     /* kafelki w rzędzie równo u góry (kafelek "Zaproś +" nie ma obrazka, więc linia bazowa była inna) */
     flex-direction: column;
     align-items: center;
     position: relative;

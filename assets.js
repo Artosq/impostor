@@ -18,7 +18,8 @@ const WATCH_FILES = !process.env.RENDER && process.env.NODE_ENV !== 'production'
 
 // Pliki spoza public/ podawane pod własnym adresem
 const EXTRA_FILES = {
-    '/vendor/socket.io.min.js': path.join(path.dirname(require.resolve('socket.io')), '..', 'client-dist', 'socket.io.min.js')
+    '/vendor/socket.io.min.js': path.join(path.dirname(require.resolve('socket.io')), '..', 'client-dist', 'socket.io.min.js'),
+    '/vendor/qrcode.js': require.resolve('qrcode-generator')       // kody QR w oknie zaproszenia (MIT)
 };
 
 const TYPES = {

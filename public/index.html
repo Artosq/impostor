@@ -137,7 +137,9 @@
                         <button class="impostor-tile" id="3" onclick="selectImpostors('3')">3</button>
                         <button class="impostor-tile" id="4" onclick="selectImpostors('4')">4</button>
                     </div>
+                </div>
 
+                <div id="host-start" class="hidden">
                     <button id="btn-start" class="btn-start" onclick="startGame()">START GRY</button>
                 </div>
                 <p id="room-settings" class="waiting-msg room-settings"></p>
@@ -269,6 +271,19 @@
         </div>
     </div>
 
+    <!-- Zaproszenie do pokoju: kod QR, kopiowanie linku, udostępnianie -->
+    <div id="invite" class="picker-overlay hidden" onclick="if (event.target === this) closeInvite()">
+        <div class="picker-window invite-window">
+            <div class="picker-title">— Zaproś do gry —</div>
+            <div id="invite-qr" class="invite-qr"></div>
+            <div class="invite-code">Kod: <span id="invite-code"></span></div>
+            <div id="invite-link" class="invite-link"></div>
+            <button id="invite-copy" class="btn-join" onclick="copyInviteLink()">Kopiuj link</button>
+            <button id="invite-share" class="btn-create hidden" onclick="shareInvite()">Udostępnij</button>
+            <button class="btn-secondary" onclick="closeInvite()">Zamknij</button>
+        </div>
+    </div>
+
     <!-- Zasady gry w 3 obrazkach -->
     <div id="rules" class="picker-overlay hidden" onclick="if (event.target === this) closeRules()">
         <div class="picker-window rules-window">
@@ -304,6 +319,7 @@
     <script src="js/nicks.js"></script>
     <script src="js/app.js"></script>
     <script src="js/session.js"></script>
+    <script src="js/invite.js"></script>
     <script src="js/rules.js"></script>
     <script src="js/effects.js"></script>
 </body>

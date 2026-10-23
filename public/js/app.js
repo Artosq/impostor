@@ -773,6 +773,25 @@ function renderLobby(room) {
 
         list.append(container, ' ');
     });
+
+    list.append(createInviteSlot());
+}
+
+const INVITE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
+
+// Wolne miejsce na końcu listy graczy: zamiast awatara ikona udostępniania - otwiera zaproszenie (widzą wszyscy)
+function createInviteSlot() {
+    const container = createElement('div', 'avatar-container invite-slot');
+    container.title = 'Zaproś do gry';
+    container.onclick = openInvite;
+
+    const icon = createElement('div', 'invite-slot-icon');
+    icon.innerHTML = INVITE_ICON;
+    const frame = createElement('div', 'avatar-frame');
+    frame.append(icon);
+
+    container.append(frame, createElement('span', 'player-tag invite-slot-tag', 'Zaproś +'));
+    return container;
 }
 
 // Przełącznik pod kodem pokoju - działa tylko u hosta
@@ -986,7 +1005,7 @@ function lockEndButton(lockMs) {
 }
 
 function setHostControls(isHost) {
-    ['host-controls', 'host-end-controls', 'host-vote-controls'].forEach(id => {
+    ['host-controls', 'host-start', 'host-end-controls', 'host-vote-controls'].forEach(id => {
         byId(id).classList.toggle('hidden', !isHost);
     });
 
