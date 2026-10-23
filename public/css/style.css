@@ -306,6 +306,7 @@ body {
 /* ZAPROSZENIE: przycisk w poczekalni i okno z kodem QR */
 /* kafelek "Zaproś +" na końcu listy graczy - jak gracz, ale z ikoną udostępniania zamiast awatara */
 .invite-slot-icon{
+    animation: fadeIn 0.5s ease-in;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1944,32 +1945,27 @@ animation: fadeIn 0.5s ease-in;
     }
 }
 
-/* TELEFON W POZIOMIE: zamiast rozjechanej gry prośba o obrócenie.
-   Tylko telefony (dotyk + niski ekran) - tablety i komputery w poziomie działają normalnie. */
-.rotate-notice{
-    display: none;
-}
+/* TELEFON W POZIOMIE: gra obraca się w drugą stronę i zostaje w pionie względem telefonu,
+   jak przy blokadzie orientacji. Tylko telefony (dotyk + niski ekran) - tablety i komputery działają normalnie.
+   Kierunek obrotu (lewo/prawo) ustawia session.js w zależności od tego, w którą stronę obrócono telefon. */
 @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse){
-    .rotate-notice{
-        position: fixed;
-        inset: 0;
-        z-index: 3000;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 14px;
-        background: #161616;
-        color: white;
-        font-size: 1em;
-        letter-spacing: 2px;
-        text-transform: uppercase;
+    html{
+        overflow: hidden;
     }
-    .rotate-notice svg{
-        width: 64px;
-        height: 64px;
-        color: var(--secondary);
-        filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.6));
+    body{
+        position: fixed;
+        top: 0;
+        left: 0;
+        box-sizing: border-box;
+        width: 100vh;
+        height: 100vw;
+        margin: 0;
+        overflow-y: auto;
+        transform-origin: top left;
+        transform: rotate(-90deg) translateX(-100%);
+    }
+    html.landscape-secondary body{
+        transform: rotate(90deg) translateY(-100%);
     }
 }
 

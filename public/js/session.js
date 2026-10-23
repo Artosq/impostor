@@ -159,3 +159,21 @@ window.addEventListener('popstate', () => {
     backTrapSet = false;
     if (handleBack()) setBackTrap();
 });
+
+// ===== ORIENTACJA PIONOWA =====
+// Zainstalowana aplikacja na Androidzie jest zablokowana w pionie przez manifest. Tam, gdzie przeglądarka pozwala
+// (aplikacja, pełny ekran), prosimy też o blokadę wprost. W zwykłej karcie gra obraca się w CSS w drugą stronę -
+// tutaj tylko zaznaczamy, w którą stronę obrócono telefon, żeby obraz nie stanął do góry nogami.
+function lockPortrait() {
+    if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
+}
+document.addEventListener('pointerdown', lockPortrait, { once: true, capture: true });
+
+function markLandscapeSide() {
+    const type = screen.orientation ? screen.orientation.type : '';
+    const secondary = type === 'landscape-secondary' || window.orientation === -90;
+    document.documentElement.classList.toggle('landscape-secondary', secondary);
+}
+if (screen.orientation) screen.orientation.addEventListener('change', markLandscapeSide);
+window.addEventListener('orientationchange', markLandscapeSide);
+markLandscapeSide();
