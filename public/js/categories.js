@@ -61,6 +61,32 @@ const categoryArt = {
             <path d="M12 58c0-12 9-18 20-18s20 6 20 18"/>
             <path d="M22 13l4 5 6-8 6 8 4-5v8H22z"/>`)
     },
+    // TRYB PYTANIA
+    // dymek z pytajnikiem
+    klasyczne: {
+        emoji: '❓',
+        svg: categorySvg(`
+            <path d="M8 12h48v30H30l-12 10v-10H8z"/>
+            <path d="M26 22a6 6 0 1 1 8 5.6c-1.3.6-2 1.6-2 3V32"/>
+            <circle cx="32" cy="37" r="1.5" fill="currentColor"/>`)
+    },
+    // trzy osoby i wskazująca strzałka
+    'kto-z-nas': {
+        emoji: '👉',
+        svg: categorySvg(`
+            <circle cx="16" cy="24" r="6"/><circle cx="32" cy="20" r="7"/><circle cx="48" cy="24" r="6"/>
+            <path d="M6 44c0-6 4-10 10-10s10 4 10 10M22 44c0-8 4-12 10-12s10 4 10 12M38 44c0-6 4-10 10-10s10 4 10 10"/>
+            <path d="M32 50v8M28 54l4 4 4-4"/>`)
+    },
+    // suwak
+    skala: {
+        emoji: '🎚️',
+        svg: categorySvg(`
+            <path d="M8 32h48"/>
+            <circle cx="40" cy="32" r="7" fill="currentColor"/>
+            <path d="M8 20v-6M18 22v-8M28 24v-10M38 22v-8M48 20v-6"/>
+            <path d="M12 48h6M44 48h8M48 44v8"/>`)
+    },
     // ołówek - kategoria wpisana przez hosta
     wlasna: {
         emoji: '\u270F\uFE0F',

@@ -519,8 +519,52 @@ function changeSettings(change) {
         mode: gameMode,
         category: category,
         impostorCount: parseInt(impostors),
+        options: change.mode && change.mode !== gameMode ? null : roomOptions,     // nowy tryb = jego domyślne
         ...change
     });
+}
+
+// ===== USTAWIENIA GRY (przełączniki trybu: ostatnia szansa, dodatkowe role) =====
+let roomOptions = {};
+
+// Nazwy włączonych ról (opcje, które wymagają dodatkowego gracza) - lista jest jawna dla wszystkich
+function enabledRoleNames(mode, options) {
+    return (mode.options || []).filter(o => o.players > 0 && options[o.id]).map(o => o.name);
+}
+
+function openGameOptions() {
+    renderGameOptions();
+    byId('game-options').classList.remove('hidden', 'closing');
+}
+
+function closeGameOptions() {
+    const panel = byId('game-options');
+    if (panel.classList.contains('hidden') || panel.classList.contains('closing')) return;
+    panel.classList.add('closing');
+    setTimeout(() => {
+        if (!panel.classList.contains('closing')) return;
+        panel.classList.add('hidden');
+        panel.classList.remove('closing');
+    }, PICKER_CLOSE_MS);
+}
+
+function renderGameOptions() {
+    const mode = findMode(gameMode);
+    if (!mode) return;
+    byId('options-list').replaceChildren(...(mode.options || []).map(option => {
+        const row = createElement('div', 'option-row');
+        row.classList.toggle('is-on', Boolean(roomOptions[option.id]));
+        const text = createElement('div', 'option-text');
+        text.append(createElement('div', 'option-name', option.name), createElement('div', 'option-description', option.description));
+        const toggle = createElement('span', 'privacy-switch option-switch');
+        toggle.append(createElement('span', 'privacy-knob'));
+        row.append(text, toggle);
+        row.onclick = () => changeSettings({ options: { ...roomOptions, [option.id]: !roomOptions[option.id] } });
+        return row;
+    }));
+    const extra = (mode.options || []).filter(o => o.players > 0 && roomOptions[o.id]).length;
+    const needed = parseInt(impostors) + (extra > 0 ? extra + 2 : 1);    // jak na serwerze
+    byId('options-players').textContent = `Potrzeba co najmniej ${needed} graczy`;
 }
 
 function selectCategory(id) {
@@ -538,6 +582,7 @@ function applySettings(settings) {
         category = settings.category;
         impostors = String(settings.impostorCount);
         roomCustom = settings.custom;
+        roomOptions = settings.options || {};
     }
 
     // Lista trybów albo ustawienia pokoju mogły jeszcze nie dotrzeć
@@ -564,7 +609,17 @@ function applySettings(settings) {
     const summary = [mode.name];
     if (selectedCategory) summary.push(selectedCategory.name);
     summary.push(`${impostors} ${impostors === '1' ? 'impostor' : 'impostorów'}`);
+    const lastChance = (mode.options || []).find(o => o.id === 'lastChance');
+    if (lastChance && roomOptions.lastChance) summary.push('ostatnia szansa');
     byId('room-settings').textContent = summary.join(' · ');
+
+    // Jawna lista ról w grze (dla wszystkich) i licznik na przycisku hosta
+    const roles = enabledRoleNames(mode, roomOptions);
+    byId('room-roles').classList.toggle('hidden', roles.length === 0);
+    byId('room-roles').textContent = roles.length ? `W grze: ${roles.join(', ')}` : '';
+    byId('btn-game-options').classList.toggle('hidden', !(mode.options && mode.options.length));
+    byId('options-count').textContent = roles.length ? `+${roles.length}` : '';
+    if (!byId('game-options').classList.contains('hidden')) renderGameOptions();
 }
 
 // ===== OKNO WYBORU KATEGORII =====
@@ -584,7 +639,7 @@ function renderCategoryPicker() {
     const list = byId('picker-list');
 
     const tiles = mode.categories.filter(matches).map(c => {
-        const description = c.random ? 'Inna przy każdej grze' : `${c.count} haseł`;
+        const description = c.random ? 'Inna przy każdej grze' : `${c.count} ${c.unit || 'haseł'}`;
         const tile = createCategoryTile(c, description, () => selectCategory(c.id));
         tile.classList.toggle('selected', c.id === category);
         return tile;
@@ -983,7 +1038,10 @@ function startCountdown() {
 function showGame(data) {
     setRoleRevealed(false);
     byId('impostor-info').classList.add('hidden');
+    byId('role-note').classList.add('hidden');
+    byId('game-roles').classList.add('hidden');
     byId('input-answer').classList.add('hidden');
+    byId('answer-extra').classList.add('hidden');
     byId('starter-display').classList.add('hidden');
     byId('category-display').innerText = data.category;
 
@@ -1018,6 +1076,7 @@ function renderVoteTiles(vote) {
     });
 
     renderVoteStatus(vote);
+    byId('vote-mode-extras').replaceChildren(...(mode.voteExtras ? mode.voteExtras(vote) : []));
     lockEndButton(vote.endLockMs);
 }
 
@@ -1124,6 +1183,7 @@ const VOTER_STEP_MS = 90;        // kolejne awatary głosujących w wierszu
 // Wiersze wskakują po kolei, a wyrzuceni dostają czerwony błysk tuż przed werdyktem.
 function renderResultVotes(results) {
     const container = byId('res-votes');
+    const mode = gameModes[results.mode];
     const impostorIds = results.impostors.map(i => i.id);
     const kickedIds = results.kickedPlayers.map(k => k.id);
     const playersById = Object.fromEntries(results.players.map(p => [p.id, p]));
@@ -1142,10 +1202,14 @@ function renderResultVotes(results) {
 
         const who = createElement('div', 'res-vote-who');
         who.append(createElement('div', 'res-vote-name', p.name));
+        const tags = [];
+        const roleTag = mode.resultRoleTag ? mode.resultRoleTag(p) : null;
+        if (roleTag) tags.push(roleTag);
         if (kickedIds.includes(p.id)) {
             row.classList.add('res-vote-kicked');
-            who.append(createElement('div', 'res-vote-tag', 'Wyrzucony'));
+            tags.push('Wyrzucony');
         }
+        if (tags.length) who.append(createElement('div', 'res-vote-tag', tags.join(' · ')));
 
         // Pasek rośnie, gdy wiersz się pojawia
         const bar = createElement('div', 'res-vote-bar');

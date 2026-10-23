@@ -4,7 +4,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { Server } = require('socket.io');
 const { cleanText, publicPlayer } = require('./utils');
-const { getMode, listModes } = require('./modes');
+const { getMode, listModes, cleanOptions } = require('./modes');
 const avatars = require('./avatars');
 const assets = require('./assets');
 const nicks = require('./public/js/nicks');
@@ -153,11 +153,31 @@ function defaultCategory(mode) {
 
 function defaultSettings() {
     const mode = getMode(listModes()[0].id);
-    return { mode: mode.id, category: defaultCategory(mode), impostorCount: 1, custom: null };
+    return { mode: mode.id, category: defaultCategory(mode), impostorCount: 1, custom: null, options: cleanOptions(mode) };
 }
 
 function gameView(room, player) {
     return { mode: room.mode.id, ...room.mode.playerView(room, player) };
+}
+
+// Koniec gry: host zakończył głosowanie albo impostor zgadywał hasło
+function finishGame(room) {
+    const results = room.mode.finish(room);
+    room.status = 'finished';
+
+    room.players.forEach(p => {
+        p.away = true;
+        io.to(p.socketId).emit('game_over', {
+            mode: room.mode.id,
+            ...results,
+            ...room.mode.playerResult(room, p, results)
+        });
+    });
+
+    // Kto do tego czasu nie kliknie "Zagraj ponownie", odpada; pusty pokój znika
+    room.resultsTimer = setTimeout(() => {
+        if (rooms.get(room.code) === room) ejectAwayPlayers(room);
+    }, RESULTS_VISIBLE_MS);
 }
 
 function voteView(room, player) {
@@ -455,7 +475,7 @@ io.on('connection', (socket) => {
     });
 
     // Host zmienia ustawienia w poczekalni; nieprawidłowe wartości wracają do domyślnych
-    handle('set_room_settings', ({ roomCode, mode: modeId, category, impostorCount, custom } = {}) => {
+    handle('set_room_settings', ({ roomCode, mode: modeId, category, impostorCount, custom, options } = {}) => {
         const room = rooms.get(roomCode);
         const player = room && findBySocket(room, socket);
         if (!player || room.host !== player.userId || room.status !== 'waiting') return;
@@ -483,7 +503,9 @@ io.on('connection', (socket) => {
             impostorCount: Number.isInteger(count) && count >= 1 && count < MAX_PLAYERS ? count : room.settings.impostorCount,
             custom: customCategory
                 ? { id: customCategory.id, name: customCategory.name, count: customCategory.entries.length }
-                : null
+                : null,
+            // przełączniki z okna "Ustawienia gry"; bez nowych wartości zostają dotychczasowe (przy zmianie trybu - domyślne)
+            options: cleanOptions(mode, options || (mode.id === room.settings.mode ? room.settings.options : null))
         };
         emitLobby(room);
     });
@@ -571,7 +593,8 @@ io.on('connection', (socket) => {
         if (!player) return;
 
         touch(room);
-        room.mode.onAction(room, player, type, payload);
+        const outcome = room.mode.onAction(room, player, type, payload);
+        if (outcome && outcome.finish && room.status === 'voting') finishGame(room);
     });
 
     handle('end_game', (roomCode) => {
@@ -585,22 +608,7 @@ io.on('connection', (socket) => {
             return socket.emit('error', 'Daj graczom chwilę na głosowanie!');
         }
 
-        const results = room.mode.finish(room);
-        room.status = 'finished';
-
-        room.players.forEach(p => {
-            p.away = true;
-            io.to(p.socketId).emit('game_over', {
-                mode: room.mode.id,
-                ...results,
-                ...room.mode.playerResult(room, p, results)
-            });
-        });
-
-        // Kto do tego czasu nie kliknie "Zagraj ponownie", odpada; pusty pokój znika
-        room.resultsTimer = setTimeout(() => {
-            if (rooms.get(room.code) === room) ejectAwayPlayers(room);
-        }, RESULTS_VISIBLE_MS);
+        finishGame(room);
     });
 
     handle('play_again', ({ level } = {}) => {

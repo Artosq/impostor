@@ -107,6 +107,8 @@ function huntPlayerResult(room, player, results) {
 
 module.exports = {
     ROLE_IMPOSTOR,
+    ROLE_PLAYER,
+    publicPlayerOf: publicPlayer,
     checkImpostorCount,
     assignImpostors,
     pickFresh,

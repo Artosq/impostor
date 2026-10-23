@@ -131,6 +131,8 @@ function isOpen(id) {
 function handleBack() {
     if (isOpen('rules')) return closeRules(), true;
     if (isOpen('invite')) return closeInvite(), true;
+    if (isOpen('guess')) return closeGuess(), true;
+    if (isOpen('game-options')) return closeGameOptions(), true;
     if (isOpen('category-picker')) return closeCategoryPicker(), true;
     if (!byId('install-help').classList.contains('hidden')) return byId('install-help').classList.add('hidden'), true;
 

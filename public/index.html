@@ -137,12 +137,17 @@
                         <button class="impostor-tile" id="3" onclick="selectImpostors('3')">3</button>
                         <button class="impostor-tile" id="4" onclick="selectImpostors('4')">4</button>
                     </div>
+                    <button id="btn-game-options" class="btn-options" onclick="openGameOptions()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+                        <span>Ustawienia gry</span><span id="options-count" class="options-count"></span>
+                    </button>
                 </div>
 
                 <div id="host-start" class="hidden">
                     <button id="btn-start" class="btn-start" onclick="startGame()">START GRY</button>
                 </div>
                 <p id="room-settings" class="waiting-msg room-settings"></p>
+                <p id="room-roles" class="room-roles hidden"></p>
                 <p class="waiting-msg">Oczekiwanie na start przez hosta...</p>
             </div>
 
@@ -150,11 +155,9 @@
             <div id="screen-game" class="screen hidden">
                 <h3>Kategoria: <span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);"></span></h3>
                 <p id="starter-display" class="starter-display hidden"></p>
+                <p id="game-roles" class="room-roles hidden"></p>
                 <!-- Karta roli: przyciemniona, przytrzymanie (palcem albo myszą) ją rozjaśnia -->
                 <div id="role-card" class="role-card" tabindex="0" aria-label="Przytrzymaj, aby zobaczyć rolę">
-                    <div class="role-hint" aria-hidden="true">
-                        <svg viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M30.5 42.4A3 4.5 0 1 1 32.5 40.6"/><path d="M25.9 44.8A6.4 8.9 0 1 1 30.6 46.9"/><path d="M34.9 49.5A9.8 13.3 0 1 1 39.5 41.4"/><path d="M18.6 46.9A13.2 17.700000000000003 0 1 1 26.6 55.1"/><path d="M30 60.1A16.6 22.1 0 1 1 41.7 53.6"/><path d="M20 60.9A20 26.5 0 1 1 35.2 63.6"/><path d="M38 67A23.4 30.900000000000002 0 1 1 51.2 51.1"/><path d="M9.5 60.7A26.8 35.300000000000004 0 1 1 27.7 73.2"/></svg>
-                    </div>
                     <div id="role-display">
                         <div id="impostor-info" class="hidden">
                             <p>Twoja rola:</p>
@@ -163,11 +166,14 @@
                         </div>
                         <p>Twoja informacja:</p>
                         <h2 id="role-data" color="black">---</h2>
+                        <p id="role-note" class="role-note hidden"></p>
                     </div>
                 </div>
                 <!-- Odliczanie przed rundą -->
                 <div id="round-countdown" class="round-countdown hidden" aria-hidden="true"><span id="countdown-number"></span></div>
                 <input id="input-answer" class="hidden" maxlength="16" placeholder="Podaj odpowiedz" onkeyup="sendAnswer(this.value)">
+                <!-- odpowiedź w kategoriach "Kto z nas…" (wybór gracza) i "Skala 1–10" (suwak) -->
+                <div id="answer-extra" class="answer-extra hidden"></div>
                 <p class="waiting-msg">Oczekiwanie na rozpoczęcie głosowania przez hosta...</p>
                 <div id="host-vote-controls" class="hidden">
                     <button class="btn-end" onclick="castVote()">ZACZNIJ GŁOSOWANIE</button>
@@ -180,6 +186,7 @@
                 <h4 class="hidden" id="players-question"></h4>
                 <div id="vote-display"></div>
                 <p id="vote-status" class="vote-status"></p>
+                <div id="vote-mode-extras"></div>
                 <p class="waiting-msg">Oczekiwanie na zakończenie gry przez hosta...</p>
                 <div id="host-end-controls" class="hidden">
                     <button id="btn-end-game" class="btn-end" onclick="endGame()">ZAKOŃCZ I POKAŻ WYNIKI</button>
@@ -268,6 +275,27 @@
                     <button onclick="showEditorPaste(false)">Anuluj</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Ustawienia gry: przełączniki trybu (ostatnia szansa, dodatkowe role) - tylko host -->
+    <div id="game-options" class="picker-overlay hidden" onclick="if (event.target === this) closeGameOptions()">
+        <div class="picker-window options-window">
+            <div class="picker-title">— Ustawienia gry —</div>
+            <div id="options-list" class="options-list"></div>
+            <p id="options-players" class="options-players"></p>
+            <button class="btn-join" onclick="closeGameOptions()">Gotowe</button>
+        </div>
+    </div>
+
+    <!-- Zgadywanie hasła przez impostora (tryb Impostor, w trakcie głosowania) -->
+    <div id="guess" class="picker-overlay hidden" onclick="if (event.target === this) closeGuess()">
+        <div class="picker-window guess-window">
+            <div class="picker-title">— Zgadnij hasło —</div>
+            <p class="guess-warning">Masz <b>jedną próbę</b> i wszyscy zobaczą, że jesteś impostorem.<br>Trafisz - <span class="guess-win">wygrywasz</span>. Pomylisz się - <span class="guess-lose">przegrywasz</span>.</p>
+            <input type="text" id="guess-input" maxlength="60" placeholder="Twoje hasło" autocomplete="off" enterkeyhint="send" onkeydown="if (event.key === 'Enter') submitGuess()">
+            <button class="btn-end" onclick="submitGuess()">Zgaduję!</button>
+            <button class="btn-secondary" onclick="closeGuess()">Anuluj</button>
         </div>
     </div>
 

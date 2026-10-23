@@ -79,6 +79,17 @@ const RULES = [
             + ruleText(150, 148, 'IMPOSTOR!', { size: 14, color: '#e74c3c' })
             + `<rect x="128" y="20" width="44" height="22" rx="6" fill="#e74c3c" stroke="${RULE_INK}" stroke-width="2.5"/>` + ruleText(150, 36, '2 głosy', { size: 8 })
         )
+    },
+    {
+        title: 'Role specjalne',
+        text: 'Host może je włączyć w <b>Ustawieniach gry</b> - wszyscy wiedzą, które są w grze, ale nie kto je ma. <b>Wspólnik</b> wie, kto jest impostorem i gra z nim. <b>Błazen</b> wygrywa, gdy go wyrzucą. <b>Detektyw</b> zna jedną niewinną osobę. <b>Podmieniec</b> ma inne hasło i nawet o tym nie wie.',
+        art: ruleSvg(
+            ruleBot(14, 70, 52, '#8e44ad', { eyes: 'shifty', mouth: 'flat' }) + ruleText(40, 146, 'WSPÓLNIK', { size: 9, color: '#c08be0' })
+            + ruleBot(86, 70, 52, '#f1c40f', { mouth: 'open' }) + ruleText(112, 146, 'BŁAZEN', { size: 9, color: '#f1c40f' })
+            + ruleBot(158, 70, 52, '#3498db') + ruleText(184, 146, 'DETEKTYW', { size: 9, color: '#5dade2' })
+            + ruleBot(230, 70, 52, '#2ecc71', { mouth: 'flat' }) + ruleText(256, 146, 'PODMIENIEC', { size: 8, color: '#58d68d' })
+            + ruleText(256, 58, '?', { size: 22, color: '#2ecc71' }) + ruleText(112, 58, 'HA!', { size: 14, color: '#f1c40f' })
+        )
     }
 ];
 

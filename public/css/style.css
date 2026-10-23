@@ -18,6 +18,15 @@ body {
     justify-content: center; 
     padding: 15px;
     color: #eee;
+}
+/* siatka w tle na osobnej, nieruchomej warstwie - nie przewija się razem z kartą
+   (background-attachment: fixed nie działa w Safari na iPhonie) */
+body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -2;            /* pod falami (canvas z-index -1) i pod kartą */
+    pointer-events: none;
     background-image: linear-gradient(0deg, transparent 24%, rgba(255, 255, 255, .2) 25%, rgba(255, 255, 255, .2) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .2) 75%, rgba(255, 255, 255, .2) 77%, transparent 78%, transparent),
     linear-gradient(90deg, transparent 24%, rgba(255, 255, 255, .2) 25%, rgba(255, 255, 255, .2) 27%, transparent 28%, transparent 74%, rgba(255, 255, 255, .2) 75%, rgba(255, 255, 255, .2) 77%, transparent 78%, transparent);
     background-size: 70px 70px;
@@ -301,6 +310,205 @@ body {
 @keyframes pickerItemIn {
     from { opacity: 0; transform: translateX(-20px); }
     to { opacity: 1; transform: translateX(0); }
+}
+
+/* ODPOWIEDZI W TRYBIE PYTANIA: wybór gracza i suwak */
+.answer-extra{
+    margin: 4px 0 16px;
+}
+.answer-label{
+    margin: 0 0 8px;
+    font-size: 0.8em;
+    color: #999;
+}
+.answer-players{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+}
+.answer-player{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 76px;
+    margin: 0;
+    padding: 6px 4px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 3px solid black;
+    border-radius: 10px;
+    color: #ddd;
+    font-size: 0.65em;
+    overflow: hidden;
+}
+.answer-player img{
+    width: 40px;
+    height: 40px;
+    border: 3px solid black;
+    border-radius: 6px;
+    box-sizing: border-box;
+}
+.answer-player span{
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.answer-player.selected{
+    border-color: var(--secondary);
+    color: var(--secondary);
+    box-shadow: 0 0 14px rgba(46, 204, 113, 0.5);
+}
+.answer-scale-value{
+    font-size: 2.6em;
+    font-weight: 700;
+    color: var(--secondary);
+    text-shadow: 0 0 20px var(--secondary);
+}
+.answer-slider{
+    width: 100%;
+    margin: 10px 0 4px;
+    border: none;
+}
+.answer-scale-ends{
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75em;
+    color: #999;
+}
+
+/* USTAWIENIA GRY: przycisk hosta i okno z przełącznikami */
+.btn-options{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 14px;
+    background: transparent;
+    border: 3px solid #444;
+    color: #ddd;
+}
+.btn-options svg{
+    width: 18px;
+    height: 18px;
+}
+.btn-options:hover{
+    border-color: #777;
+    color: white;
+}
+.options-count{
+    color: var(--secondary);
+    text-shadow: 0 0 10px var(--secondary);
+}
+.options-window{
+    max-width: 380px;
+}
+.options-list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin: 10px 0;
+    overflow-y: auto;
+}
+.option-row{
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 3px solid black;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.3);
+    text-align: left;
+    cursor: pointer;
+    transition: 0.25s;
+}
+.option-row:hover{
+    border-color: #555;
+}
+.option-text{
+    flex: 1;
+}
+.option-name{
+    font-weight: 700;
+    color: #ddd;
+}
+.option-description{
+    margin-top: 3px;
+    font-size: 0.65em;
+    line-height: 1.4;
+    color: #999;
+}
+.option-row.is-on .option-name{
+    color: var(--secondary);
+    text-shadow: 0 0 10px var(--secondary);
+}
+.option-row .option-switch{
+    display: block;
+    flex-shrink: 0;
+    color: #666;
+}
+.option-row.is-on .option-switch{
+    color: var(--secondary);
+}
+.option-row.is-on .privacy-knob{
+    left: 24px;
+}
+.options-players{
+    margin: 0 0 8px;
+    font-size: 0.7em;
+    color: #999;
+}
+/* jawna lista ról w grze (poczekalnia i ekran gry) */
+.room-roles{
+    margin: 4px 0 8px;
+    font-size: 0.75em;
+    color: #f1c40f;
+    text-shadow: 0 0 14px rgba(241, 196, 15, 0.5);
+}
+/* karty nowych ról i zdanie celu */
+.role-accomplice{
+    background: #8e44ad;
+}
+.role-jester{
+    background: #f1c40f;
+    color: #141414 !important;     /* na żółtym biały tekst byłby nieczytelny */
+}
+.role-jester hr{
+    border-color: #141414;
+}
+.role-detective{
+    background: var(--primary);
+}
+.role-note{
+    margin: 10px 0 0;
+    font-size: 0.75em;
+    line-height: 1.5;
+    color: #141414;
+    font-weight: 700;
+}
+
+/* ZGADYWANIE HASŁA przez impostora */
+.btn-guess{
+    margin-top: 12px;
+}
+.guess-window{
+    max-width: 340px;
+}
+.guess-warning{
+    margin: 10px 0 6px;
+    font-size: 0.8em;
+    line-height: 1.6;
+    color: #ccc;
+}
+.guess-win{
+    color: var(--secondary);
+}
+.guess-lose{
+    color: var(--danger);
+}
+.res-value.res-value-guess-ok{
+    font-size: 0.9em;
 }
 
 /* ZAPROSZENIE: przycisk w poczekalni i okno z kodem QR */
@@ -1142,30 +1350,6 @@ button {
 }
 .role-card.revealed #role-display{
     filter: brightness(100%);
-}
-/* odcisk palca na czarnej karcie - znika, gdy karta się rozjaśnia */
-.role-card{
-    position: relative;
-}
-.role-hint{
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    transition: opacity 0.4s;
-}
-/* mniej więcej wielkość odcisku kciuka */
-.role-hint svg{
-    width: 66px;
-    height: 88px;
-    color: white;
-}
-.role-card.revealed .role-hint{
-    opacity: 0;
 }
 
 /* ODLICZANIE 3-2-1 przed rundą: zasłania kartę gry */
