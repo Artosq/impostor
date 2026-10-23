@@ -775,7 +775,52 @@ function renderLobby(room) {
     });
 
     list.append(createInviteSlot());
+    fitPlayerTags(list);
 }
+
+// Długie nicki dostają mniejszą czcionkę, żeby w rzędzie mieściło się 3 graczy (krótkie zostają bez zmian).
+// Plakietka szersza niż 1/3 listy zmniejsza się krokami, najwyżej do TAG_MIN_FONT - czytelność ważniejsza.
+const TAG_MIN_FONT = 8;     // pikselowa czcionka Silkscreen jest najostrzejsza przy 8 px
+const PLAYERS_GAP = 6;      // jak column-gap w #players-list
+
+function fitPlayerTags(list) {
+    const maxWidth = Math.floor((list.clientWidth - 2 * PLAYERS_GAP) / 3);
+    list.querySelectorAll('.avatar-container:not(.invite-slot) .player-tag').forEach(tag => {
+        tag.style.fontSize = '';
+        tag.style.paddingLeft = tag.style.paddingRight = '';
+        if (tag.offsetWidth <= maxWidth) return;
+
+        tag.style.paddingLeft = tag.style.paddingRight = '6px';
+        let size = parseFloat(getComputedStyle(tag).fontSize);
+        while (tag.offsetWidth > maxWidth && size > TAG_MIN_FONT) {
+            size = Math.max(TAG_MIN_FONT, size - 0.5);
+            tag.style.fontSize = `${size}px`;
+        }
+    });
+    breakPlayerRows(list);
+}
+
+// Rzędy po najwyżej 3 kafelki: kolejny trafia do rzędu, jeśli się zmieści, inaczej zaczyna nowy rząd
+const PLAYERS_PER_ROW = 3;
+
+function breakPlayerRows(list) {
+    list.querySelectorAll('.row-break').forEach(element => element.remove());
+    const width = list.clientWidth;
+    let used = 0, count = 0;
+    [...list.querySelectorAll('.avatar-container')].forEach(tile => {
+        const tileWidth = tile.offsetWidth;
+        const fits = count > 0 && count < PLAYERS_PER_ROW && used + PLAYERS_GAP + tileWidth <= width;
+        if (count > 0 && !fits) {
+            tile.before(createElement('div', 'row-break'));
+            used = 0;
+            count = 0;
+        }
+        used += (count > 0 ? PLAYERS_GAP : 0) + tileWidth;
+        count++;
+    });
+}
+// czcionka gry wczytuje się chwilę po stronie - wtedy mierzymy jeszcze raz
+document.fonts.ready.then(() => fitPlayerTags(byId('players-list')));
 
 const INVITE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>';
 

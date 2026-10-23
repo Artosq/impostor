@@ -695,8 +695,18 @@ body {
 .avatar-container.away{
     opacity: 0.4;
 }
+/* lista graczy: kafelki w rzędach ze stałym odstępem (3 w rzędzie, przy długich nickach mniej) */
 #players-list{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    column-gap: 6px;
     padding-top: 14px;
+}
+/* koniec rzędu - wstawia go app.js (najwyżej 3 graczy w rzędzie) */
+#players-list .row-break{
+    flex-basis: 100%;
+    height: 0;
 }
 .avatar-frame{
     position: relative;
@@ -1080,7 +1090,16 @@ button {
     
     /* Dodatkowe wygładzenie */
     text-align: center;
-    min-width: 60px;
+    box-sizing: border-box;
+    min-width: 56px;     /* mniej więcej szerokość awatara */
+    /* stała wysokość - długie nicki mają mniejszą czcionkę, ale plakietka zostaje tak samo wysoka */
+    height: 26px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    padding-top: 0;
+    padding-bottom: 0;
     transition: transform 0.2s;
 }
 
@@ -1945,27 +1964,32 @@ animation: fadeIn 0.5s ease-in;
     }
 }
 
-/* TELEFON W POZIOMIE: gra obraca się w drugą stronę i zostaje w pionie względem telefonu,
-   jak przy blokadzie orientacji. Tylko telefony (dotyk + niski ekran) - tablety i komputery działają normalnie.
-   Kierunek obrotu (lewo/prawo) ustawia session.js w zależności od tego, w którą stronę obrócono telefon. */
+/* TELEFON W POZIOMIE: zamiast rozjechanej gry prośba o obrócenie.
+   Tylko telefony (dotyk + niski ekran) - tablety i komputery w poziomie działają normalnie. */
+.rotate-notice{
+    display: none;
+}
 @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse){
-    html{
-        overflow: hidden;
-    }
-    body{
+    .rotate-notice{
         position: fixed;
-        top: 0;
-        left: 0;
-        box-sizing: border-box;
-        width: 100vh;
-        height: 100vw;
-        margin: 0;
-        overflow-y: auto;
-        transform-origin: top left;
-        transform: rotate(-90deg) translateX(-100%);
+        inset: 0;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: #161616;
+        color: white;
+        font-size: 1em;
+        letter-spacing: 2px;
+        text-transform: uppercase;
     }
-    html.landscape-secondary body{
-        transform: rotate(90deg) translateY(-100%);
+    .rotate-notice svg{
+        width: 64px;
+        height: 64px;
+        color: var(--secondary);
+        filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.6));
     }
 }
 
