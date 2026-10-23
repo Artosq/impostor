@@ -4,22 +4,41 @@
   "description": "Towarzyska gra w zgadywanie haseł i wykrywanie oszusta.",
   "icons": [
     {
-      "src": "icon-192.png",
+      "src": "icons/icon-192.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     }
   ],
   "start_url": "/",
-  "background_color": "#1a1a1a",
+  "background_color": "#161616",
   "display": "standalone",
   "scope": "/",
-  "theme_color": "#202020",
+  "theme_color": "#161616",
   "shortcuts": [
     {
-      "name": "Impostr gra",
-      "short_name": "Impostor",
+      "name": "Impostor - nowa gra",
+      "short_name": "Nowa gra",
       "url": "/",
-      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+      "icons": [
+        {
+          "src": "icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
-  ]
+  ],
+  "orientation": "portrait"
 }

@@ -1865,6 +1865,35 @@ animation: fadeIn 0.5s ease-in;
     }
 }
 
+/* TELEFON W POZIOMIE: zamiast rozjechanej gry prośba o obrócenie.
+   Tylko telefony (dotyk + niski ekran) - tablety i komputery w poziomie działają normalnie. */
+.rotate-notice{
+    display: none;
+}
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse){
+    .rotate-notice{
+        position: fixed;
+        inset: 0;
+        z-index: 3000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: #161616;
+        color: white;
+        font-size: 1em;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+    }
+    .rotate-notice svg{
+        width: 64px;
+        height: 64px;
+        color: var(--secondary);
+        filter: drop-shadow(0 0 10px rgba(46, 204, 113, 0.6));
+    }
+}
+
 /* PASEK ŁĄCZENIA: wygląda jak komunikat błędu (czerwony świecący napis u góry karty),
    a karta jest odbarwiona, dopóki połączenie nie wróci */
 .connection-banner{

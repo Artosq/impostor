@@ -4,10 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Impostor Game v1🕵️‍♂️</title>
-    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <!-- iPhone: ekran startowy zainstalowanej aplikacji (Android tworzy go sam z manifestu) -->
+    <link rel="apple-touch-startup-image" href="icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
+    <link rel="apple-touch-startup-image" href="icons/splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
     <link rel="manifest" href="manifest.json">
 
-    <meta name="theme-color" content="#181818">
+    <meta name="theme-color" content="#161616">
+    <meta name="apple-mobile-web-app-title" content="Impostor">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <!-- Fonty pobierane od razu, równolegle ze stylami - bez mignięcia zastępczej czcionki -->
@@ -32,6 +44,11 @@
             <span class="drop"></span>
         </div>
         <div id="error-display"></div>
+        <!-- Telefon w poziomie: prośba o obrócenie (gra jest projektowana na pion) -->
+        <div id="rotate-notice" class="rotate-notice" aria-hidden="true">
+            <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="6" width="16" height="30" rx="3"/><path d="M22 31h4"/><path d="M8 30a16 16 0 0 0 14 12l-3-3m3 3-3 3"/></svg>
+            <span>Obróć telefon pionowo</span>
+        </div>
         <div id="connection-banner" class="connection-banner hidden" role="status">Łączenie z serwerem</div>
 
         <!-- Lewy róg: wyjście z pokoju -->
