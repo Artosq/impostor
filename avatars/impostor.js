@@ -149,7 +149,7 @@ function catalog() {
     const parts = {
         background: [
             ...BACKGROUND_COLORS.map(color => ({ id: color, name: '', rarity: 'common', css: '#' + color })),
-            ...Object.entries(SPECIAL_BACKGROUNDS).map(([id, background]) => ({ id, name: background.name, rarity: 'rare', css: specialBackgroundCss(background) }))
+            ...Object.entries(SPECIAL_BACKGROUNDS).map(([id, background]) => ({ id, name: background.name, rarity: background.rarity || 'rare', css: specialBackgroundCss(background) }))
         ]
     };
     ['pattern', 'eyes', 'mouth', 'gear'].forEach(slot => {

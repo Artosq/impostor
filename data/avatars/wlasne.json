@@ -3143,43 +3143,6 @@
             }
           ]
         },
-        "grillround": {
-          "elements": [
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "34",
-                "cy": "12",
-                "r": "12",
-                "fill": "black",
-                "fill-opacity": ".88"
-              }
-            },
-            {
-              "name": "path",
-              "type": "element",
-              "attributes": {
-                "d": "M42 12a8 8 0 1 1-16 0a8 8 0 1 1 16 0M38.5 12a4.5 4.5 0 1 1-9 0a4.5 4.5 0 1 1 9 0",
-                "fill": "none",
-                "stroke": "white",
-                "stroke-opacity": ".25",
-                "stroke-width": "1.6"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "34",
-                "cy": "12",
-                "r": "1.6",
-                "fill": "white",
-                "fill-opacity": ".5"
-              }
-            }
-          ]
-        },
         "cablestache": {
           "elements": [
             {
@@ -3417,97 +3380,6 @@
                 "height": "8",
                 "rx": "2",
                 "fill": "black",
-                "fill-opacity": ".6"
-              }
-            }
-          ]
-        },
-        "thinking": {
-          "elements": [
-            {
-              "name": "rect",
-              "type": "element",
-              "attributes": {
-                "x": "8",
-                "width": "52",
-                "height": "24",
-                "rx": "6",
-                "fill": "black",
-                "fill-opacity": ".88"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "22",
-                "cy": "12",
-                "r": "3.5",
-                "fill": "#4EFAC9"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "34",
-                "cy": "12",
-                "r": "3.5",
-                "fill": "#4EFAC9"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "46",
-                "cy": "12",
-                "r": "3.5",
-                "fill": "#4EFAC9"
-              }
-            }
-          ]
-        },
-        "shush": {
-          "elements": [
-            {
-              "name": "path",
-              "type": "element",
-              "attributes": {
-                "d": "M16 14H52",
-                "fill": "none",
-                "stroke": "black",
-                "stroke-opacity": ".7",
-                "stroke-width": "4",
-                "stroke-linecap": "round",
-                "stroke-linejoin": "round"
-              }
-            },
-            {
-              "name": "rect",
-              "type": "element",
-              "attributes": {
-                "x": "29",
-                "y": "0",
-                "width": "10",
-                "height": "24",
-                "rx": "5",
-                "fill": "#C9CED6",
-                "stroke": "black",
-                "stroke-opacity": ".6",
-                "stroke-width": "2"
-              }
-            },
-            {
-              "name": "rect",
-              "type": "element",
-              "attributes": {
-                "x": "31",
-                "y": "2",
-                "width": "6",
-                "height": "5",
-                "rx": "2",
-                "fill": "white",
                 "fill-opacity": ".6"
               }
             }
@@ -4188,6 +4060,174 @@
       "colors": [
         "#3B2A7A",
         "#16123A"
+      ]
+    },
+    "olive": {
+      "name": "Oliwkowy",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#5B6B3A"
+      ]
+    },
+    "khaki": {
+      "name": "Khaki",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#A89F6B"
+      ]
+    },
+    "sand": {
+      "name": "Piaskowy",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#C8B48A"
+      ]
+    },
+    "navy": {
+      "name": "Granatowy",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#2C3E66"
+      ]
+    },
+    "burgundy": {
+      "name": "Bordowy",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#7B2D3A"
+      ]
+    },
+    "steelBlue": {
+      "name": "Stalowy niebieski",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#4C6B84"
+      ]
+    },
+    "rustYellow": {
+      "name": "Rdzawo-żółty",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#C9962E"
+      ]
+    },
+    "robotGray": {
+      "name": "Robotowy szary",
+      "type": "solid",
+      "rarity": "common",
+      "colors": [
+        "#8C9BAA"
+      ]
+    },
+    "steel": {
+      "name": "Stal szczotkowana",
+      "type": "material",
+      "finish": "brushed",
+      "rarity": "rare",
+      "colors": [
+        "#9AA4AD"
+      ]
+    },
+    "gold": {
+      "name": "Złoto",
+      "type": "material",
+      "finish": "metal",
+      "rarity": "legendary",
+      "colors": [
+        "#D4A72C"
+      ]
+    },
+    "copper": {
+      "name": "Miedź",
+      "type": "material",
+      "finish": "metal",
+      "rarity": "rare",
+      "colors": [
+        "#B8663A"
+      ]
+    },
+    "bronze": {
+      "name": "Brąz",
+      "type": "material",
+      "finish": "metal",
+      "rarity": "rare",
+      "colors": [
+        "#8C6A3B"
+      ]
+    },
+    "graphite": {
+      "name": "Grafit",
+      "type": "material",
+      "finish": "metal",
+      "rarity": "epic",
+      "colors": [
+        "#2B2E33"
+      ]
+    },
+    "carbon": {
+      "name": "Włókno węglowe",
+      "type": "material",
+      "finish": "carbon",
+      "rarity": "rare",
+      "colors": [
+        "#24272B",
+        "#33373D"
+      ]
+    },
+    "whitePlastic": {
+      "name": "Biały plastik",
+      "type": "material",
+      "finish": "plastic",
+      "rarity": "rare",
+      "colors": [
+        "#E9ECEF"
+      ]
+    },
+    "ironFace": {
+      "name": "Złota maska",
+      "type": "paint",
+      "shape": "faceplate",
+      "rarity": "rare",
+      "colors": [
+        "#B3261E",
+        "#D4A72C"
+      ]
+    },
+    "racingStripe": {
+      "name": "Pas wyścigowy",
+      "type": "paint",
+      "shape": "stripe",
+      "rarity": "rare",
+      "colors": [
+        "#1F5FBF",
+        "#F2F2F2"
+      ]
+    },
+    "eyeBand": {
+      "name": "Opaska na oczy",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#E9ECEF",
+        "#2B2E33"
+      ]
+    },
+    "fireCap": {
+      "name": "Czerwony czubek",
+      "type": "paint",
+      "shape": "cap",
+      "rarity": "rare",
+      "colors": [
+        "#8C9BAA",
+        "#D93A2B"
       ]
     }
   }

@@ -25,8 +25,48 @@ function starDots() {
     }).join('');
 }
 
+// Płaski połysk metalu: dwa jasne ukośne pasy (bez gradientów, w stylu Bottts)
+const SHEEN = '<path d="M0 70L70 0H95L0 95Z" fill="white" fill-opacity=".16"/><path d="M0 105L105 0H113L0 113Z" fill="white" fill-opacity=".1"/>';
+
+function materialSvg(finish, [base, second]) {
+    const fill = `<rect width="120" height="120" fill="${base}"/>`;
+    if (finish === 'brushed') {
+        const lines = Array.from({ length: 40 }, (_, i) => `M0 ${i * 3}h120v1H0z`).join('');
+        return fill + `<path d="${lines}" fill="white" fill-opacity=".08"/>` + SHEEN;
+    }
+    if (finish === 'carbon') {
+        // splot włókna: na przemian poziome i pionowe połówki komórek 6x6
+        let weave = '';
+        for (let y = 0; y < 120; y += 6) for (let x = 0; x < 120; x += 6) {
+            weave += (x / 6 + y / 6) % 2 ? `M${x} ${y}h6v3h-6z` : `M${x} ${y}h3v6h-3z`;
+        }
+        return fill + `<path d="${weave}" fill="${second}"/>` + '<path d="M0 70L70 0H95L0 95Z" fill="white" fill-opacity=".07"/>';
+    }
+    if (finish === 'plastic') {
+        return fill + '<ellipse cx="32" cy="26" rx="28" ry="13" transform="rotate(-20 32 26)" fill="white" fill-opacity=".7"/>'
+            + '<ellipse cx="96" cy="104" rx="60" ry="34" fill="black" fill-opacity=".05"/>';
+    }
+    return fill + SHEEN;    // metal: złoto, miedź, brąz, grafit
+}
+
+// Malowanie: drugi kolor w kształcie maski, pasa, opaski albo czubka (oczy ok. y 20-68, buzia y 72-96)
+const PAINT_SHAPES = {
+    faceplate: 'M16 16H104L98 102Q60 118 22 102Z',
+    stripe: 'M48 0H72V120H48Z',
+    eyeband: 'M0 24H120V64H0Z',
+    cap: 'M0 0H120V30Q60 16 0 30Z'
+};
+function paintSvg(shape, [base, accent]) {
+    const d = PAINT_SHAPES[shape];
+    return `<rect width="120" height="120" fill="${base}"/><path d="${d}" fill="${accent}"/>`
+        + `<path d="${d}" fill="none" stroke="black" stroke-opacity=".15" stroke-width="2"/>`;
+}
+
 // SVG tła 120x120 wstawiane w miejsce jednolitego koloru
-function specialBackgroundSvg({ type, colors, direction }) {
+function specialBackgroundSvg({ type, colors, direction, finish, shape }) {
+    if (type === 'solid') return `<rect width="120" height="120" fill="${colors[0]}"/>`;
+    if (type === 'material') return materialSvg(finish, colors);
+    if (type === 'paint') return paintSvg(shape, colors);
     if (type === 'split') {
         const [first, second] = colors;
         return direction === 'diagonal'
@@ -39,7 +79,14 @@ function specialBackgroundSvg({ type, colors, direction }) {
 }
 
 // Ten sam wygląd w CSS - dla kafelka w panelu personalizacji
-function specialBackgroundCss({ type, colors, direction }) {
+function specialBackgroundCss(background) {
+    const { type, colors, direction } = background;
+    if (type === 'solid') return colors[0];
+    // materiały i malowania: kafelek pokazuje dokładnie to samo SVG co awatar
+    if (type === 'material' || type === 'paint') {
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">${specialBackgroundSvg(background)}</svg>`;
+        return `url("data:image/svg+xml,${encodeURIComponent(svg)}") center / cover`;
+    }
     if (type === 'split') {
         return `linear-gradient(${direction === 'diagonal' ? '135deg' : '90deg'}, ${colors[0]} 50%, ${colors[1]} 50%)`;
     }
