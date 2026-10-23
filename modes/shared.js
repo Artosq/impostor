@@ -77,6 +77,12 @@ function pickKicked(room, votes, kickCount) {
 }
 
 // Gracze wygrywają, gdy wyrzucą wszystkich impostorów
+function votersOf(room, target) {
+    return room.players
+        .filter(voter => (room.playerChoices.get(voter.userId) || []).slice(0, room.round.impostors.length).includes(target.publicId))
+        .map(voter => voter.publicId);
+}
+
 function huntResults(room) {
     const { impostors } = room.round;
     const votes = countVotes(room, impostors.length);
@@ -90,7 +96,8 @@ function huntResults(room) {
         winner: allImpostorsCaught ? ROLE_PLAYER : ROLE_IMPOSTOR,
         impostors: impostors.map(publicPlayer),
         kickedPlayers: kickedPlayers.map(publicPlayer),
-        players: room.players.map(p => ({ ...publicPlayer(p), votes: votes[p.publicId] || 0 }))
+        // voters: kto głosował na tego gracza (na ekranie wyników małe awatary jak w Among Us)
+        players: room.players.map(p => ({ ...publicPlayer(p), votes: votes[p.publicId] || 0, voters: votersOf(room, p) }))
     };
 }
 

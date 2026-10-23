@@ -39,9 +39,12 @@ app.get('/health', (req, res) => {
 });
 
 // Klienta Socket.IO podaje assets.js (wersja zminifikowana, skompresowana, z cache)
+// Ping co 10 s: zerwane połączenie (uśpiony telefon, zmiana sieci) wychodzi na jaw po ok. 18 s, a nie po 45 s
 const io = new Server(server, {
     cors: { origin: "*" },
-    serveClient: false
+    serveClient: false,
+    pingInterval: 10000,
+    pingTimeout: 8000
 });
 
 const rooms = new Map();
@@ -357,7 +360,8 @@ io.on('connection', (socket) => {
         broadcastRoomList();
     });
 
-    handle('rejoin_room', ({ roomCode, userId } = {}) => {
+    // Powrót gracza do pokoju (po odświeżeniu, zerwaniu połączenia, uśpieniu telefonu)
+    function rejoin(roomCode, userId) {
         const room = rooms.get(roomCode);
         const player = room && room.players.find(p => p.userId === userId);
 
@@ -392,6 +396,25 @@ io.on('connection', (socket) => {
                 break;
         }
         socket.emit('rejoin_failed', false);
+    }
+
+    // Klient podaje pokój i swoje id już przy łączeniu - wraca do pokoju, zanim wyśle jakąkolwiek akcję
+    // (kliknięcia z czasu zerwania docierają po ponownym połączeniu i trafiają już do właściwego gracza)
+    const auth = socket.handshake.auth || {};
+    if (typeof auth.roomCode === 'string' && auth.roomCode && isValidUserId(auth.userId)) {
+        try {
+            rejoin(auth.roomCode, auth.userId);
+        } catch (err) {
+            console.error('Błąd przy powrocie do pokoju:', err);
+        }
+    }
+
+    // Starsze karty (sprzed tej wersji) wracają osobnym zdarzeniem
+    handle('rejoin_room', ({ roomCode, userId } = {}) => rejoin(roomCode, userId));
+
+    // Klient sprawdza, czy połączenie naprawdę działa (np. po powrocie do karty)
+    handle('ping_check', (ack) => {
+        if (typeof ack === 'function') ack(true);
     });
 
     // Host zmienia ustawienia w poczekalni; nieprawidłowe wartości wracają do domyślnych
@@ -448,7 +471,7 @@ io.on('connection', (socket) => {
         room.playerChoices = new Map();
 
         room.players.forEach((p) => {
-            io.to(p.socketId).emit('game_start', gameView(room, p));
+            io.to(p.socketId).emit('game_start', { ...gameView(room, p), countdown: true });
         });
 
         broadcastRoomList();

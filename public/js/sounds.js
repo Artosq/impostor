@@ -66,6 +66,10 @@ const sfx = (() => {
         voteStart: () => [0, 0.18].forEach(s => { tone({ type: 'triangle', freq: N.A4, start: s, length: 0.09 }); tone({ type: 'triangle', freq: N.E5, start: s + 0.09, length: 0.09 }); }),
         win: () => { notes([N.C5, N.E5, N.G5], 'square', 0.1, 0.12, 0.8); tone({ type: 'square', freq: N.C6, start: 0.3, length: 0.35, volume: 0.8 }); },
         lose: () => { notes([N.G4, N.E4], 'triangle', 0.16, 0.18); tone({ type: 'triangle', freq: N.C4, to: 200, start: 0.32, length: 0.5 }); },
+        countdown: () => tone({ type: 'square', freq: N.A4, length: 0.08, volume: 0.8 }),       // 3, 2, 1
+        go: () => notes([N.A5, N.C6], 'square', 0.06, 0.12, 0.8),                             // start rundy po odliczaniu
+        voteIn: () => tone({ type: 'triangle', freq: N.C5, to: N.G5, length: 0.06, volume: 0.6 }),  // głos na wynikach
+        hit: () => { tone({ type: 'square', freq: 160, to: 70, length: 0.25, volume: 0.6 }); noise({ length: 0.08, volume: 0.3 }); },
         reveal: () => { noise({ length: 0.2, volume: 0.6 }); tone({ type: 'sawtooth', freq: 300, to: 80, length: 0.4, volume: 0.5 }); }
     };
 
@@ -99,8 +103,8 @@ document.addEventListener('click', event => {
     haptic(target.classList.contains('vote-tile') ? 25 : 10);
 });
 document.addEventListener('DOMContentLoaded', () => {
-    const role = document.getElementById('role-display');
-    if (role) role.addEventListener('touchstart', () => haptic(30), { passive: true });
+    const role = document.getElementById('role-card');
+    if (role) role.addEventListener('pointerdown', () => haptic(30));
 });
 
 // ===== GŁOŚNIK W ROGU =====

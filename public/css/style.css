@@ -382,7 +382,8 @@ body {
     text-transform: uppercase;
     color: #999;
 }
-.picker-window input{
+.picker-window input,
+#screen-editor > input{
     flex: none;
 }
 .picker-view{
@@ -425,6 +426,21 @@ body {
 .editor-list{
     min-height: 150px;
     margin-bottom: 5px;
+}
+/* Na ekranie edytora lista haseł przewija się w ramce (jak lista części w panelu awatara),
+   a pole nowego hasła i przyciski zostają zawsze widoczne */
+#screen-editor .editor-list{
+    flex: none;
+    height: 45vh;
+    min-height: 200px;
+    max-height: 420px;
+    margin: 10px 0;
+    padding: 10px;
+    box-sizing: border-box;
+    border: 5px solid rgb(22, 22, 22);
+    border-radius: 10px;
+    background-color: #333333;
+    box-shadow: inset 0 -20px 20px -10px rgba(0, 0, 0, 0.7);
 }
 .editor-entry{
     padding: 6px 8px 8px;
@@ -1002,17 +1018,89 @@ button {
     outline: 5px solid white;
 }
 
-#role-display { 
-    padding: 20px; 
-    border-radius: 10px; 
-    color: whitesmoke; 
+#role-display {
+    padding: 20px;
+    border-radius: 10px;
+    color: whitesmoke;
     box-sizing: border-box;
     width: 100%;
+    user-select: none;
+}
+
+/* KARTA ROLI: przyciemniona do zera, rozjaśnia się tylko w trakcie przytrzymania */
+.role-card{
+    margin-bottom: 20px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: none;
+    outline: none;
+}
+.role-card #role-display{
     filter: brightness(0%);
     transition: 1s;
-    user-select: none;
-    margin-bottom: 20px;
-    
+}
+.role-card.revealed #role-display{
+    filter: brightness(100%);
+}
+/* odcisk palca na czarnej karcie - znika, gdy karta się rozjaśnia */
+.role-card{
+    position: relative;
+}
+.role-hint{
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    transition: opacity 0.4s;
+}
+/* mniej więcej wielkość odcisku kciuka */
+.role-hint svg{
+    width: 66px;
+    height: 88px;
+    color: white;
+}
+.role-card.revealed .role-hint{
+    opacity: 0;
+}
+
+/* ODLICZANIE 3-2-1 przed rundą: zasłania kartę gry */
+.round-countdown{
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 15px;
+    background: rgba(22, 22, 22, 0.96);
+    animation: pickerFadeIn 0.2s ease-out;
+}
+.round-countdown.closing{
+    animation: pickerFadeOut 0.25s ease-in forwards;
+}
+.round-countdown.hidden{
+    display: none;
+}
+#countdown-number{
+    font-size: 7em;
+    font-weight: 700;
+    color: var(--secondary);
+    text-shadow: 0 0 30px var(--secondary);
+}
+.countdown-pop{
+    animation: countdownPop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@keyframes countdownPop {
+    0% { opacity: 0; transform: scale(2.2); }
+    30% { opacity: 1; transform: scale(1); }
+    80% { opacity: 1; transform: scale(0.95); }
+    100% { opacity: 0.2; transform: scale(0.8); }
 }
 #role-data{
     color: var(--dark);
@@ -1388,9 +1476,94 @@ animation: fadeIn 0.5s ease-in;
 
 /* EKRAN WYNIKÓW */
 .res-banner{
+    position: relative;
     margin-bottom: 25px;
     color: var(--danger);
     animation: fadeIn 0.5s;
+}
+
+/* NAPIĘCIE NA WYNIKACH: najpierw "liczenie głosów" i same głosy, po ~2 s werdykt jak pieczątka */
+.res-counting{
+    display: none;
+    position: absolute;
+    inset: 0;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #ccc;
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+}
+.res-counting::after{
+    content: "";
+    display: inline-block;
+    width: 1.5em;
+    text-align: left;
+    animation: countingDots 1s steps(4) infinite;
+}
+@keyframes countingDots {
+    0% { content: ""; }
+    25% { content: "."; }
+    50% { content: ".."; }
+    75% { content: "..."; }
+}
+.res-suspense .res-counting{
+    display: flex;
+}
+/* do werdyktu ukryte, ale zajmują miejsce - nic nie podskakuje */
+.res-suspense .res-outcome,
+.res-suspense .res-summary,
+.res-suspense .res-player-status,
+.res-suspense #res-mode-sections,
+.res-suspense #res-impostors,
+.res-suspense .res-section:has(#res-impostors),
+.res-suspense .res-exp,
+.res-suspense .install-offer{
+    visibility: hidden;
+}
+/* w trakcie liczenia nic nie zdradza wyniku: impostor bez czerwonego nicku, bez dopisku "Wyrzucony" */
+.res-suspense .res-vote-impostor .res-vote-name{
+    color: inherit;
+    text-shadow: none;
+}
+.res-suspense .res-vote-tag{
+    visibility: hidden;
+}
+.res-reveal .res-vote-tag,
+.res-reveal .res-vote-impostor .res-vote-name{
+    animation: fadeIn 0.4s ease-out backwards;
+}
+.res-reveal .res-outcome{
+    animation: verdictStamp 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+.res-reveal .res-summary,
+.res-reveal .res-player-status,
+.res-reveal #res-mode-sections,
+.res-reveal #res-impostors,
+.res-reveal .res-exp{
+    animation: fadeIn 0.5s ease-out backwards;
+    animation-delay: 0.25s;
+}
+@keyframes verdictStamp {
+    0% { opacity: 0; transform: scale(2.4) rotate(-6deg); filter: blur(3px) brightness(2); }
+    60% { opacity: 1; transform: scale(0.94) rotate(1deg); filter: blur(0) brightness(1.6); }
+    100% { opacity: 1; transform: scale(1) rotate(0); filter: brightness(1); }
+}
+/* błysk ramki karty w kolorze wyniku */
+#card:has(.res-reveal .res-win){
+    animation: cardFlashWin 0.9s ease-out;
+}
+#card:has(.res-reveal .res-lose){
+    animation: cardFlashLose 0.9s ease-out;
+}
+@keyframes cardFlashWin {
+    0% { box-shadow: 0 0 0 3px var(--secondary), 0 0 60px var(--secondary); }
+    100% { box-shadow: 0 10px 25px rgba(0, 0, 0, 1); }
+}
+@keyframes cardFlashLose {
+    0% { box-shadow: 0 0 0 3px var(--danger), 0 0 60px var(--danger); }
+    100% { box-shadow: 0 10px 25px rgba(0, 0, 0, 1); }
 }
 .res-banner.res-win{
     color: var(--secondary);
@@ -1503,7 +1676,63 @@ animation: fadeIn 0.5s ease-in;
     align-items: center;
     gap: 8px;
     font-size: 11px;
+    animation: voteRowIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
+@keyframes voteRowIn {
+    from { opacity: 0; transform: translateX(-24px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+/* wyrzucony: czerwony błysk i drgnięcie tuż przed werdyktem */
+.res-vote-row.res-vote-kicked{
+    border-radius: 8px;
+    animation: voteRowIn 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) backwards, kickedHit 0.6s ease-out 1.5s backwards;
+}
+@keyframes kickedHit {
+    0% { background: rgba(231, 76, 60, 0); transform: translateX(0); }
+    15% { background: rgba(231, 76, 60, 0.45); transform: translateX(-6px); }
+    30% { transform: translateX(6px); }
+    45% { transform: translateX(-4px); }
+    60% { transform: translateX(3px); }
+    100% { background: rgba(231, 76, 60, 0); transform: translateX(0); }
+}
+/* pasek głosów, a pod nim kto głosował: małe awatary jak w Among Us */
+.res-vote-graph{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+}
+.res-vote-bar{
+    width: 100%;
+    height: 10px;
+    border-radius: 50px;
+    background-color: #161616;
+    overflow: hidden;
+}
+.res-vote-bar div{
+    height: 100%;
+    border-radius: 50px;
+    background-color: var(--danger);
+    transition: 1s;
+}
+.res-voters{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+}
+.res-vote-row .res-voter{
+    width: 18px;
+    height: 18px;
+    border: 2px solid black;
+    border-radius: 4px;
+    animation: voterPop 0.3s cubic-bezier(0.2, 0.9, 0.3, 1.4) backwards;
+}
+@keyframes voterPop {
+    from { opacity: 0; transform: scale(0.2); }
+    to { opacity: 1; transform: scale(1); }
+}
+
 .res-vote-row img{
     width: 38px;
     height: 38px;
@@ -1532,19 +1761,6 @@ animation: fadeIn 0.5s ease-in;
     letter-spacing: 1px;
     text-transform: uppercase;
     color: #999;
-}
-.res-vote-bar{
-    flex: 1;
-    height: 10px;
-    border-radius: 50px;
-    background-color: #161616;
-    overflow: hidden;
-}
-.res-vote-bar div{
-    height: 100%;
-    border-radius: 50px;
-    background-color: var(--danger);
-    transition: 1s;
 }
 .res-vote-count{
     flex: 0 0 20px;
@@ -1646,6 +1862,97 @@ animation: fadeIn 0.5s ease-in;
         top: 200px;
         opacity: 0;
         transform: rotate(45deg) scale(0.8);
+    }
+}
+
+/* PASEK ŁĄCZENIA: wygląda jak komunikat błędu (czerwony świecący napis u góry karty),
+   a karta jest odbarwiona, dopóki połączenie nie wróci */
+.connection-banner{
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    z-index: 999;
+    padding: 10px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    color: var(--danger);
+    text-shadow: 0 0 20px var(--danger);
+    transition: 0.8s ease-in-out;
+}
+.connection-banner::after{
+    content: "";
+    display: inline-block;
+    width: 1.5em;
+    text-align: left;
+    animation: countingDots 1s steps(4) infinite;
+}
+.connection-banner.hidden{
+    display: block;
+    top: -10%;
+    opacity: 0;
+    pointer-events: none;
+}
+#card.disconnected #error-blur{
+    filter: saturate(0%);
+}
+
+/* Bez przybliżania podwójnym dotknięciem i bez odświeżania przeciągnięciem w dół w trakcie gry */
+html, body{
+    overscroll-behavior-y: none;
+}
+body{
+    touch-action: manipulation;
+}
+
+/* SZKIELETY: szary kafelek z przesuwającym się błyskiem, dopóki treść się nie wczyta */
+.skeleton,
+.skeleton-failed{
+    background-color: #2c2c2c;
+    color: transparent;
+}
+.skeleton{
+    background-image: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.09) 50%, transparent 70%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: skeleton-shine 1.2s ease-in-out infinite;
+}
+img.skeleton,
+img.skeleton-failed{
+    aspect-ratio: 1 / 1;    /* awatary są kwadratowe - miejsce zajęte od razu, nic nie podskakuje */
+}
+@keyframes skeleton-shine {
+    from { background-position: 150% 0; }
+    to { background-position: -50% 0; }
+}
+/* wiersz listy pokoi przed pierwszą odpowiedzią serwera */
+.room-skeleton{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 4px;
+}
+.sk-avatar{
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: 8px;
+}
+.sk-lines{
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 6px;
+}
+.sk-line{
+    height: 10px;
+    border-radius: 5px;
+}
+.sk-short{
+    width: 55%;
+}
+@media (prefers-reduced-motion: reduce){
+    .skeleton{
+        animation: none;
     }
 }
 

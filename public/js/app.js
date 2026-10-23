@@ -1,8 +1,9 @@
-const REVEAL_DELAY_MS = 1200;    // po tylu ms odkryty impostor zrzuca przebranie na ekranie wyników
+const RESULTS_SUSPENSE_MS = 2000; // tyle trwa "liczenie głosów", zanim pojawi się werdykt
+const REVEAL_DELAY_MS = 2600;    // po tylu ms odkryty impostor zrzuca przebranie na ekranie wyników
 const HOST_CROWN_SVG = '<svg viewBox="0 0 26 20" fill="#f1c40f" stroke="black" stroke-width="2" stroke-linejoin="round">'
     + '<path d="M3 17L2 5l6 5 5-8 5 8 6-5-1 12z"/>'
     + '<circle cx="13" cy="13" r="1.6" fill="#e74c3c" stroke="none"/></svg>';
-const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results'];
+const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results', 'screen-editor'];
 const SCREENS_WITH_STATS = ['screen-login', 'screen-customize', 'screen-results'];
 
 // Kolejność części w adresie awatara - taka sama jak w avatars/*.js na serwerze
@@ -67,7 +68,7 @@ function showScreen(screenId) {
     byId(screenId).classList.remove('hidden');
 
     const showStats = SCREENS_WITH_STATS.includes(screenId);
-    byId('logo').classList.toggle('hidden', showStats);
+    byId('logo').classList.toggle('hidden', showStats || screenId === 'screen-editor');   // edytor potrzebuje miejsca
     byId('player-stats').classList.toggle('hidden', !showStats);
     if (showStats) refreshProgressBar();
     updateCornerButtons();
@@ -200,7 +201,7 @@ function renderCustomizeTabs() {
 // Kafelek części: kolory jako próbka, reszta jako cały awatar z tą częścią. Ramka pokazuje rzadkość.
 function createCustomizeTile(slot, item) {
     const isSwatch = slot.kind === 'swatch';
-    const tile = createElement(isSwatch ? 'div' : 'img', `customize-tile rarity-${item.rarity || 'common'}`);
+    const tile = createElement(isSwatch ? 'div' : 'img', `customize-tile rarity-${item.rarity || 'common'}${isSwatch ? '' : ' skeleton'}`);
 
     if (isSwatch) tile.style.background = item.css;
     else tile.src = avatarUrl({ style: botConfig.style, [slot.id]: item.id });   // sama ta część, bez reszty wyglądu
@@ -371,7 +372,12 @@ window.addEventListener('resize', refreshProgressBar);
 // ===== POKOJE =====
 
 // Od razu WebSocket - oszczędza kilka wymian z serwerem przy łączeniu. Gdy sieć go blokuje, zostaje odpytywanie.
-const socket = io({ transports: ['websocket', 'polling'], tryAllTransports: true });
+// Przy każdym (ponownym) połączeniu serwer dostaje nasz pokój i id - od razu przywraca nas do gry
+const socket = io({
+    transports: ['websocket', 'polling'],
+    tryAllTransports: true,
+    auth: callback => callback({ userId: userId, roomCode: localStorage.getItem('lastRoomCode') || '' })
+});
 
 function createRoom() {
     socket.emit('create_room', { ...nickToSend(), avatar: botConfig, level: playerLVL, userId: userId });
@@ -398,6 +404,7 @@ function updateCornerButtons() {
     byId('btn-leave').classList.toggle('hidden', !ROOM_SCREENS.includes(currentScreen));
     byId('btn-rules').classList.toggle('hidden', currentScreen !== 'screen-login');
     byId('btn-sound').classList.toggle('hidden', currentScreen === 'screen-results');   // na wynikach zasłaniałby napis
+    if (typeof updateWakeLock === 'function') updateWakeLock();     // session.js
     byId('btn-download').classList.toggle('hidden', !(canInstall() && currentScreen === 'screen-login'));
     byId('install-help').classList.add('hidden');
 }
@@ -601,7 +608,6 @@ const PICKER_CLOSE_MS = 250;    // długość animacji wyjścia w style.css
 
 function openCategoryPicker() {
     byId('picker-search').value = "";
-    showPickerView('picker-view-list');
     renderCategoryPicker();
 
     // Kafelki wjeżdżają po kolei tylko przy otwarciu, nie przy każdym wyszukiwaniu
@@ -636,6 +642,15 @@ document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') dismissCategoryPicker();
 });
 
+// Szkielet obrazka znika, gdy obrazek się wczyta; przy błędzie zostaje szary kafelek bez błysku
+// (przezroczysty obrazek zastępczy "data:" w index.html nie zdejmuje szkieletu - bez niego przeglądarka rysuje ramkę pustego obrazka)
+document.addEventListener('load', event => {
+    if (event.target.tagName === 'IMG' && !event.target.src.startsWith('data:')) event.target.classList.remove('skeleton');
+}, true);
+document.addEventListener('error', event => {
+    if (event.target.tagName === 'IMG' && event.target.classList.contains('skeleton')) event.target.classList.replace('skeleton', 'skeleton-failed');
+}, true);
+
 function createElement(tag, className, text) {
     const element = document.createElement(tag);
     if (className) element.className = className;
@@ -647,7 +662,7 @@ function createRoomRow(room) {
     const joinable = room.status === 'waiting' && !room.isFull;
     const row = createElement('div', 'room-row');
 
-    const hostAvatar = createElement('img', 'room-row-host');
+    const hostAvatar = createElement('img', 'room-row-host skeleton');
     hostAvatar.src = avatarUrl(room.host.avatar);
 
     // Pod nickiem: kod i gracze albo powód, dla którego nie da się wejść
@@ -657,7 +672,7 @@ function createRoomRow(room) {
     else details.append(`#${room.code}`);
 
     room.avatars.forEach(playerAvatar => {
-        const avatar = createElement('img');
+        const avatar = createElement('img', 'skeleton');
         avatar.src = avatarUrl(playerAvatar);
         details.append(avatar);
     });
@@ -729,7 +744,7 @@ function renderLobby(room) {
             container.title = 'Ogląda jeszcze wyniki';
         }
 
-        const avatar = createElement('img', 'player-avatar');
+        const avatar = createElement('img', 'player-avatar skeleton');
         avatar.src = avatarUrl(p.avatar);
 
         // Znaczniki trzymają się rogów samego awatara, a nie szerszej plakietki z nickiem
@@ -851,7 +866,58 @@ function voteOn(selectedTile, maxVotes, playerId) {
 }
 
 // Wspólne elementy ekranu gry wracają do stanu wyjściowego, resztę ustawia tryb
+// ===== KARTA ROLI =====
+// Przytrzymanie (palcem, myszą albo spacją) rozjaśnia kartę, puszczenie znowu ją przyciemnia
+
+const roleCard = byId('role-card');
+
+function setRoleRevealed(revealed) {
+    roleCard.classList.toggle('revealed', revealed);
+}
+
+roleCard.addEventListener('pointerdown', event => {
+    event.preventDefault();
+    if (roleCard.setPointerCapture) roleCard.setPointerCapture(event.pointerId);
+    setRoleRevealed(true);
+});
+['pointerup', 'pointercancel', 'lostpointercapture'].forEach(type => roleCard.addEventListener(type, () => setRoleRevealed(false)));
+roleCard.addEventListener('contextmenu', event => event.preventDefault());     // bez menu po długim przytrzymaniu
+roleCard.addEventListener('keydown', event => {
+    if (event.key === ' ' || event.key === 'Enter') {
+        event.preventDefault();
+        setRoleRevealed(true);
+    }
+});
+roleCard.addEventListener('keyup', () => setRoleRevealed(false));
+
+// ===== ODLICZANIE PRZED RUNDĄ =====
+// Tylko przy starcie rundy (serwer wysyła countdown), nie przy powrocie do trwającej gry
+const COUNTDOWN_STEP_MS = 650;
+let countdownTimers = [];
+
+function startCountdown() {
+    const overlay = byId('round-countdown');
+    const number = byId('countdown-number');
+    countdownTimers.forEach(clearTimeout);
+    overlay.classList.remove('hidden', 'closing');
+
+    countdownTimers = [3, 2, 1].map((value, index) => setTimeout(() => {
+        number.textContent = value;
+        number.classList.remove('countdown-pop');
+        void number.offsetWidth;        // ponowne odegranie animacji
+        number.classList.add('countdown-pop');
+        sfx.play('countdown');
+    }, index * COUNTDOWN_STEP_MS));
+
+    countdownTimers.push(setTimeout(() => {
+        sfx.play('go');
+        overlay.classList.add('closing');
+    }, 3 * COUNTDOWN_STEP_MS));
+    countdownTimers.push(setTimeout(() => overlay.classList.add('hidden'), 3 * COUNTDOWN_STEP_MS + 250));
+}
+
 function showGame(data) {
+    setRoleRevealed(false);
     byId('impostor-info').classList.add('hidden');
     byId('input-answer').classList.add('hidden');
     byId('starter-display').classList.add('hidden');
@@ -937,9 +1003,18 @@ function resultAvatarState(player, results) {
     return results.kickedPlayers.some(k => k.id === player.id) ? 'kicked' : undefined;
 }
 
+const KICK_HIT_MS = RESULTS_SUSPENSE_MS - 500;    // chwila "trafienia" wyrzuconego (błysk i dźwięk)
+
 function setResultAvatar(img, player, results) {
     const state = resultAvatarState(player, results);
-    img.src = avatarUrl(player.avatar, state === 'kicked' ? state : undefined);
+    img.src = avatarUrl(player.avatar);
+
+    if (state === 'kicked') {
+        // Krzyżyki w oczach dopiero przy trafieniu - wcześniej zdradzałyby wynik liczenia
+        const kicked = avatarUrl(player.avatar, state);
+        new Image().src = kicked;
+        resultsTimers.push(setTimeout(() => { img.src = kicked; }, KICK_HIT_MS));
+    }
 
     if (state === 'revealed') {
         // Najpierw wygląda jak zwykle, po chwili zrzuca przebranie (obraz czeka już w pamięci)
@@ -978,17 +1053,25 @@ function renderResultPlayers(containerId, players, results, emptyText) {
     }
 }
 
-// Jedna lista zamiast osobnych sekcji: głosy, impostorzy (na czerwono) i wyrzuceni (z dopiskiem)
+const VOTE_ROW_STEP_MS = 220;    // kolejne wiersze głosów wskakują co tyle
+const VOTER_STEP_MS = 90;        // kolejne awatary głosujących w wierszu
+
+// Jedna lista: pasek z liczbą głosów, a pod nim małe awatary tych, którzy głosowali (jak w Among Us).
+// Wiersze wskakują po kolei, a wyrzuceni dostają czerwony błysk tuż przed werdyktem.
 function renderResultVotes(results) {
     const container = byId('res-votes');
     const impostorIds = results.impostors.map(i => i.id);
     const kickedIds = results.kickedPlayers.map(k => k.id);
+    const playersById = Object.fromEntries(results.players.map(p => [p.id, p]));
     const ranking = [...results.players].sort((a, b) => b.votes - a.votes);
     const maxVotes = Math.max(1, ...ranking.map(p => p.votes));
 
-    container.replaceChildren(...ranking.map(p => {
+    container.replaceChildren(...ranking.map((p, index) => {
         const row = createElement('div', 'res-vote-row');
         if (impostorIds.includes(p.id)) row.classList.add('res-vote-impostor');
+        const rowDelay = index * VOTE_ROW_STEP_MS;
+        row.style.animationDelay = `${rowDelay}ms`;
+        resultsTimers.push(setTimeout(() => sfx.play('voteIn'), rowDelay));
 
         const avatar = createElement('img');
         setResultAvatar(avatar, p, results);
@@ -1000,32 +1083,63 @@ function renderResultVotes(results) {
             who.append(createElement('div', 'res-vote-tag', 'Wyrzucony'));
         }
 
+        // Pasek rośnie, gdy wiersz się pojawia
         const bar = createElement('div', 'res-vote-bar');
         const fill = createElement('div');
-        fill.style.width = `${p.votes / maxVotes * 100}%`;
+        fill.style.width = '0%';
         bar.append(fill);
+        resultsTimers.push(setTimeout(() => { fill.style.width = `${p.votes / maxVotes * 100}%`; }, rowDelay + 60));
 
-        row.append(avatar, who, bar, createElement('span', 'res-vote-count', p.votes));
+        // Pod paskiem: kto głosował na tego gracza
+        const voters = createElement('div', 'res-voters');
+        (p.voters || []).map(id => playersById[id]).filter(Boolean).forEach((voter, voterIndex) => {
+            const mini = createElement('img', 'res-voter skeleton');
+            mini.src = avatarUrl(voter.avatar);
+            mini.title = voter.name;
+            mini.alt = voter.name;
+            mini.style.animationDelay = `${rowDelay + 150 + voterIndex * VOTER_STEP_MS}ms`;
+            voters.append(mini);
+        });
+        const graph = createElement('div', 'res-vote-graph');
+        graph.append(bar);
+        if (voters.childElementCount > 0) graph.append(voters);
+
+        row.append(avatar, who, graph, createElement('span', 'res-vote-count', p.votes));
         return row;
     }));
+
+    // Wyrzuceni: błysk i dźwięk tuż przed werdyktem
+    if (kickedIds.length > 0) resultsTimers.push(setTimeout(() => sfx.play('hit'), KICK_HIT_MS));
 
     if (kickedIds.length === 0) {
         container.append(createElement('div', 'res-empty', 'Nikt nie został wyrzucony'));
     }
 }
 
+let resultsTimers = [];
+
 function showResults(results) {
     showScreen('screen-results');
 
     const mode = gameModes[results.mode];
     const won = results.won;
+
+    // Napięcie: najpierw "liczenie głosów" i głosy wskakujące po kolei, po chwili werdykt
+    const screen = byId('screen-results');
+    resultsTimers.forEach(clearTimeout);
+    screen.classList.remove('res-reveal');
+    screen.classList.add('res-suspense');
+    resultsTimers = [setTimeout(() => {
+        screen.classList.remove('res-suspense');
+        screen.classList.add('res-reveal');
+        sfx.play(won ? 'win' : 'lose');
+    }, RESULTS_SUSPENSE_MS)];
     const wasIKicked = results.kickedPlayers.some(player => player.id === myPlayerId);
 
     byId('res-banner').className = `res-banner ${won ? 'res-win' : 'res-lose'}`;
     byId('res-outcome').textContent = won ? 'WYGRANA' : 'PRZEGRANA';
-    sfx.play(won ? 'win' : 'lose');
     // ten sam moment co zrzucenie przebrania przez impostora na awatarze
-    if (results.impostors.length > 0) setTimeout(() => sfx.play('reveal'), REVEAL_DELAY_MS);
+    if (results.impostors.length > 0) resultsTimers.push(setTimeout(() => sfx.play('reveal'), REVEAL_DELAY_MS));
     byId('res-summary').textContent = mode.resultSummary(results);
     byId('res-player-status').textContent = wasIKicked ? 'Zostałeś zabity!' : 'Przeżyłeś!';
 
@@ -1050,16 +1164,7 @@ function showResults(results) {
 
 // ===== ZDARZENIA Z SERWERA =====
 
-socket.on("connect", () => {
-    const lastRoomCode = localStorage.getItem('lastRoomCode');
-    if (!lastRoomCode) return;
-
-    socket.emit('rejoin_room', {
-        roomCode: lastRoomCode,
-        userId: userId
-    });
-});
-
+// Powrót do pokoju po ponownym połączeniu robi serwer (dane idą w "auth" przy łączeniu) - zob. session.js
 socket.on("connect_error", (error) => {
     console.error("Błąd połączenia:", error.message);
 });
@@ -1074,9 +1179,10 @@ socket.on('rejoin_failed', (failed) => {
 
     localStorage.removeItem('lastRoomCode');
     if (currentRoomCode) {
-        // Pokój zniknął, gdy nas nie było
+        // Pokój zniknął, gdy nas nie było (np. serwer był restartowany)
         currentRoomCode = "";
         showScreen('screen-login');
+        showError('Pokój już nie istnieje');
     }
 });
 
@@ -1089,7 +1195,8 @@ socket.on('room_update', (room) => {
     socket.emit('check_host', currentRoomCode);
     localStorage.setItem('lastRoomCode', room.code);
     byId('input-answer').value = "";
-    showScreen('screen-lobby');
+    // Host piszący własną kategorię zostaje w edytorze, nawet gdy ktoś dołączy
+    if (currentScreen !== 'screen-editor') showScreen('screen-lobby');
 
     playLobbySounds(room);
     renderLobby(room);
@@ -1121,8 +1228,9 @@ socket.on('is_host', setHostControls);
 
 socket.on('game_start', (data) => {
     showScreen('screen-game');
-    sfx.play('roundStart');
     showGame(data);
+    if (data.countdown) startCountdown();
+    else sfx.play('roundStart');
     socket.emit('check_host', currentRoomCode);
 });
 
@@ -1143,15 +1251,6 @@ socket.on('receive_fuck', (data) => {
 
 socket.on('error', showError);
 
-document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') {
-
-        // Jeśli socket jest rozłączony, natychmiast wymuszamy próbę połączenia
-        if (socket.disconnected) {
-            socket.connect();
-        }
-    }
-});
 
 // ===== START =====
 

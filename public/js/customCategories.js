@@ -64,14 +64,8 @@ function selectCustomCategory(customCategory) {
 let editorEntries = [];      // [{ word, hints }] w kolejności dodawania
 let editorSnapshot = "";     // stan z chwili otwarcia - do pytania o niezapisane zmiany
 
-function showPickerView(viewId) {
-    ['picker-view-list', 'picker-view-editor'].forEach(id => {
-        byId(id).classList.toggle('hidden', id !== viewId);
-    });
-}
-
 function isCategoryEditorOpen() {
-    return !byId('picker-view-editor').classList.contains('hidden');
+    return currentScreen === 'screen-editor';
 }
 
 function openCategoryEditor(id) {
@@ -91,7 +85,11 @@ function openCategoryEditor(id) {
     editorSnapshot = editorState();
     showEditorPaste(false);
     renderEditorEntries();
-    showPickerView('picker-view-editor');
+
+    // Edytor ma własny ekran - okno z listą kategorii się zamyka
+    closeCategoryPicker();
+    showScreen('screen-editor');
+    window.scrollTo(0, 0);
 }
 
 function editorState() {
@@ -104,9 +102,10 @@ function closeCategoryEditor() {
     leaveCategoryEditor();
 }
 
+// Powrót z edytora do poczekalni z otwartą listą kategorii
 function leaveCategoryEditor() {
-    showPickerView('picker-view-list');
-    renderCategoryPicker();
+    showScreen('screen-lobby');
+    openCategoryPicker();
 }
 
 // Hasła gotowe do zapisu: przycięte, bez pustych i bez powtórzeń
@@ -240,9 +239,10 @@ function addEditorEntry() {
     scrollEditorToEnd();
 }
 
+// Lista haseł ma stałą wysokość i własne przewijanie - przewijamy ją do ostatniego hasła
 function scrollEditorToEnd() {
     const list = byId('editor-list');
-    list.scrollTop = list.scrollHeight;
+    list.scrollTo({ top: list.scrollHeight, behavior: 'smooth' });
 }
 
 // ===== WKLEJANIE LISTY =====
@@ -318,7 +318,7 @@ function saveCategoryEditor() {
     else categories[index] = saved;
     saveCustomCategories(categories);
 
-    showPickerView('picker-view-list');
+    showScreen('screen-lobby');
     selectCustomCategory(saved);
 }
 

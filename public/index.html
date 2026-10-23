@@ -32,6 +32,7 @@
             <span class="drop"></span>
         </div>
         <div id="error-display"></div>
+        <div id="connection-banner" class="connection-banner hidden" role="status">Łączenie z serwerem</div>
 
         <!-- Lewy róg: wyjście z pokoju -->
         <button class="corner-btn corner-left hidden" id="btn-leave" onclick="leaveClick()" title="Wyjdź z pokoju" aria-label="Wyjdź z pokoju">
@@ -61,7 +62,7 @@
             <div id="screen-login" class="screen">
                 <div id="player-stats">
                     <div class="main-avatar" onclick="customizeAvatar()" title="Zmień wygląd">
-                        <img src="icon-192.png" id="main-player-avatar" alt="Twój awatar">
+                        <img id="main-player-avatar" class="skeleton" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E" alt="">
                         <span class="edit-badge" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
                         </span>
@@ -82,7 +83,11 @@
                 <div style="margin: 15px 0; color: #999;">— LUB —</div>
                 <input type="text" id="input-code" placeholder="Kod pokoju">
                 <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
-                <div id="rooms-list"></div>
+                <div id="rooms-list">
+                    <!-- szkielet do pierwszej listy z serwera -->
+                    <div class="room-skeleton" aria-hidden="true"><span class="skeleton sk-avatar"></span><span class="sk-lines"><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-short"></span></span></div>
+                    <div class="room-skeleton" aria-hidden="true"><span class="skeleton sk-avatar"></span><span class="sk-lines"><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-short"></span></span></div>
+                </div>
             </div>
 
             <div id="screen-mode">
@@ -126,15 +131,23 @@
             <div id="screen-game" class="screen hidden">
                 <h3>Kategoria: <span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);"></span></h3>
                 <p id="starter-display" class="starter-display hidden"></p>
-                <div id="role-display" ontouchstart="this.style.filter = 'brightness(100%)';" ontouchend="this.style.filter = 'brightness(0%)'">
-                    <div id="impostor-info" class="hidden">
-                        <p>Twoja rola:</p>
-                        <h2 id="role-name">---</h2>
-                        <hr>
+                <!-- Karta roli: przyciemniona, przytrzymanie (palcem albo myszą) ją rozjaśnia -->
+                <div id="role-card" class="role-card" tabindex="0" aria-label="Przytrzymaj, aby zobaczyć rolę">
+                    <div class="role-hint" aria-hidden="true">
+                        <svg viewBox="0 0 60 80" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M30.5 42.4A3 4.5 0 1 1 32.5 40.6"/><path d="M25.9 44.8A6.4 8.9 0 1 1 30.6 46.9"/><path d="M34.9 49.5A9.8 13.3 0 1 1 39.5 41.4"/><path d="M18.6 46.9A13.2 17.700000000000003 0 1 1 26.6 55.1"/><path d="M30 60.1A16.6 22.1 0 1 1 41.7 53.6"/><path d="M20 60.9A20 26.5 0 1 1 35.2 63.6"/><path d="M38 67A23.4 30.900000000000002 0 1 1 51.2 51.1"/><path d="M9.5 60.7A26.8 35.300000000000004 0 1 1 27.7 73.2"/></svg>
                     </div>
-                    <p>Twoja informacja:</p>
-                    <h2 id="role-data" color="black">---</h2>
+                    <div id="role-display">
+                        <div id="impostor-info" class="hidden">
+                            <p>Twoja rola:</p>
+                            <h2 id="role-name">---</h2>
+                            <hr>
+                        </div>
+                        <p>Twoja informacja:</p>
+                        <h2 id="role-data" color="black">---</h2>
+                    </div>
                 </div>
+                <!-- Odliczanie przed rundą -->
+                <div id="round-countdown" class="round-countdown hidden" aria-hidden="true"><span id="countdown-number"></span></div>
                 <input id="input-answer" class="hidden" maxlength="16" placeholder="Podaj odpowiedz" onkeyup="sendAnswer(this.value)">
                 <p class="waiting-msg">Oczekiwanie na rozpoczęcie głosowania przez hosta...</p>
                 <div id="host-vote-controls" class="hidden">
@@ -161,6 +174,7 @@
             <!-- Ekran Wyników -->
             <div id="screen-results" class="screen hidden">
                 <div id="res-banner" class="res-banner">
+                    <div id="res-counting" class="res-counting">Liczenie głosów</div>
                     <div id="res-outcome" class="res-outcome"></div>
                     <div id="res-summary" class="res-summary"></div>
                     <div id="res-player-status" class="res-player-status"></div>
@@ -196,7 +210,7 @@
             <div id="screen-customize" class="screen hidden">
                 <div class="customize-preview">
                     <div class="customize-avatar">
-                        <img src="icon-192.png" id="customize-player-avatar">
+                        <img id="customize-player-avatar" class="skeleton" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E" alt="">
                     </div>
                     <span class="symbol customize-dice" title="Losuj wygląd" onclick="randomizeAvatar(this)">&#9860;</span>
                 </div>
@@ -208,34 +222,9 @@
                 </div>
                 <button class="btn-join" onclick="showScreen('screen-login')">Powrót do menu -></button>
             </div>
-        </div>
-    </div>
 
-    <!-- Zasady gry w 3 obrazkach -->
-    <div id="rules" class="picker-overlay hidden" onclick="if (event.target === this) closeRules()">
-        <div class="picker-window rules-window">
-            <div class="picker-title">— Jak grać —</div>
-            <div id="rules-slide" class="rules-slide"></div>
-            <div id="rules-dots" class="rules-dots"></div>
-            <div class="rules-nav">
-                <button id="rules-prev" class="btn-secondary" onclick="changeRulesSlide(-1)">Wstecz</button>
-                <button id="rules-next" class="btn-join" onclick="changeRulesSlide(1)">Dalej</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Okno wyboru kategorii -->
-    <div id="category-picker" class="picker-overlay hidden" onclick="if (event.target === this) dismissCategoryPicker()">
-        <div class="picker-window">
-            <div id="picker-view-list" class="picker-view">
-                <div class="picker-title">— Wybierz kategorię —</div>
-                <input type="text" id="picker-search" placeholder="Szukaj kategorii" oninput="renderCategoryPicker()">
-                <div id="picker-list" class="picker-list"></div>
-                <button onclick="closeCategoryPicker()">Zamknij</button>
-            </div>
-
-            <!-- Edytor własnej kategorii -->
-            <div id="picker-view-editor" class="picker-view hidden">
+            <!-- Ekran edytora własnej kategorii (otwierany z okna kategorii) -->
+            <div id="screen-editor" class="screen hidden">
                 <div id="editor-title" class="picker-title"></div>
                 <input type="text" id="editor-name" placeholder="Nazwa kategorii" oninput="updateEditorStatus()">
 
@@ -263,6 +252,31 @@
         </div>
     </div>
 
+    <!-- Zasady gry w 3 obrazkach -->
+    <div id="rules" class="picker-overlay hidden" onclick="if (event.target === this) closeRules()">
+        <div class="picker-window rules-window">
+            <div class="picker-title">— Jak grać —</div>
+            <div id="rules-slide" class="rules-slide"></div>
+            <div id="rules-dots" class="rules-dots"></div>
+            <div class="rules-nav">
+                <button id="rules-prev" class="btn-secondary" onclick="changeRulesSlide(-1)">Wstecz</button>
+                <button id="rules-next" class="btn-join" onclick="changeRulesSlide(1)">Dalej</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Okno wyboru kategorii -->
+    <div id="category-picker" class="picker-overlay hidden" onclick="if (event.target === this) dismissCategoryPicker()">
+        <div class="picker-window">
+            <div id="picker-view-list" class="picker-view">
+                <div class="picker-title">— Wybierz kategorię —</div>
+                <input type="text" id="picker-search" placeholder="Szukaj kategorii" oninput="renderCategoryPicker()">
+                <div id="picker-list" class="picker-list"></div>
+                <button onclick="closeCategoryPicker()">Zamknij</button>
+            </div>
+        </div>
+    </div>
+
     <script src="vendor/socket.io.min.js"></script>
     <script src="js/modes/shared.js"></script>
     <script src="js/modes/impostor.js"></script>
@@ -272,6 +286,7 @@
     <script src="js/sounds.js"></script>
     <script src="js/nicks.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/session.js"></script>
     <script src="js/rules.js"></script>
     <script src="js/effects.js"></script>
 </body>

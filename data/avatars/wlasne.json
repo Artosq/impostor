@@ -632,6 +632,1235 @@
               }
             }
           ]
+        },
+        "camera": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "20",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "10",
+                "fill": "#4FB3FF",
+                "fill-opacity": ".55"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "4.5",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "23",
+                "cy": "19",
+                "r": "2.5",
+                "fill": "white",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "10",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "6.5",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "3.5",
+                "fill": "#FF3D3D"
+              }
+            }
+          ]
+        },
+        "portholes": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "20",
+                "fill": "black",
+                "fill-opacity": ".6"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "14",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "30",
+                "cy": "26",
+                "r": "6",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "40.02",
+                "cy": "36.02",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "15.98",
+                "cy": "36.02",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "15.98",
+                "cy": "11.98",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "40.02",
+                "cy": "11.98",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "20",
+                "fill": "black",
+                "fill-opacity": ".6"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "14",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "78",
+                "cy": "26",
+                "r": "6",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "88.02",
+                "cy": "36.02",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "63.98",
+                "cy": "36.02",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "63.98",
+                "cy": "11.98",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "88.02",
+                "cy": "11.98",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            }
+          ]
+        },
+        "goggles": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "y": "19",
+                "width": "104",
+                "height": "10",
+                "rx": "3",
+                "fill": "black",
+                "fill-opacity": ".6"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "19",
+                "fill": "black",
+                "fill-opacity": ".3"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "15",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "15",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".25"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M19 21l6-7 3 2.5-6 7z",
+                "fill": "white",
+                "fill-opacity": ".45"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "19",
+                "fill": "black",
+                "fill-opacity": ".3"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "15",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "15",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".25"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M67 21l6-7 3 2.5-6 7z",
+                "fill": "white",
+                "fill-opacity": ".45"
+              }
+            }
+          ]
+        },
+        "battery": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "13",
+                "y": "12",
+                "width": "27",
+                "height": "24",
+                "rx": "3",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "40",
+                "y": "19",
+                "width": "4",
+                "height": "10",
+                "rx": "1",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "16",
+                "y": "15",
+                "width": "6",
+                "height": "18",
+                "rx": "1",
+                "fill": "#5EE38B",
+                "fill-opacity": "1"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "24",
+                "y": "15",
+                "width": "6",
+                "height": "18",
+                "rx": "1",
+                "fill": "#5EE38B",
+                "fill-opacity": "1"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "32",
+                "y": "15",
+                "width": "6",
+                "height": "18",
+                "rx": "1",
+                "fill": "#5EE38B",
+                "fill-opacity": "1"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "61",
+                "y": "12",
+                "width": "27",
+                "height": "24",
+                "rx": "3",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "88",
+                "y": "19",
+                "width": "4",
+                "height": "10",
+                "rx": "1",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "64",
+                "y": "15",
+                "width": "6",
+                "height": "18",
+                "rx": "1",
+                "fill": "#FF3D3D",
+                "fill-opacity": "1"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "72",
+                "y": "15",
+                "width": "6",
+                "height": "18",
+                "rx": "1",
+                "fill": "white",
+                "fill-opacity": ".08"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "80",
+                "y": "15",
+                "width": "6",
+                "height": "18",
+                "rx": "1",
+                "fill": "white",
+                "fill-opacity": ".08"
+              }
+            }
+          ]
+        },
+        "screws": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "18",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "15",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M20 24H36M28 16V32",
+                "stroke": "black",
+                "stroke-opacity": ".7",
+                "stroke-width": "4",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "21",
+                "cy": "17",
+                "r": "2",
+                "fill": "white"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "18",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "15",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M68 24H84M76 16V32",
+                "stroke": "black",
+                "stroke-opacity": ".7",
+                "stroke-width": "4",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "69",
+                "cy": "17",
+                "r": "2",
+                "fill": "white"
+              }
+            }
+          ]
+        },
+        "binoculars": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "44",
+                "y": "20",
+                "width": "16",
+                "height": "8",
+                "rx": "2",
+                "fill": "black",
+                "fill-opacity": ".55"
+              }
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "rotate(-8 28 24)"
+              },
+              "children": [
+                {
+                  "name": "rect",
+                  "type": "element",
+                  "attributes": {
+                    "x": "8",
+                    "y": "5",
+                    "width": "40",
+                    "height": "38",
+                    "rx": "13",
+                    "fill": "black",
+                    "fill-opacity": ".35"
+                  }
+                },
+                {
+                  "name": "rect",
+                  "type": "element",
+                  "attributes": {
+                    "x": "12",
+                    "y": "9",
+                    "width": "32",
+                    "height": "30",
+                    "rx": "10",
+                    "fill": "#C9CED6"
+                  }
+                },
+                {
+                  "name": "rect",
+                  "type": "element",
+                  "attributes": {
+                    "x": "12",
+                    "y": "9",
+                    "width": "32",
+                    "height": "7",
+                    "rx": "3.5",
+                    "fill": "black",
+                    "fill-opacity": ".15"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "28",
+                    "cy": "25",
+                    "r": "11",
+                    "fill": "black",
+                    "fill-opacity": ".9"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "28",
+                    "cy": "25",
+                    "r": "6",
+                    "fill": "#3B4252"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "24",
+                    "cy": "21",
+                    "r": "2.6",
+                    "fill": "white",
+                    "fill-opacity": ".9"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "32",
+                    "cy": "29",
+                    "r": "1.3",
+                    "fill": "white",
+                    "fill-opacity": ".6"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "rotate(8 76 24)"
+              },
+              "children": [
+                {
+                  "name": "rect",
+                  "type": "element",
+                  "attributes": {
+                    "x": "56",
+                    "y": "5",
+                    "width": "40",
+                    "height": "38",
+                    "rx": "13",
+                    "fill": "black",
+                    "fill-opacity": ".35"
+                  }
+                },
+                {
+                  "name": "rect",
+                  "type": "element",
+                  "attributes": {
+                    "x": "60",
+                    "y": "9",
+                    "width": "32",
+                    "height": "30",
+                    "rx": "10",
+                    "fill": "#C9CED6"
+                  }
+                },
+                {
+                  "name": "rect",
+                  "type": "element",
+                  "attributes": {
+                    "x": "60",
+                    "y": "9",
+                    "width": "32",
+                    "height": "7",
+                    "rx": "3.5",
+                    "fill": "black",
+                    "fill-opacity": ".15"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "76",
+                    "cy": "25",
+                    "r": "11",
+                    "fill": "black",
+                    "fill-opacity": ".9"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "76",
+                    "cy": "25",
+                    "r": "6",
+                    "fill": "#3B4252"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "72",
+                    "cy": "21",
+                    "r": "2.6",
+                    "fill": "white",
+                    "fill-opacity": ".9"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "80",
+                    "cy": "29",
+                    "r": "1.3",
+                    "fill": "white",
+                    "fill-opacity": ".6"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "hal": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "52",
+                "cy": "24",
+                "r": "22",
+                "fill": "black",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "52",
+                "cy": "24",
+                "r": "18",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "52",
+                "cy": "24",
+                "r": "14",
+                "fill": "#FF3D3D",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "52",
+                "cy": "24",
+                "r": "9",
+                "fill": "#FF3D3D"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "52",
+                "cy": "24",
+                "r": "4",
+                "fill": "#FFC2B8"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "46",
+                "cy": "17",
+                "r": "2.5",
+                "fill": "white",
+                "fill-opacity": ".7"
+              }
+            }
+          ]
+        },
+        "cylon": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "y": "14",
+                "width": "104",
+                "height": "20",
+                "rx": "10",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "28",
+                "y": "22",
+                "width": "34",
+                "height": "4",
+                "rx": "2",
+                "fill": "#FF3D3D",
+                "fill-opacity": ".3"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "66",
+                "cy": "24",
+                "r": "10",
+                "fill": "#FF3D3D",
+                "fill-opacity": ".25"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "66",
+                "cy": "24",
+                "r": "6",
+                "fill": "#FF3D3D"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "66",
+                "cy": "24",
+                "r": "2.5",
+                "fill": "#FFD0C8"
+              }
+            }
+          ]
+        },
+        "nightvision": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "y": "19",
+                "width": "104",
+                "height": "10",
+                "rx": "4",
+                "fill": "black",
+                "fill-opacity": ".55"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "15",
+                "cy": "26",
+                "r": "12",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "15",
+                "cy": "26",
+                "r": "7",
+                "fill": "#5EE38B",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "15",
+                "cy": "26",
+                "r": "3",
+                "fill": "#D6FFE3"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "39",
+                "cy": "22",
+                "r": "13",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "39",
+                "cy": "22",
+                "r": "8",
+                "fill": "#5EE38B",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "39",
+                "cy": "22",
+                "r": "3",
+                "fill": "#D6FFE3"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "65",
+                "cy": "22",
+                "r": "13",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "65",
+                "cy": "22",
+                "r": "8",
+                "fill": "#5EE38B",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "65",
+                "cy": "22",
+                "r": "3",
+                "fill": "#D6FFE3"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "89",
+                "cy": "26",
+                "r": "12",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "89",
+                "cy": "26",
+                "r": "7",
+                "fill": "#5EE38B",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "89",
+                "cy": "26",
+                "r": "3",
+                "fill": "#D6FFE3"
+              }
+            }
+          ]
+        },
+        "baymax": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M20 24H84",
+                "fill": "none",
+                "stroke": "black",
+                "stroke-opacity": ".85",
+                "stroke-width": "4.5",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "20",
+                "cy": "24",
+                "r": "10",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "84",
+                "cy": "24",
+                "r": "10",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            }
+          ]
+        },
+        "lcdtears": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "2",
+                "y": "4",
+                "width": "100",
+                "height": "40",
+                "rx": "8",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M18 20l20-4v6l-20 4zM86 20l-20-4v6l20 4z",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "24",
+                "y": "28",
+                "width": "4",
+                "height": "4",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "24",
+                "y": "34",
+                "width": "4",
+                "height": "4",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".6"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "24",
+                "y": "40",
+                "width": "4",
+                "height": "4",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".3"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "79",
+                "y": "28",
+                "width": "4",
+                "height": "4",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "79",
+                "y": "34",
+                "width": "4",
+                "height": "4",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".5"
+              }
+            }
+          ]
+        },
+        "sus": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "15",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "31",
+                "y": "23",
+                "width": "9",
+                "height": "9",
+                "rx": "2",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M11 25A17 17 0 0 1 45 25Z",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "15",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "79",
+                "y": "23",
+                "width": "9",
+                "height": "9",
+                "rx": "2",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M59 25A17 17 0 0 1 93 25Z",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            }
+          ]
         }
       }
     },
@@ -963,7 +2192,8 @@
               "attributes": {
                 "d": "M23.05 19.56a2 2 0 1 0 3.9.88C27.72 17.04 30.4 15 34 15s6.28 2.04 7.05 5.44a2 2 0 1 0 3.9-.88C43.75 14.3 39.43 11 34 11s-9.76 3.3-10.95 8.56",
                 "fill": "black",
-                "fill-opacity": ".6"
+                "fill-opacity": ".6",
+                "transform": "translate(0 -9)"
               }
             }
           ]
@@ -1116,6 +2346,1172 @@
               }
             }
           ]
+        },
+        "vent": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "width": "68",
+                "height": "24",
+                "rx": "5",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "4",
+                "y": "4",
+                "width": "60",
+                "height": "16",
+                "rx": "3",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "8",
+                "y": "7",
+                "width": "52",
+                "height": "2",
+                "rx": "1",
+                "fill": "white",
+                "fill-opacity": ".25"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "8",
+                "y": "11",
+                "width": "52",
+                "height": "2",
+                "rx": "1",
+                "fill": "white",
+                "fill-opacity": ".25"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "8",
+                "y": "15",
+                "width": "52",
+                "height": "2",
+                "rx": "1",
+                "fill": "white",
+                "fill-opacity": ".25"
+              }
+            }
+          ]
+        },
+        "keypad": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "width": "68",
+                "height": "24",
+                "rx": "5",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "4",
+                "y": "4",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "14.2",
+                "y": "4",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "24.4",
+                "y": "4",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "34.6",
+                "y": "4",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "44.8",
+                "y": "4",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "55",
+                "y": "4",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "4",
+                "y": "13",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "14.2",
+                "y": "13",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "24.4",
+                "y": "13",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "34.6",
+                "y": "13",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "44.8",
+                "y": "13",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "55",
+                "y": "13",
+                "width": "8",
+                "height": "7",
+                "rx": "1.5",
+                "fill": "black",
+                "fill-opacity": ".7"
+              }
+            }
+          ]
+        },
+        "equalizer": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "width": "68",
+                "height": "24",
+                "rx": "5",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "5",
+                "y": "9",
+                "width": "3",
+                "height": "6",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "10",
+                "y": "6",
+                "width": "3",
+                "height": "12",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "15",
+                "y": "3",
+                "width": "3",
+                "height": "18",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "20",
+                "y": "7",
+                "width": "3",
+                "height": "10",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "25",
+                "y": "4",
+                "width": "3",
+                "height": "16",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "30",
+                "y": "8",
+                "width": "3",
+                "height": "8",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "35",
+                "y": "5",
+                "width": "3",
+                "height": "14",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "40",
+                "y": "9",
+                "width": "3",
+                "height": "6",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "45",
+                "y": "6.5",
+                "width": "3",
+                "height": "11",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "50",
+                "y": "10",
+                "width": "3",
+                "height": "4",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "55",
+                "y": "6",
+                "width": "3",
+                "height": "12",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "60",
+                "y": "8",
+                "width": "3",
+                "height": "8",
+                "rx": "1.5",
+                "fill": "#4EFAC9"
+              }
+            }
+          ]
+        },
+        "barcode": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "width": "68",
+                "height": "24",
+                "rx": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "6",
+                "y": "4",
+                "width": "2",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "10",
+                "y": "4",
+                "width": "1",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "13",
+                "y": "4",
+                "width": "3",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "18",
+                "y": "4",
+                "width": "1",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "21",
+                "y": "4",
+                "width": "2",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "25",
+                "y": "4",
+                "width": "1",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "28",
+                "y": "4",
+                "width": "3",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "33",
+                "y": "4",
+                "width": "2",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "37",
+                "y": "4",
+                "width": "1",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "40",
+                "y": "4",
+                "width": "2",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "44",
+                "y": "4",
+                "width": "3",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "49",
+                "y": "4",
+                "width": "1",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "52",
+                "y": "4",
+                "width": "2",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "56",
+                "y": "4",
+                "width": "1",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "59",
+                "y": "4",
+                "width": "3",
+                "height": "16",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            }
+          ]
+        },
+        "loading": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "width": "68",
+                "height": "24",
+                "rx": "12",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "4",
+                "y": "6",
+                "width": "60",
+                "height": "12",
+                "rx": "6",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "6",
+                "y": "8",
+                "width": "36",
+                "height": "8",
+                "rx": "4",
+                "fill": "#5EE38B"
+              }
+            }
+          ]
+        },
+        "teethgrid": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "2",
+                "y": "0",
+                "width": "64",
+                "height": "24",
+                "rx": "11",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "5",
+                "y": "3",
+                "width": "58",
+                "height": "18",
+                "rx": "8",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M6 12H62M19 3.5V20.5M34 3V21M49 3.5V20.5",
+                "stroke": "black",
+                "stroke-opacity": ".7",
+                "stroke-width": "2"
+              }
+            }
+          ]
+        },
+        "respirator": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M14 6H4V18H16",
+                "fill": "none",
+                "stroke": "black",
+                "stroke-opacity": ".6",
+                "stroke-width": "3",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M54 6H64V18H52",
+                "fill": "none",
+                "stroke": "black",
+                "stroke-opacity": ".6",
+                "stroke-width": "3",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M12 0H56L48 24H20Z",
+                "fill": "black",
+                "fill-opacity": ".88"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "24",
+                "cy": "6",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "34",
+                "cy": "6",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "44",
+                "cy": "6",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "27",
+                "cy": "12.5",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "34",
+                "cy": "12.5",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "41",
+                "cy": "12.5",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "30",
+                "cy": "19",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "38",
+                "cy": "19",
+                "r": "1.8",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            }
+          ]
+        },
+        "grillround": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "34",
+                "cy": "12",
+                "r": "12",
+                "fill": "black",
+                "fill-opacity": ".88"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M42 12a8 8 0 1 1-16 0a8 8 0 1 1 16 0M38.5 12a4.5 4.5 0 1 1-9 0a4.5 4.5 0 1 1 9 0",
+                "fill": "none",
+                "stroke": "white",
+                "stroke-opacity": ".25",
+                "stroke-width": "1.6"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "34",
+                "cy": "12",
+                "r": "1.6",
+                "fill": "white",
+                "fill-opacity": ".5"
+              }
+            }
+          ]
+        },
+        "cablestache": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M32 7C24 2 13 3 9 11C7 16 12 20 16 15",
+                "fill": "none",
+                "stroke": "black",
+                "stroke-opacity": ".85",
+                "stroke-width": "4",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M36 7C44 2 55 3 59 11C61 16 56 20 52 15",
+                "fill": "none",
+                "stroke": "black",
+                "stroke-opacity": ".85",
+                "stroke-width": "4",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "29",
+                "y": "2",
+                "width": "10",
+                "height": "8",
+                "rx": "2",
+                "fill": "black",
+                "fill-opacity": ".9"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "31",
+                "y": "10",
+                "width": "2",
+                "height": "4",
+                "fill": "#C9CED6"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "35",
+                "y": "10",
+                "width": "2",
+                "height": "4",
+                "fill": "#C9CED6"
+              }
+            }
+          ]
+        },
+        "zipper": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "4",
+                "y": "8",
+                "width": "58",
+                "height": "8",
+                "rx": "2",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "6",
+                "y": "8",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "10.3",
+                "y": "12",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "14.6",
+                "y": "8",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "18.9",
+                "y": "12",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "23.2",
+                "y": "8",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "27.5",
+                "y": "12",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "31.799999999999997",
+                "y": "8",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "36.099999999999994",
+                "y": "12",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "40.4",
+                "y": "8",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "44.699999999999996",
+                "y": "12",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "49",
+                "y": "8",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "53.3",
+                "y": "12",
+                "width": "2.6",
+                "height": "4",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "56",
+                "y": "4",
+                "width": "10",
+                "height": "16",
+                "rx": "3",
+                "fill": "#C9CED6",
+                "stroke": "black",
+                "stroke-opacity": ".5",
+                "stroke-width": "1.5"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "59",
+                "y": "15",
+                "width": "4",
+                "height": "8",
+                "rx": "2",
+                "fill": "black",
+                "fill-opacity": ".6"
+              }
+            }
+          ]
+        },
+        "thinking": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "8",
+                "width": "52",
+                "height": "24",
+                "rx": "6",
+                "fill": "black",
+                "fill-opacity": ".88"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "22",
+                "cy": "12",
+                "r": "3.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "34",
+                "cy": "12",
+                "r": "3.5",
+                "fill": "#4EFAC9"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "46",
+                "cy": "12",
+                "r": "3.5",
+                "fill": "#4EFAC9"
+              }
+            }
+          ]
+        },
+        "shush": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M16 14H52",
+                "fill": "none",
+                "stroke": "black",
+                "stroke-opacity": ".7",
+                "stroke-width": "4",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "29",
+                "y": "0",
+                "width": "10",
+                "height": "24",
+                "rx": "5",
+                "fill": "#C9CED6",
+                "stroke": "black",
+                "stroke-opacity": ".6",
+                "stroke-width": "2"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "31",
+                "y": "2",
+                "width": "6",
+                "height": "5",
+                "rx": "2",
+                "fill": "white",
+                "fill-opacity": ".6"
+              }
+            }
+          ]
         }
       }
     },
@@ -1212,6 +3608,507 @@
                 "fill": "white",
                 "fill-opacity": ".2"
               }
+            }
+          ]
+        },
+        "panels": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M98 0h4v139.78h-4zM150 0h4v139.78h-4zM0 48h217v4H0zM0 93h217v4H0z",
+                "fill": "black",
+                "fill-opacity": ".12"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M44.5 3a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 3a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M44.5 13a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 13a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M44.5 45a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 45a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M44.5 55a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 55a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M44.5 90a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 90a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M44.5 100a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 100a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M44.5 127a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 127a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M44.5 137a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M56.5 137a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 3a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 3a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 13a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 13a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 45a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 45a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 55a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 55a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 90a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 90a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 100a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 100a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 127a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 127a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M96.5 137a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M108.5 137a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 3a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 3a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 13a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 13a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 45a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 45a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 55a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 55a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 90a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 90a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 100a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 100a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 127a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 127a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M148.5 137a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0M160.5 137a2.5 2.5 0 1 1-5 0a2.5 2.5 0 1 1 5 0",
+                "fill": "white",
+                "fill-opacity": ".3"
+              }
+            }
+          ]
+        },
+        "honeycomb": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M40.39 20L30 26L19.61 20L19.61 8L30 2L40.39 8ZM61.19 20L50.8 26L40.41 20L40.41 8L50.8 2L61.19 8ZM81.99 20L71.6 26L61.21 20L61.21 8L71.6 2L81.99 8ZM102.79 20L92.4 26L82.01 20L82.01 8L92.4 2L102.79 8ZM123.59 20L113.2 26L102.81 20L102.81 8L113.2 2L123.59 8ZM144.39 20L134 26L123.61 20L123.61 8L134 2L144.39 8ZM165.19 20L154.8 26L144.41 20L144.41 8L154.8 2L165.19 8ZM185.99 20L175.6 26L165.21 20L165.21 8L175.6 2L185.99 8ZM206.79 20L196.4 26L186.01 20L186.01 8L196.4 2L206.79 8ZM227.59 20L217.2 26L206.81 20L206.81 8L217.2 2L227.59 8ZM248.39 20L238 26L227.61 20L227.61 8L238 2L248.39 8ZM50.79 38L40.4 44L30.01 38L30.01 26L40.4 20L50.79 26ZM71.59 38L61.2 44L50.81 38L50.81 26L61.2 20L71.59 26ZM92.39 38L82 44L71.61 38L71.61 26L82 20L92.39 26ZM113.19 38L102.8 44L92.41 38L92.41 26L102.8 20L113.19 26ZM133.99 38L123.6 44L113.21 38L113.21 26L123.6 20L133.99 26ZM154.79 38L144.4 44L134.01 38L134.01 26L144.4 20L154.79 26ZM175.59 38L165.2 44L154.81 38L154.81 26L165.2 20L175.59 26ZM196.39 38L186 44L175.61 38L175.61 26L186 20L196.39 26ZM217.19 38L206.8 44L196.41 38L196.41 26L206.8 20L217.19 26ZM237.99 38L227.6 44L217.21 38L217.21 26L227.6 20L237.99 26ZM258.79 38L248.4 44L238.01 38L238.01 26L248.4 20L258.79 26ZM40.39 56L30 62L19.61 56L19.61 44L30 38L40.39 44ZM61.19 56L50.8 62L40.41 56L40.41 44L50.8 38L61.19 44ZM81.99 56L71.6 62L61.21 56L61.21 44L71.6 38L81.99 44ZM102.79 56L92.4 62L82.01 56L82.01 44L92.4 38L102.79 44ZM123.59 56L113.2 62L102.81 56L102.81 44L113.2 38L123.59 44ZM144.39 56L134 62L123.61 56L123.61 44L134 38L144.39 44ZM165.19 56L154.8 62L144.41 56L144.41 44L154.8 38L165.19 44ZM185.99 56L175.6 62L165.21 56L165.21 44L175.6 38L185.99 44ZM206.79 56L196.4 62L186.01 56L186.01 44L196.4 38L206.79 44ZM227.59 56L217.2 62L206.81 56L206.81 44L217.2 38L227.59 44ZM248.39 56L238 62L227.61 56L227.61 44L238 38L248.39 44ZM50.79 74L40.4 80L30.01 74L30.01 62L40.4 56L50.79 62ZM71.59 74L61.2 80L50.81 74L50.81 62L61.2 56L71.59 62ZM92.39 74L82 80L71.61 74L71.61 62L82 56L92.39 62ZM113.19 74L102.8 80L92.41 74L92.41 62L102.8 56L113.19 62ZM133.99 74L123.6 80L113.21 74L113.21 62L123.6 56L133.99 62ZM154.79 74L144.4 80L134.01 74L134.01 62L144.4 56L154.79 62ZM175.59 74L165.2 80L154.81 74L154.81 62L165.2 56L175.59 62ZM196.39 74L186 80L175.61 74L175.61 62L186 56L196.39 62ZM217.19 74L206.8 80L196.41 74L196.41 62L206.8 56L217.19 62ZM237.99 74L227.6 80L217.21 74L217.21 62L227.6 56L237.99 62ZM258.79 74L248.4 80L238.01 74L238.01 62L248.4 56L258.79 62ZM40.39 92L30 98L19.61 92L19.61 80L30 74L40.39 80ZM61.19 92L50.8 98L40.41 92L40.41 80L50.8 74L61.19 80ZM81.99 92L71.6 98L61.21 92L61.21 80L71.6 74L81.99 80ZM102.79 92L92.4 98L82.01 92L82.01 80L92.4 74L102.79 80ZM123.59 92L113.2 98L102.81 92L102.81 80L113.2 74L123.59 80ZM144.39 92L134 98L123.61 92L123.61 80L134 74L144.39 80ZM165.19 92L154.8 98L144.41 92L144.41 80L154.8 74L165.19 80ZM185.99 92L175.6 98L165.21 92L165.21 80L175.6 74L185.99 80ZM206.79 92L196.4 98L186.01 92L186.01 80L196.4 74L206.79 80ZM227.59 92L217.2 98L206.81 92L206.81 80L217.2 74L227.59 80ZM248.39 92L238 98L227.61 92L227.61 80L238 74L248.39 80ZM50.79 110L40.4 116L30.01 110L30.01 98L40.4 92L50.79 98ZM71.59 110L61.2 116L50.81 110L50.81 98L61.2 92L71.59 98ZM92.39 110L82 116L71.61 110L71.61 98L82 92L92.39 98ZM113.19 110L102.8 116L92.41 110L92.41 98L102.8 92L113.19 98ZM133.99 110L123.6 116L113.21 110L113.21 98L123.6 92L133.99 98ZM154.79 110L144.4 116L134.01 110L134.01 98L144.4 92L154.79 98ZM175.59 110L165.2 116L154.81 110L154.81 98L165.2 92L175.59 98ZM196.39 110L186 116L175.61 110L175.61 98L186 92L196.39 98ZM217.19 110L206.8 116L196.41 110L196.41 98L206.8 92L217.19 98ZM237.99 110L227.6 116L217.21 110L217.21 98L227.6 92L237.99 98ZM258.79 110L248.4 116L238.01 110L238.01 98L248.4 92L258.79 98ZM40.39 128L30 134L19.61 128L19.61 116L30 110L40.39 116ZM61.19 128L50.8 134L40.41 128L40.41 116L50.8 110L61.19 116ZM81.99 128L71.6 134L61.21 128L61.21 116L71.6 110L81.99 116ZM102.79 128L92.4 134L82.01 128L82.01 116L92.4 110L102.79 116ZM123.59 128L113.2 134L102.81 128L102.81 116L113.2 110L123.59 116ZM144.39 128L134 134L123.61 128L123.61 116L134 110L144.39 116ZM165.19 128L154.8 134L144.41 128L144.41 116L154.8 110L165.19 116ZM185.99 128L175.6 134L165.21 128L165.21 116L175.6 110L185.99 116ZM206.79 128L196.4 134L186.01 128L186.01 116L196.4 110L206.79 116ZM227.59 128L217.2 134L206.81 128L206.81 116L217.2 110L227.59 116ZM248.39 128L238 134L227.61 128L227.61 116L238 110L248.39 116ZM50.79 146L40.4 152L30.01 146L30.01 134L40.4 128L50.79 134ZM71.59 146L61.2 152L50.81 146L50.81 134L61.2 128L71.59 134ZM92.39 146L82 152L71.61 146L71.61 134L82 128L92.39 134ZM113.19 146L102.8 152L92.41 146L92.41 134L102.8 128L113.19 134ZM133.99 146L123.6 152L113.21 146L113.21 134L123.6 128L133.99 134ZM154.79 146L144.4 152L134.01 146L134.01 134L144.4 128L154.79 134ZM175.59 146L165.2 152L154.81 146L154.81 134L165.2 128L175.59 134ZM196.39 146L186 152L175.61 146L175.61 134L186 128L196.39 134ZM217.19 146L206.8 152L196.41 146L196.41 134L206.8 128L217.19 134ZM237.99 146L227.6 152L217.21 146L217.21 134L227.6 128L237.99 134ZM258.79 146L248.4 152L238.01 146L238.01 134L248.4 128L258.79 134Z",
+                "fill": "none",
+                "stroke": "black",
+                "stroke-opacity": ".1",
+                "stroke-width": "2.5"
+              }
+            }
+          ]
+        },
+        "gears": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M96 30L94.73 38.03L89.29 36.27L86.41 41.92L91.03 45.28L85.28 51.03L81.92 46.41L76.27 49.29L78.03 54.73L70 56L70 50.28L63.73 49.29L61.97 54.73L54.72 51.03L58.08 46.41L53.59 41.92L48.97 45.28L45.27 38.03L50.71 36.27L49.72 30L44 30L45.27 21.97L50.71 23.73L53.59 18.08L48.97 14.72L54.72 8.97L58.08 13.59L63.73 10.71L61.97 5.27L70 4L70 9.72L76.27 10.71L78.03 5.27L85.28 8.97L81.92 13.59L86.41 18.08L91.03 14.72L94.73 21.97L89.29 23.73L90.28 30ZM79.1 30A9.1 9.1 0 1 0 60.9 30A9.1 9.1 0 1 0 79.1 30ZM184 100L182.84 108.8L175.62 106.86L172.97 113.26L179.44 117L174.04 124.04L168.75 118.75L163.26 122.97L167 129.44L158.8 132.84L156.86 125.62L150 126.52L150 134L141.2 132.84L143.14 125.62L136.74 122.97L133 129.44L125.96 124.04L131.25 118.75L127.03 113.26L120.56 117L117.16 108.8L124.38 106.86L123.48 100L116 100L117.16 91.2L124.38 93.14L127.03 86.74L120.56 83L125.96 75.96L131.25 81.25L136.74 77.03L133 70.56L141.2 67.16L143.14 74.38L150 73.48L150 66L158.8 67.16L156.86 74.38L163.26 77.03L167 70.56L174.04 75.96L168.75 81.25L172.97 86.74L179.44 83L182.84 91.2L175.62 93.14L176.52 100ZM161.9 100A11.9 11.9 0 1 0 138.1 100A11.9 11.9 0 1 0 161.9 100ZM131 60L129.78 66.12L126.53 64.78L123.82 68.82L126.31 71.31L121.12 74.78L119.78 71.53L115 72.48L115 76L108.88 74.78L110.22 71.53L106.18 68.82L103.69 71.31L100.22 66.12L103.47 64.78L102.52 60L99 60L100.22 53.88L103.47 55.22L106.18 51.18L103.69 48.69L108.88 45.22L110.22 48.47L115 47.52L115 44L121.12 45.22L119.78 48.47L123.82 51.18L126.31 48.69L129.78 53.88L126.53 55.22L127.48 60ZM120.6 60A5.6 5.6 0 1 0 109.4 60A5.6 5.6 0 1 0 120.6 60Z",
+                "fill-rule": "evenodd",
+                "fill": "black",
+                "fill-opacity": ".1"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M174 28L172.93 33.36L170.09 32.18L167.72 35.72L169.9 37.9L165.36 40.93L164.18 38.09L160 38.92L160 42L154.64 40.93L155.82 38.09L152.28 35.72L150.1 37.9L147.07 33.36L149.91 32.18L149.08 28L146 28L147.07 22.64L149.91 23.82L152.28 20.28L150.1 18.1L154.64 15.07L155.82 17.91L160 17.08L160 14L165.36 15.07L164.18 17.91L167.72 20.28L169.9 18.1L172.93 22.64L170.09 23.82L170.92 28ZM164.9 28A4.9 4.9 0 1 0 155.1 28A4.9 4.9 0 1 0 164.9 28Z",
+                "fill-rule": "evenodd",
+                "fill": "white",
+                "fill-opacity": ".15"
+              }
+            }
+          ]
+        },
+        "scanlines": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M0 0h217v2H0zM0 6h217v2H0zM0 12h217v2H0zM0 18h217v2H0zM0 24h217v2H0zM0 30h217v2H0zM0 36h217v2H0zM0 42h217v2H0zM0 48h217v2H0zM0 54h217v2H0zM0 60h217v2H0zM0 66h217v2H0zM0 72h217v2H0zM0 78h217v2H0zM0 84h217v2H0zM0 90h217v2H0zM0 96h217v2H0zM0 102h217v2H0zM0 108h217v2H0zM0 114h217v2H0zM0 120h217v2H0zM0 126h217v2H0zM0 132h217v2H0zM0 138h217v2H0z",
+                "fill": "black",
+                "fill-opacity": ".1"
+              }
+            }
+          ]
+        },
+        "lightlines": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M48 34H96V62H170M58 132V96H118V140M128 8V44H170M48 84H78V112H100M140 76V120H170",
+                "fill": "none",
+                "stroke": "#4EFAC9",
+                "stroke-opacity": ".15",
+                "stroke-width": "8",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M48 34H96V62H170M58 132V96H118V140M128 8V44H170M48 84H78V112H100M140 76V120H170",
+                "fill": "none",
+                "stroke": "#4EFAC9",
+                "stroke-opacity": ".65",
+                "stroke-width": "2.5",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M99.5 34a3.5 3.5 0 1 1-7 0a3.5 3.5 0 1 1 7 0M99.5 62a3.5 3.5 0 1 1-7 0a3.5 3.5 0 1 1 7 0M121.5 96a3.5 3.5 0 1 1-7 0a3.5 3.5 0 1 1 7 0M131.5 44a3.5 3.5 0 1 1-7 0a3.5 3.5 0 1 1 7 0M81.5 84a3.5 3.5 0 1 1-7 0a3.5 3.5 0 1 1 7 0M143.5 76a3.5 3.5 0 1 1-7 0a3.5 3.5 0 1 1 7 0",
+                "fill": "#4EFAC9",
+                "fill-opacity": ".8"
+              }
+            }
+          ]
+        },
+        "helmet": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 0H52L54 16L30 14L0 26ZM120 0H68L66 16L90 14L120 26Z",
+                    "fill": "black",
+                    "fill-opacity": ".1"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M52 0H68L66 16H54Z",
+                    "fill": "white",
+                    "fill-opacity": ".14"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M52 0L54 16M68 0L66 16",
+                    "fill": "none",
+                    "stroke": "black",
+                    "stroke-opacity": ".2",
+                    "stroke-width": "2",
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 26L30 14L54 16M120 26L90 14L66 16",
+                    "fill": "none",
+                    "stroke": "black",
+                    "stroke-opacity": ".22",
+                    "stroke-width": "2.5",
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M6 22Q60 12 114 22L110 66Q60 74 10 66Z",
+                    "fill": "none",
+                    "stroke": "black",
+                    "stroke-opacity": ".25",
+                    "stroke-width": "3",
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 72L22 70L34 104L26 120H0ZM120 72L98 70L86 104L94 120H120Z",
+                    "fill": "black",
+                    "fill-opacity": ".14"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M22 70L34 104M98 70L86 104",
+                    "fill": "none",
+                    "stroke": "black",
+                    "stroke-opacity": ".18",
+                    "stroke-width": "2",
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M42 100H78L72 120H48Z",
+                    "fill": "white",
+                    "fill-opacity": ".08"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M42 100L48 120M78 100L72 120M42 100H78",
+                    "fill": "none",
+                    "stroke": "black",
+                    "stroke-opacity": ".22",
+                    "stroke-width": "2.5",
+                    "stroke-linejoin": "round",
+                    "stroke-linecap": "round"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 36h6v26H0zM114 36h6v26h-6z",
+                    "fill": "black",
+                    "fill-opacity": ".22"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M3 39v20M117 39v20",
+                    "stroke": "white",
+                    "stroke-opacity": ".22",
+                    "stroke-width": "1.5",
+                    "stroke-linecap": "round"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M14 8Q30 2 44 4",
+                    "fill": "none",
+                    "stroke": "white",
+                    "stroke-opacity": ".18",
+                    "stroke-width": "3",
+                    "stroke-linecap": "round"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "rust": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M16.63 3.44Q16.4 8 16.55 12.49Q16.71 16.98 12.47 18.84Q8.24 20.7 4.43 19.01Q0.62 17.32 -4.81 15.62Q-10.24 13.91 -8.54 8.62Q-6.84 3.33 -4.06 -0.63Q-1.27 -4.59 3.59 -5.26Q8.46 -5.93 12.66 -3.52Q16.86 -1.11 16.63 3.44ZM123.89 99.99Q126.23 104 124.35 108.39Q122.47 112.78 118.81 117.32Q115.15 121.85 110.33 118.54Q105.52 115.23 101.65 112.2Q97.79 109.17 96.91 103.68Q96.03 98.19 99.23 92.81Q102.43 87.42 108.53 88.26Q114.63 89.09 118.09 92.54Q121.55 95.99 123.89 99.99ZM105.68 4.1Q106.83 6 106.92 8.94Q107.02 11.89 104.25 13.14Q101.48 14.39 98.65 13.81Q95.83 13.23 94.15 10.98Q92.48 8.74 92.99 6.19Q93.51 3.64 94.95 1.69Q96.38 -0.27 99.01 -1.78Q101.64 -3.29 103.08 -0.54Q104.52 2.21 105.68 4.1ZM21.39 108.93Q21.47 112 21.33 115.01Q21.19 118.03 18.47 119.97Q15.75 121.91 13.23 119.8Q10.72 117.69 8.4 116.28Q6.09 114.88 4.91 111.57Q3.72 108.26 6.58 106.19Q9.44 104.11 12.33 104.62Q15.21 105.12 18.27 105.49Q21.32 105.86 21.39 108.93ZM65.92 116.35Q67.91 118 66.13 119.82Q64.34 121.65 62.84 123.62Q61.34 125.59 59.52 123.79Q57.69 122 55.53 121.21Q53.36 120.42 53.22 117.95Q53.07 115.48 54.57 113.33Q56.06 111.18 58.51 111.86Q60.96 112.53 62.45 113.62Q63.93 114.7 65.92 116.35Z",
+                    "fill": "#B5561C",
+                    "fill-opacity": ".5"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M98.27 113.76a2.32 2.32 0 1 1-4.64 0a2.32 2.32 0 1 1 4.64 0M121.76 96.06a1.78 1.78 0 1 1-3.56 0a1.78 1.78 0 1 1 3.56 0M31.65 73.86a1.04 1.04 0 1 1-2.08 0a1.04 1.04 0 1 1 2.08 0M115.86 99.79a1.63 1.63 0 1 1-3.26 0a1.63 1.63 0 1 1 3.26 0M107.11 0.15a2.2 2.2 0 1 1-4.4 0a2.2 2.2 0 1 1 4.4 0M116.36 65.97a2.22 2.22 0 1 1-4.44 0a2.22 2.22 0 1 1 4.44 0M62.9 102.37a1.78 1.78 0 1 1-3.56 0a1.78 1.78 0 1 1 3.56 0M113.08 119.77a1.77 1.77 0 1 1-3.54 0a1.77 1.77 0 1 1 3.54 0M98.76 60.93a1.41 1.41 0 1 1-2.82 0a1.41 1.41 0 1 1 2.82 0M8.24 6.24a2.49 2.49 0 1 1-4.98 0a2.49 2.49 0 1 1 4.98 0M15.06 42.09a1.99 1.99 0 1 1-3.98 0a1.99 1.99 0 1 1 3.98 0M46.39 56.67a1.19 1.19 0 1 1-2.38 0a1.19 1.19 0 1 1 2.38 0M47.51 20.95a2.03 2.03 0 1 1-4.06 0a2.03 2.03 0 1 1 4.06 0M67.27 111a1.18 1.18 0 1 1-2.36 0a1.18 1.18 0 1 1 2.36 0",
+                    "fill": "#B5561C",
+                    "fill-opacity": ".45"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M100.39 58.71Q101.7 60 101.05 61.84Q100.39 63.69 98.65 64.4Q96.9 65.11 95.28 64.57Q93.67 64.04 92.87 62.73Q92.08 61.43 91.5 59.79Q90.92 58.15 92.25 56.97Q93.57 55.79 95.17 55.67Q96.78 55.56 97.93 56.49Q99.08 57.42 100.39 58.71ZM23.36 50.72Q23.67 52 23.03 53Q22.38 54 21.59 55.23Q20.79 56.46 19.46 55.85Q18.13 55.24 16.99 54.37Q15.85 53.51 16.56 52.26Q17.28 51.01 17.91 50.24Q18.54 49.47 19.66 48.51Q20.79 47.55 21.92 48.49Q23.05 49.44 23.36 50.72ZM77.2 96.65Q77.18 98 77.22 99.37Q77.26 100.73 75.92 101.01Q74.58 101.28 73.2 101.53Q71.82 101.77 71.23 100.5Q70.65 99.22 70.62 97.99Q70.6 96.76 71.53 96.06Q72.47 95.35 73.48 95.29Q74.49 95.24 75.85 95.27Q77.21 95.3 77.2 96.65Z",
+                    "fill": "white",
+                    "fill-opacity": ".2"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "reactor": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 0H30L8 18L10 70L36 110L30 120H0ZM120 0H90L112 18L110 70L84 110L90 120H120Z",
+                    "fill": "black",
+                    "fill-opacity": ".12"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M8 18L30 8H90L112 18M10 70L36 110H84L110 70M60 104V120",
+                    "fill": "none",
+                    "stroke": "black",
+                    "stroke-opacity": ".22",
+                    "stroke-width": "2.5",
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "60",
+                    "cy": "10",
+                    "r": "8",
+                    "fill": "#4EFAC9",
+                    "fill-opacity": ".25"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "60",
+                    "cy": "10",
+                    "r": "5",
+                    "fill": "#4EFAC9",
+                    "fill-opacity": ".85"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "60",
+                    "cy": "10",
+                    "r": "2",
+                    "fill": "white"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "serial": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "rect",
+                  "type": "element",
+                  "attributes": {
+                    "x": "6",
+                    "y": "100",
+                    "width": "50",
+                    "height": "14",
+                    "rx": "2",
+                    "fill": "black",
+                    "fill-opacity": ".3"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M9.5 103h1.6v1.6h-1.6zM11.1 103h1.6v1.6h-1.6zM12.7 103h1.6v1.6h-1.6zM11.1 104.6h1.6v1.6h-1.6zM11.1 106.2h1.6v1.6h-1.6zM11.1 107.8h1.6v1.6h-1.6zM9.5 109.4h1.6v1.6h-1.6zM11.1 109.4h1.6v1.6h-1.6zM12.7 109.4h1.6v1.6h-1.6zM15.9 103h1.6v1.6h-1.6zM19.1 103h1.6v1.6h-1.6zM15.9 104.6h1.6v1.6h-1.6zM17.5 104.6h1.6v1.6h-1.6zM19.1 104.6h1.6v1.6h-1.6zM15.9 106.2h1.6v1.6h-1.6zM17.5 106.2h1.6v1.6h-1.6zM19.1 106.2h1.6v1.6h-1.6zM15.9 107.8h1.6v1.6h-1.6zM19.1 107.8h1.6v1.6h-1.6zM15.9 109.4h1.6v1.6h-1.6zM19.1 109.4h1.6v1.6h-1.6zM22.3 103h1.6v1.6h-1.6zM23.9 103h1.6v1.6h-1.6zM25.5 103h1.6v1.6h-1.6zM22.3 104.6h1.6v1.6h-1.6zM25.5 104.6h1.6v1.6h-1.6zM22.3 106.2h1.6v1.6h-1.6zM23.9 106.2h1.6v1.6h-1.6zM25.5 106.2h1.6v1.6h-1.6zM22.3 107.8h1.6v1.6h-1.6zM22.3 109.4h1.6v1.6h-1.6zM28.7 106.2h1.6v1.6h-1.6zM30.3 106.2h1.6v1.6h-1.6zM31.9 106.2h1.6v1.6h-1.6zM35.1 103h1.6v1.6h-1.6zM36.7 103h1.6v1.6h-1.6zM38.3 103h1.6v1.6h-1.6zM35.1 104.6h1.6v1.6h-1.6zM38.3 104.6h1.6v1.6h-1.6zM35.1 106.2h1.6v1.6h-1.6zM38.3 106.2h1.6v1.6h-1.6zM35.1 107.8h1.6v1.6h-1.6zM38.3 107.8h1.6v1.6h-1.6zM35.1 109.4h1.6v1.6h-1.6zM36.7 109.4h1.6v1.6h-1.6zM38.3 109.4h1.6v1.6h-1.6zM41.5 103h1.6v1.6h-1.6zM43.1 103h1.6v1.6h-1.6zM44.7 103h1.6v1.6h-1.6zM44.7 104.6h1.6v1.6h-1.6zM43.1 106.2h1.6v1.6h-1.6zM43.1 107.8h1.6v1.6h-1.6zM43.1 109.4h1.6v1.6h-1.6z",
+                    "fill": "white",
+                    "fill-opacity": ".6"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M10 100v14M52 100v14",
+                    "stroke": "white",
+                    "stroke-opacity": ".15",
+                    "stroke-width": "1"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "cracks": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 18L10 22L16 16L26 24L32 20M16 16L18 6M120 62L110 66L106 76L96 80M106 76L112 88M40 120L44 110L52 106L56 98",
+                    "fill": "none",
+                    "stroke": "black",
+                    "stroke-opacity": ".4",
+                    "stroke-width": "1.8",
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 18L10 22L16 16L26 24L32 20M16 16L18 6M120 62L110 66L106 76L96 80M106 76L112 88M40 120L44 110L52 106L56 98",
+                    "fill": "none",
+                    "stroke": "white",
+                    "stroke-opacity": ".18",
+                    "stroke-width": "1.2",
+                    "transform": "translate(1.5 1.5)",
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "matrix": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M4 0h2.4v6.95h-2.4zM4 13.62h2.4v4.76h-2.4zM4 24.36h2.4v3.57h-2.4zM4 31.34h2.4v5.37h-2.4zM4 41.09h2.4v7.04h-2.4zM4 55.64h2.4v6.58h-2.4zM4 65.15h2.4v4.04h-2.4zM4 72.79h2.4v6.89h-2.4zM4 83.81h2.4v3.23h-2.4zM4 94.54h2.4v5.01h-2.4zM4 102.07h2.4v5.6h-2.4zM4 115.34h2.4v6.91h-2.4zM13 -12.69h2.4v5.76h-2.4zM13 -3.31h2.4v3.48h-2.4zM13 5.21h2.4v6.31h-2.4zM13 18.39h2.4v4.87h-2.4zM13 26.68h2.4v7.08h-2.4zM13 39.61h2.4v3.98h-2.4zM13 50.28h2.4v8.73h-2.4zM13 65.97h2.4v4.41h-2.4zM13 77.86h2.4v6.68h-2.4zM13 91.14h2.4v4.55h-2.4zM13 99.87h2.4v3.95h-2.4zM13 108.36h2.4v5.18h-2.4zM13 116.63h2.4v7.99h-2.4zM22 -3.78h2.4v5.25h-2.4zM22 8.25h2.4v8h-2.4zM22 20.85h2.4v5.93h-2.4zM22 32.06h2.4v4.82h-2.4zM22 42.02h2.4v6.14h-2.4zM22 53.65h2.4v6.57h-2.4zM22 67.82h2.4v5.82h-2.4zM22 77.62h2.4v5.72h-2.4zM22 89.77h2.4v5.21h-2.4zM22 100h2.4v8.52h-2.4zM22 112.83h2.4v6.41h-2.4zM31 -6.44h2.4v7.23h-2.4zM31 4.29h2.4v7.85h-2.4zM31 19.25h2.4v3.83h-2.4zM31 28.84h2.4v3.48h-2.4zM31 36.97h2.4v5.05h-2.4zM31 44.91h2.4v7.09h-2.4zM31 57.76h2.4v8.98h-2.4zM31 71.4h2.4v4h-2.4zM31 80.59h2.4v7.53h-2.4zM31 93.52h2.4v8.73h-2.4zM31 105.63h2.4v3.36h-2.4zM31 112.24h2.4v5.08h-2.4zM31 119.78h2.4v7.12h-2.4zM40 -8.72h2.4v8.35h-2.4zM40 6.24h2.4v8.15h-2.4zM40 16.46h2.4v3.99h-2.4zM40 26.48h2.4v5.95h-2.4zM40 39.09h2.4v7.45h-2.4zM40 53.18h2.4v5.72h-2.4zM40 61.65h2.4v4.26h-2.4zM40 72.7h2.4v3.38h-2.4zM40 81.52h2.4v6.91h-2.4zM40 93.16h2.4v5.24h-2.4zM40 100.49h2.4v3.43h-2.4zM40 106.73h2.4v6.29h-2.4zM40 119.16h2.4v4.2h-2.4zM49 -11.75h2.4v5.61h-2.4zM49 -2.58h2.4v7.51h-2.4zM49 9.37h2.4v8.57h-2.4zM49 25.57h2.4v5.99h-2.4zM49 37.99h2.4v8.62h-2.4zM49 49.98h2.4v8.7h-2.4zM49 65.34h2.4v7.68h-2.4zM49 79.46h2.4v8.5h-2.4zM49 90.22h2.4v7.25h-2.4zM49 104.42h2.4v4.56h-2.4zM49 113.64h2.4v4.92h-2.4zM58 -12.6h2.4v8.99h-2.4zM58 1.97h2.4v3.88h-2.4zM58 11.65h2.4v4.54h-2.4zM58 18.84h2.4v3.09h-2.4zM58 25.37h2.4v5.29h-2.4zM58 38.34h2.4v3.1h-2.4zM58 44.29h2.4v6.05h-2.4zM58 53.13h2.4v7.26h-2.4zM58 66.81h2.4v3.31h-2.4zM58 76.06h2.4v5.57h-2.4zM58 86.4h2.4v7.87h-2.4zM58 98.4h2.4v7.96h-2.4zM58 109.95h2.4v7.05h-2.4zM67 -5.53h2.4v7.49h-2.4zM67 5.53h2.4v3.27h-2.4zM67 14.75h2.4v4.55h-2.4zM67 21.76h2.4v5.39h-2.4zM67 32.42h2.4v4.5h-2.4zM67 40.75h2.4v5.14h-2.4zM67 51.07h2.4v3.01h-2.4zM67 56.61h2.4v7.68h-2.4zM67 68.16h2.4v7.54h-2.4zM67 78.68h2.4v4.18h-2.4zM67 85.6h2.4v5.67h-2.4zM67 96.34h2.4v8.61h-2.4zM67 111.58h2.4v4.54h-2.4zM76 -13.74h2.4v6.43h-2.4zM76 -2.21h2.4v3.42h-2.4zM76 8.51h2.4v5.3h-2.4zM76 17.01h2.4v6.89h-2.4zM76 27.98h2.4v6.47h-2.4zM76 36.47h2.4v6.2h-2.4zM76 48.92h2.4v3.57h-2.4zM76 57.07h2.4v6.75h-2.4zM76 67.72h2.4v4.96h-2.4zM76 78.08h2.4v5.67h-2.4zM76 87.78h2.4v5.46h-2.4zM76 101.23h2.4v6.5h-2.4zM76 111.71h2.4v5.7h-2.4zM85 -13.92h2.4v4.51h-2.4zM85 -1.73h2.4v3.47h-2.4zM85 5.12h2.4v6.47h-2.4zM85 17.03h2.4v5.45h-2.4zM85 25.67h2.4v5.03h-2.4zM85 32.9h2.4v7.95h-2.4zM85 43.2h2.4v8.97h-2.4zM85 58.78h2.4v3.91h-2.4zM85 65.18h2.4v3.02h-2.4zM85 70.23h2.4v8.2h-2.4zM85 84.25h2.4v6.58h-2.4zM85 93.36h2.4v5.47h-2.4zM85 103.25h2.4v3.16h-2.4zM85 109.5h2.4v6.27h-2.4zM85 118.63h2.4v5.84h-2.4zM94 -16.4h2.4v3.89h-2.4zM94 -10.09h2.4v3.41h-2.4zM94 -2.25h2.4v8.66h-2.4zM94 12.97h2.4v7.43h-2.4zM94 28.1h2.4v5.08h-2.4zM94 37.95h2.4v5.52h-2.4zM94 50.78h2.4v8.52h-2.4zM94 61.97h2.4v5.46h-2.4zM94 75.25h2.4v3.34h-2.4zM94 86.34h2.4v8.5h-2.4zM94 98.16h2.4v3.59h-2.4zM94 107.84h2.4v8.94h-2.4zM94 118.81h2.4v8.31h-2.4zM103 -15.77h2.4v8.64h-2.4zM103 -3.41h2.4v4.01h-2.4zM103 5.65h2.4v3.58h-2.4zM103 12.27h2.4v5.88h-2.4zM103 25.99h2.4v5.89h-2.4zM103 38.47h2.4v5.09h-2.4zM103 46.56h2.4v4.69h-2.4zM103 59.2h2.4v3.81h-2.4zM103 68.57h2.4v6h-2.4zM103 80.09h2.4v7.88h-2.4zM103 93.75h2.4v7.62h-2.4zM103 109.01h2.4v6.89h-2.4zM112 -14.3h2.4v7.85h-2.4zM112 -1.89h2.4v4.81h-2.4zM112 5.32h2.4v7.71h-2.4zM112 19.2h2.4v6.48h-2.4zM112 31.74h2.4v6.86h-2.4zM112 43.92h2.4v8.64h-2.4zM112 58.1h2.4v3.93h-2.4zM112 65.8h2.4v8.11h-2.4zM112 81.7h2.4v4.41h-2.4zM112 90.39h2.4v8.63h-2.4zM112 103.4h2.4v5.35h-2.4zM112 115.84h2.4v4.62h-2.4z",
+                    "fill": "#5EE38B",
+                    "fill-opacity": ".35"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "caution": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M72 -20L146 54L134 66L60 -8Z",
+                    "fill": "#FFD43B"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M74 -18L79 -13L67 -1L62 -6ZM84 -8L89 -3L77 9L72 4ZM94 2L99 7L87 19L82 14ZM104 12L109 17L97 29L92 24ZM114 22L119 27L107 39L102 34ZM124 32L129 37L117 49L112 44ZM134 42L139 47L127 59L122 54Z",
+                    "fill": "black",
+                    "fill-opacity": ".85"
+                  }
+                }
+              ]
             }
           ]
         }
