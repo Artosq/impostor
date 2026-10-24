@@ -8,6 +8,7 @@
 // (znika nakrycie, oczy robią się czerwone, buzia pokazuje kły). Części stanów nie są w katalogu.
 
 const { BACKGROUND_COLORS, SPECIAL_BACKGROUNDS, specialBackgroundSvg, specialBackgroundCss } = require('./backgrounds');
+const { sendSvg } = require('./send');
 
 const INK = '#141414';
 const COLOR_PATTERN = /^[0-9a-f]{6}$/;
@@ -141,8 +142,7 @@ const ROUTE = '/avatar/impostor/' + ORDER.map(slot => ':' + slot).join('/');
 function send(req, res) {
     for (const slot of ORDER) if (!isValid(slot, req.params[slot])) return res.sendStatus(404);
     const state = STATES.includes(req.query.state) ? req.query.state : undefined;
-    res.set({ 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=3600' });
-    res.send(render(req.params, state));
+    sendSvg(req, res, `impostor|${req.path}|${state || ''}`, 'public, max-age=3600', () => render(req.params, state));
 }
 
 function catalog() {

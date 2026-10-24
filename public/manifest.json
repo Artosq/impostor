@@ -1,4 +1,7 @@
 {
+  "id": "/",
+  "lang": "pl",
+  "dir": "ltr",
   "short_name": "Impostor",
   "name": "Gra Impostor",
   "description": "Towarzyska gra w zgadywanie haseł i wykrywanie oszusta.",
@@ -40,5 +43,10 @@
       ]
     }
   ],
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "categories": [
+    "games",
+    "entertainment",
+    "social"
+  ]
 }

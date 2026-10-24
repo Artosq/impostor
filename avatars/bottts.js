@@ -10,6 +10,7 @@
 const bottts = require('../data/avatars/bottts-neutral.json');
 const own = require('../data/avatars/wlasne.json');
 const { BACKGROUND_COLORS, SPECIAL_BACKGROUNDS, specialBackgroundSvg, specialBackgroundCss } = require('./backgrounds');
+const { sendSvg } = require('./send');
 
 // Nasze warianty trafiają za oryginalnymi, więc kolejność części Bottts się nie zmienia
 const definition = structuredClone(bottts);
@@ -79,11 +80,7 @@ async function send(req, res) {
     if (req.query.state === 'kicked') parts.eyes = KICKED_EYES;
 
     const render = await renderer;
-    res.set({
-        'Content-Type': 'image/svg+xml',
-        'Cache-Control': 'public, max-age=31536000, immutable'
-    });
-    res.send(render(parts));
+    sendSvg(req, res, `bottts|${ORDER.map(part => parts[part]).join('/')}`, 'public, max-age=31536000, immutable', () => render(parts));
 }
 
 // Katalog dla klienta (panel personalizacji) w tym samym formacie co zestaw Agentów

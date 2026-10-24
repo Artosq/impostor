@@ -34,6 +34,7 @@ if (!userId) {
 
 let avatarCatalog = null;    // zestawy awatarów, ich części i rzadkości (z serwera: /avatar-catalog)
 let avatarStyle = null;      // aktywny zestaw, ustalany przez serwer
+let avatarCatalogLoading = true;
 let botConfig = {};          // wygląd gracza w aktywnym zestawie (razem z nazwą zestawu w polu style)
 
 let playerExp = parseInt(localStorage.getItem('playerExp'));
@@ -106,13 +107,34 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 // Awatary rysuje serwer gry. Adres: /avatar/<zestaw>/<części po kolei>[?state=kicked|revealed][&motion=off]
 function avatarUrl(avatar, state) {
     const style = avatar && AVATAR_ORDER[avatar.style] ? avatar.style : avatarStyle;
-    if (!style) return 'icon-192.png';
+    if (!style) return 'icons/icon-192.png';
 
     const parts = AVATAR_ORDER[style].map(part => encodeURIComponent((avatar && avatar[part]) || '-')).join('/');
     const query = [];
     if (state) query.push(`state=${state}`);
     if (reducedMotion.matches) query.push('motion=off');
     return `/avatar/${style}/${parts}${query.length ? `?${query.join('&')}` : ''}`;
+}
+
+// Awatar z listy pokoi: "zestaw.część.część..." - numery w katalogu (system 36), "!wartość" dosłownie, "-" brak.
+// Odpowiednik avatarCode w avatars/index.js
+function decodeListAvatar(code) {
+    if (!avatarCatalog || typeof code !== 'string') return null;
+    const [styleIndex, ...parts] = code.split('.');
+    const style = Object.keys(avatarCatalog.styles)[styleIndex];
+    if (!AVATAR_ORDER[style]) return null;
+
+    const avatar = { style };
+    AVATAR_ORDER[style].forEach((part, i) => {
+        const token = parts[i];
+        if (!token || token === '-') return;
+        if (token[0] === '!') avatar[part] = decodeURIComponent(token.slice(1));
+        else {
+            const item = (avatarCatalog.styles[style].parts[part] || [])[parseInt(token, 36)];
+            if (item) avatar[part] = item.id;
+        }
+    });
+    return avatar;
 }
 
 function loadAvatarConfig(style) {
@@ -161,6 +183,8 @@ async function loadAvatarCatalog() {
     } catch (e) {
         console.error('Nie udało się wczytać katalogu awatarów', e);
     }
+    avatarCatalogLoading = false;
+    if (pendingRoomList) renderRoomList(pendingRoomList);
 }
 
 // ===== PANEL PERSONALIZACJI (zakładki i kafelki powstają z katalogu) =====
@@ -376,7 +400,11 @@ window.addEventListener('resize', refreshProgressBar);
 const socket = io({
     transports: ['websocket', 'polling'],
     tryAllTransports: true,
-    auth: callback => callback({ userId: userId, roomCode: localStorage.getItem('lastRoomCode') || '' })
+    auth: callback => callback({
+        userId: userId,
+        roomCode: localStorage.getItem('lastRoomCode') || '',
+        modesVersion: availableModes.length ? (savedModes() || {}).version : undefined
+    })
 });
 
 function createRoom() {
@@ -503,8 +531,23 @@ function markSelectedTile(tileClass, id) {
 // ===== USTAWIENIA GRY =====
 // Trzyma je serwer: host wysyła zmianę, a wszyscy (host też) dostają ją z powrotem w room_update
 
-function renderModes(modes) {
+// Lista trybów zmienia się tylko z nową wersją gry - trzymamy ją u siebie, a serwer przysyła ją,
+// gdy podana przy łączeniu wersja jest nieaktualna (oszczędza transfer przy każdym ponownym połączeniu)
+
+function savedModes() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('modeList'));
+        return saved && Array.isArray(saved.modes) ? saved : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function renderModes(modes, version) {
     availableModes = modes;
+    if (version) {
+        try { localStorage.setItem('modeList', JSON.stringify({ version, modes })); } catch (e) {}
+    }
     renderTiles('mode-tiles', 'mode-tile', modes, id => changeSettings({ mode: id }));
     applySettings();
 }
@@ -713,46 +756,58 @@ function createElement(tag, className, text) {
     return element;
 }
 
-function createRoomRow(room) {
-    const joinable = room.status === 'waiting' && !room.isFull;
+// Wpis listy pokoi z serwera: [kod, stan, liczba graczy, nick hosta, awatar hosta, [awatary graczy]]
+const MAX_ROOM_PLAYERS = 16;    // jak MAX_PLAYERS w server.js
+const LIST_FULL = 1, LIST_PLAYING = 2;
+
+function createRoomRow([code, state, playerCount, hostName, hostCode, playerCodes]) {
+    const joinable = state !== LIST_FULL && state !== LIST_PLAYING;
     const row = createElement('div', 'room-row');
 
     const hostAvatar = createElement('img', 'room-row-host skeleton');
-    hostAvatar.src = avatarUrl(room.host.avatar);
+    hostAvatar.src = avatarUrl(decodeListAvatar(hostCode));
 
     // Pod nickiem: kod i gracze albo powód, dla którego nie da się wejść
     const details = createElement('div', 'room-row-details');
-    if (room.status !== 'waiting') details.append('W trakcie gry');
-    else if (room.isFull) details.append('Pełny');
-    else details.append(`#${room.code}`);
+    if (state === LIST_PLAYING) details.append('W trakcie gry');
+    else if (state === LIST_FULL) details.append('Pełny');
+    else details.append(`#${code}`);
 
-    room.avatars.forEach(playerAvatar => {
+    playerCodes.forEach(playerCode => {
         const avatar = createElement('img', 'skeleton');
-        avatar.src = avatarUrl(playerAvatar);
+        avatar.src = avatarUrl(decodeListAvatar(playerCode));
         details.append(avatar);
     });
-    const hiddenPlayers = room.playerCount - 1 - room.avatars.length;
+    const hiddenPlayers = playerCount - 1 - playerCodes.length;
     if (hiddenPlayers > 0) details.append(`+${hiddenPlayers}`);
 
     const info = createElement('div', 'room-row-info');
-    info.append(createElement('div', 'room-row-name', room.host.name), details);
+    info.append(createElement('div', 'room-row-name', hostName), details);
 
     if (joinable) {
         row.classList.add('joinable');
-        row.onclick = () => joinRoom(room.code);
+        row.onclick = () => joinRoom(code);
     } else {
         row.classList.add('locked');
     }
 
-    row.append(hostAvatar, info, createElement('div', 'room-row-count', `${room.playerCount}/${room.maxPlayers}`));
+    row.append(hostAvatar, info, createElement('div', 'room-row-count', `${playerCount}/${MAX_ROOM_PLAYERS}`));
     return row;
 }
 
 let renderedRoomList = null;
+let pendingRoomList = null;     // lista, która przyszła przed katalogiem awatarów (bez niego nie odczytamy awatarów)
 let roomIsPrivate = false;
 let amIHost = false;
 
 function renderRoomList(rooms) {
+    // gdy katalog się nie wczyta, lista i tak się pokaże - z zastępczymi obrazkami
+    if (avatarCatalogLoading) {
+        pendingRoomList = rooms;
+        return;
+    }
+    pendingRoomList = null;
+
     // Serwer odświeża listę co chwilę - bez zmian nie przerysowujemy, żeby karty nie migały
     const snapshot = JSON.stringify(rooms);
     if (snapshot === renderedRoomList) return;
@@ -1315,6 +1370,7 @@ socket.on('rejoin_failed', (failed) => {
 });
 
 socket.on('mode_list', renderModes);
+if (savedModes()) renderModes(savedModes().modes);    // zapamiętana lista - serwer jej już nie przyśle
 
 socket.on('room_list', renderRoomList);
 

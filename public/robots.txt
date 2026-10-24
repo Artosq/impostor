@@ -1,0 +1,8 @@
+# Indeksujemy stronę gry; obrazki awatarów i adresy techniczne nie mają sensu w wynikach wyszukiwania
+User-agent: *
+Allow: /
+Disallow: /avatar/
+Disallow: /avatar-catalog
+Disallow: /health
+
+Sitemap: %SITE_URL%/sitemap.xml

@@ -17,6 +17,9 @@ const MAX_NAME_LENGTH = 12;
 const MAX_LEVEL = 999;
 
 const LIST_AVATARS = 5;                     // ilu graczy (poza hostem) widać na liście pokoi
+const LIST_MAX_ROOMS = 12;                  // na telefonie widać kilka - więcej i tak nikt nie przewija
+const LIST_THROTTLE_MS = 2500;              // zmiany listy z tego czasu idą jedną wiadomością
+const MENU = 'menu';                        // pokój Socket.IO osób w menu - tylko one dostają listę pokoi
 
 const MIN_VOTE_MS = 5 * 1000;               // host może zakończyć głosowanie dopiero po tym czasie
 const RESULTS_VISIBLE_MS = 60 * 1000;       // czas na kliknięcie "Zagraj ponownie" po wynikach
@@ -42,12 +45,16 @@ app.get('/health', (req, res) => {
 });
 
 // Klienta Socket.IO podaje assets.js (wersja zminifikowana, skompresowana, z cache)
-// Ping co 10 s: zerwane połączenie (uśpiony telefon, zmiana sieci) wychodzi na jaw po ok. 18 s, a nie po 45 s
+// Ping co 10 s: zerwane połączenie (uśpiony telefon, zmiana sieci) wychodzi na jaw po ok. 18 s, a nie po 45 s.
+// Kompresja wiadomości (permessage-deflate) z pamięcią poprzednich wiadomości na każdym połączeniu:
+// w teście ok. 15x mniej transferu (limit egress na Renderze), za cenę ok. 40% więcej CPU
+// i ok. 0,23 MB RAM na gracza. Pingi i drobne wiadomości (poniżej progu) idą bez kompresji.
 const io = new Server(server, {
     cors: { origin: "*" },
     serveClient: false,
     pingInterval: 10000,
-    pingTimeout: 8000
+    pingTimeout: 8000,
+    perMessageDeflate: { threshold: 256 }
 });
 
 const rooms = new Map();
@@ -101,7 +108,7 @@ function cleanLevel(level) {
 function createPlayer(socket, { userId, playerName, avatar, level }) {
     return {
         userId: userId,                     // sekret gracza - nigdy nie trafia do innych klientów
-        publicId: crypto.randomUUID(),      // identyfikator widoczny dla wszystkich
+        publicId: crypto.randomBytes(6).toString('base64url'),  // identyfikator widoczny dla wszystkich (krótki - powtarza się w wielu wiadomościach)
         socketId: socket.id,
         connected: true,
         name: cleanText(playerName, MAX_NAME_LENGTH) || 'Gracz',
@@ -199,50 +206,76 @@ function voteStatus(room, player) {
     };
 }
 
+// Host dostaje listę głosujących, reszta jedną wspólną wiadomość
 function emitVoteStatus(room) {
-    room.players.forEach(p => {
-        io.to(p.socketId).emit('vote_status', voteStatus(room, p));
-    });
+    const host = findHost(room);
+    const others = room.players.filter(p => p !== host).map(p => p.socketId);
+    if (others.length) io.to(others).emit('vote_status', voteStatus(room, room.players.find(p => p !== host)));
+    if (host) io.to(host.socketId).emit('vote_status', voteStatus(room, host));
 }
 
-// Publiczne pokoje: najpierw te, do których da się wejść, potem pełne, na końcu gry w toku
-function roomListView() {
-    const listOrder = entry => (entry.status !== 'waiting' ? 2 : entry.isFull ? 1 : 0);
+// Publiczne pokoje: najpierw te, do których da się wejść, potem pełne, na końcu gry w toku.
+// Lista idzie często do wielu osób, więc wpis to tablica bez nazw pól i z najkrótszym zapisem awatarów:
+// [kod (null w trakcie gry), stan, liczba graczy, nick hosta, awatar hosta, [awatary kilku graczy]]
+const LIST_OPEN = 0, LIST_FULL = 1, LIST_PLAYING = 2;
 
+function roomListView() {
     return [...rooms.values()]
         .filter(room => !room.isPrivate)
         .map(room => {
             const host = findHost(room) || room.players[0];
             const isWaiting = room.status === 'waiting';
-            return {
-                code: isWaiting ? room.code : null,
-                status: isWaiting ? 'waiting' : 'playing',
-                isFull: room.players.length >= MAX_PLAYERS,
-                playerCount: room.players.length,
-                maxPlayers: MAX_PLAYERS,
-                host: { name: host.name, avatar: host.avatar },
-                avatars: room.players.filter(p => p !== host).slice(0, LIST_AVATARS).map(p => p.avatar)
-            };
+            const state = !isWaiting ? LIST_PLAYING : room.players.length >= MAX_PLAYERS ? LIST_FULL : LIST_OPEN;
+            return [
+                isWaiting ? room.code : null,
+                state,
+                room.players.length,
+                host.name,
+                avatars.avatarCode(host.avatar),
+                room.players.filter(p => p !== host).slice(0, LIST_AVATARS).map(p => avatars.avatarCode(p.avatar))
+            ];
         })
-        .sort((a, b) => listOrder(a) - listOrder(b));
+        .sort((a, b) => a[1] - b[1])
+        .slice(0, LIST_MAX_ROOMS);
 }
 
+// Lista pokoi trafia tylko do osób w menu (grający jej nie widzą), najwyżej raz na LIST_THROTTLE_MS
+// i tylko gdy coś się zmieniło - przy wielu pokojach to była większość całego ruchu serwera
+let roomListTimer = null;
+let sentRoomList = '';
+
 function broadcastRoomList() {
-    io.emit('room_list', roomListView());
+    if (roomListTimer) return;
+    roomListTimer = setTimeout(() => {
+        roomListTimer = null;
+        const list = roomListView();
+        const snapshot = JSON.stringify(list);
+        if (snapshot === sentRoomList) return;
+        sentRoomList = snapshot;
+        io.to(MENU).emit('room_list', list);
+    }, LIST_THROTTLE_MS);
+}
+
+// Gracz poza pokojem: wraca do odbiorców listy i dostaje ją od razu
+function enterMenu(socket) {
+    socket.data.roomCode = undefined;
+    socket.join(MENU);
+    socket.emit('room_list', roomListView());
 }
 
 // Poczekalnię widzą tylko ci, którzy w niej są - reszta ogląda jeszcze wyniki
 function emitLobby(room) {
-    const view = lobbyView(room);
-    room.players.filter(p => !p.away).forEach(p => {
-        io.to(p.socketId).emit('room_update', view);
-    });
+    const present = room.players.filter(p => !p.away).map(p => p.socketId);
+    if (present.length) io.to(present).emit('room_update', lobbyView(room));
 }
 
 // ZARZĄDZANIE POKOJAMI
 function deleteRoom(roomCode) {
     rooms.delete(roomCode);
-    io.socketsLeave(roomCode);
+    io.in(roomCode).fetchSockets().then(sockets => sockets.forEach(socket => {
+        socket.leave(roomCode);
+        if (socket.data.roomCode === roomCode) enterMenu(socket);
+    }));
 }
 
 function assignHost(room, player) {
@@ -256,6 +289,7 @@ function attachSocket(socket, room, player) {
     player.socketId = socket.id;
     player.connected = true;
     socket.data.roomCode = room.code;
+    socket.leave(MENU);
     socket.join(room.code);
     socket.emit('joined', { roomCode: room.code, playerId: player.publicId });
 }
@@ -290,10 +324,10 @@ function removePlayer(room, player) {
 function ejectPlayer(room, player, reason) {
     const socket = io.sockets.sockets.get(player.socketId);
     if (socket && socket.data.roomCode === room.code) {
-        socket.data.roomCode = undefined;
         socket.leave(room.code);
         if (reason) socket.emit('error', reason);
         socket.emit('left_room_success');
+        enterMenu(socket);
     }
     removePlayer(room, player);
 }
@@ -325,6 +359,10 @@ function leaveCurrentRoom(socket) {
     removePlayer(room, player);
 }
 
+// Tryby zmieniają się tylko przy wdrożeniu - klient trzyma listę u siebie i podaje jej wersję przy łączeniu
+const modeList = listModes();
+const MODES_VERSION = crypto.createHash('sha1').update(JSON.stringify(modeList)).digest('base64url').slice(0, 8);
+
 // Gracz, który nie wrócił po rozłączeniu: w poczekalni znika, w trakcie gry oddaje hosta
 function handleAbsentPlayer(room, player) {
     const stillAbsent = !player.connected && Date.now() - player.disconnectedAt >= DISCONNECT_GRACE_MS;
@@ -352,8 +390,8 @@ io.on('connection', (socket) => {
         });
     };
 
-    socket.emit('mode_list', listModes());
-    socket.emit('room_list', roomListView());
+    const auth = socket.handshake.auth || {};
+    if (auth.modesVersion !== MODES_VERSION) socket.emit('mode_list', modeList, MODES_VERSION);
 
     // Tworzenie pokoju
     handle('create_room', ({ playerName, randomName, avatar, level, userId } = {}) => {
@@ -457,7 +495,6 @@ io.on('connection', (socket) => {
 
     // Klient podaje pokój i swoje id już przy łączeniu - wraca do pokoju, zanim wyśle jakąkolwiek akcję
     // (kliknięcia z czasu zerwania docierają po ponownym połączeniu i trafiają już do właściwego gracza)
-    const auth = socket.handshake.auth || {};
     if (typeof auth.roomCode === 'string' && auth.roomCode && isValidUserId(auth.userId)) {
         try {
             rejoin(auth.roomCode, auth.userId);
@@ -465,6 +502,8 @@ io.on('connection', (socket) => {
             console.error('Błąd przy powrocie do pokoju:', err);
         }
     }
+    // Kto nie wrócił do pokoju, jest w menu i ogląda listę pokoi
+    if (!socket.data.roomCode) enterMenu(socket);
 
     // Starsze karty (sprzed tej wersji) wracają osobnym zdarzeniem
     handle('rejoin_room', ({ roomCode, userId } = {}) => rejoin(roomCode, userId));
@@ -666,6 +705,7 @@ io.on('connection', (socket) => {
     handle('leave_room', () => {
         leaveCurrentRoom(socket);
         socket.emit('left_room_success');
+        enterMenu(socket);
     });
 
     handle('disconnect', () => {

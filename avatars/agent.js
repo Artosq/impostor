@@ -7,6 +7,8 @@
 // Części oznaczone `animated` ruszają się tylko w zwykłym stanie awatara (nie po wyrzuceniu).
 // Nowa część = jeden wpis w odpowiednim katalogu niżej.
 
+const { sendSvg } = require('./send');
+
 const INK = '#0a0b0e', INK2 = '#15171c', INK3 = '#242730', INK4 = '#3b3f4b', FACE = '#1b1e25', BG = '#12141a';
 
 const ACCENTS = {
@@ -588,8 +590,8 @@ const ROUTE = '/avatar/agent/' + ORDER.map(slot => ':' + slot).join('/');
 function send(req, res) {
     for (const slot of ORDER) if (!isValid(slot, req.params[slot])) return res.sendStatus(404);
     const state = STATES.includes(req.query.state) ? req.query.state : undefined;
-    res.set({ 'Content-Type': 'image/svg+xml', 'Cache-Control': 'public, max-age=3600' });
-    res.send(render(req.params, state, { still: req.query.motion === 'off' }));
+    const still = req.query.motion === 'off';
+    sendSvg(req, res, `agent|${req.path}|${state || ''}|${still ? 'still' : ''}`, 'public, max-age=3600', () => render(req.params, state, { still }));
 }
 
 // Katalog dla klienta (panel personalizacji): nazwy, rzadkości i kolory kafelków

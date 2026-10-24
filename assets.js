@@ -5,7 +5,10 @@
 // - index.html dostaje do adresów skryptów, stylów i obrazków odcisk zawartości (?v=abc123),
 //   więc przeglądarka trzyma je w pamięci przez rok i przy kolejnym wejściu nie pyta o nic serwera.
 //   Zmiana pliku = nowy odcisk = gracze od razu dostają nową wersję.
-// - fonty (wołane z CSS bez odcisku) są trzymane 30 dni, reszta jest sprawdzana przez ETag.
+// - fonty (wołane z CSS bez odcisku) są trzymane 30 dni, reszta jest sprawdzana przez ETag,
+// - style z <link rel="stylesheet"> są wklejane prosto do index.html: strona rysuje się bez czekania
+//   na osobne pliki CSS (index.html i tak jest sprawdzany ETagiem, więc przy kolejnym wejściu nic nie idzie),
+// - %SITE_URL% w stronie, robots.txt i sitemap.xml zamienia się na publiczny adres gry (adres kanoniczny, podgląd linku).
 // Poza Renderem (lokalnie) zmieniony plik jest wczytywany od nowa bez restartu serwera.
 
 const fs = require('fs');
@@ -15,20 +18,23 @@ const crypto = require('crypto');
 
 const PUBLIC_DIR = path.join(__dirname, 'public');
 const WATCH_FILES = !process.env.RENDER && process.env.NODE_ENV !== 'production';
+const SITE_URL = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || 'https://impostor-3uk0.onrender.com').replace(/\/+$/, '');
 
 // Pliki spoza public/ podawane pod własnym adresem
 const EXTRA_FILES = {
     '/vendor/socket.io.min.js': path.join(path.dirname(require.resolve('socket.io')), '..', 'client-dist', 'socket.io.min.js'),
-    '/vendor/qrcode.js': require.resolve('qrcode-generator')       // kody QR w oknie zaproszenia (MIT)
+    '/vendor/qrcode.js': require.resolve('qrcode-generator'),      // kody QR w oknie zaproszenia (MIT)
+    '/favicon.ico': path.join(PUBLIC_DIR, 'icons', 'favicon-32.png')   // przeglądarki i Google pytają o ten adres same
 };
 
 const TYPES = {
     '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
     '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.txt': 'text/plain; charset=utf-8',
     '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.ico': 'image/x-icon',
-    '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json'
+    '.woff2': 'font/woff2', '.webmanifest': 'application/manifest+json', '.xml': 'application/xml; charset=utf-8'
 };
-const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.json', '.svg', '.txt', '.webmanifest']);
+const COMPRESSIBLE = new Set(['.html', '.css', '.js', '.json', '.svg', '.txt', '.webmanifest', '.xml']);
+const WITH_SITE_URL = new Set(['.html', '.txt', '.xml']);
 const YEAR = 'public, max-age=31536000, immutable';
 const MONTH = 'public, max-age=2592000';
 const REVALIDATE = 'no-cache';
@@ -47,7 +53,8 @@ function fileFor(urlPath) {
 function build(urlPath, file, stat) {
     const ext = path.extname(file).toLowerCase();
     let raw = fs.readFileSync(file);
-    if (ext === '.html') raw = Buffer.from(addVersions(raw.toString('utf8')));
+    if (ext === '.html') raw = Buffer.from(inlineStyles(addVersions(raw.toString('utf8'))));
+    if (WITH_SITE_URL.has(ext)) raw = Buffer.from(raw.toString('utf8').replaceAll('%SITE_URL%', SITE_URL));
     const entry = {
         file, mtime: stat.mtimeMs, type: TYPES[ext] || 'application/octet-stream',
         hash: crypto.createHash('sha1').update(raw).digest('hex').slice(0, 10), raw,
@@ -75,6 +82,21 @@ function addVersions(html) {
     return html.replace(/(src|href|srcset)="([^"?#:]+\.(?:js|css|png|webp|json))"/g, (match, attr, url) => {
         const target = load('/' + url.replace(/^\//, ''));
         return target ? `${attr}="${url}?v=${target.hash}"` : match;
+    });
+}
+
+// <link rel="stylesheet" href="css/x.css?v=..."> -> <style>treść</style>.
+// Względne adresy w CSS (np. ../fonts/) były liczone od css/, teraz liczą się od strony.
+function inlineStyles(html) {
+    return html.replace(/<link rel="stylesheet" href="([^"?#:]+\.css)(?:\?v=\w+)?">/g, (match, url) => {
+        const urlPath = '/' + url.replace(/^\//, '');
+        const file = fileFor(urlPath);
+        let css;
+        try { css = fs.readFileSync(file, 'utf8'); } catch (e) { return match; }
+        const base = path.posix.dirname(urlPath);
+        css = css.replace(/url\((['"]?)(?![a-z]+:|#|\/)([^'")]+)\1\)/g,
+            (m, quote, ref) => `url(${quote}${path.posix.join(base, ref).slice(1)}${quote})`);
+        return `<style>${css.replace(/<\/style/gi, '<\\/style')}</style>`;
     });
 }
 

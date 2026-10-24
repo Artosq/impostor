@@ -3,8 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Impostor Game v1🕵️‍♂️</title>
+    <title>Impostor – darmowa gra imprezowa online na telefon</title>
+    <!-- Znacznik adresu strony podmienia serwer (assets.js) na publiczny adres gry -->
+    <meta name="description" content="Darmowa gra imprezowa na telefon dla grupy znajomych (do 16 osób). Wszyscy znają tajne hasło, tylko impostor blefuje. Bez instalacji i rejestracji – stwórz pokój i zaproś znajomych.">
+    <link rel="canonical" href="%SITE_URL%/">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+
+    <!-- Podgląd linku w Messengerze, WhatsAppie, Discordzie, X... -->
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pl_PL">
+    <meta property="og:site_name" content="Impostor">
+    <meta property="og:url" content="%SITE_URL%/">
+    <meta property="og:title" content="Impostor – kto z was blefuje?">
+    <meta property="og:description" content="Darmowa gra imprezowa na telefon. Wszyscy znają hasło, tylko impostor blefuje. Wejdź, stwórz pokój i zaproś znajomych kodem.">
+    <meta property="og:image" content="%SITE_URL%/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Impostor – gra imprezowa na telefon">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "VideoGame",
+        "name": "Impostor",
+        "url": "%SITE_URL%/",
+        "image": "%SITE_URL%/og-image.png",
+        "description": "Darmowa gra imprezowa w przeglądarce telefonu. Wszyscy gracze znają tajne hasło lub pytanie, a impostor musi blefować, żeby go nie wykryto.",
+        "inLanguage": "pl",
+        "genre": ["Gra imprezowa", "Gra towarzyska", "Dedukcja społeczna"],
+        "gamePlatform": ["Przeglądarka internetowa", "Android", "iOS"],
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Dowolny (przeglądarka)",
+        "playMode": "MultiPlayer",
+        "numberOfPlayers": { "@type": "QuantitativeValue", "minValue": 2, "maxValue": 16 },
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "PLN" }
+    }
+    </script>
+
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="48x48" href="icons/favicon-48.png">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <!-- iPhone: ekran startowy zainstalowanej aplikacji (Android tworzy go sam z manifestu) -->
     <link rel="apple-touch-startup-image" href="icons/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
@@ -28,13 +67,19 @@
     <link rel="preload" href="fonts/silkscreen-700-latin.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/silkscreen-700-latin-ext.woff2" as="font" type="font/woff2" crossorigin>
 
+    <!-- Serwer wkleja te style prosto do strony (assets.js) - bez osobnych żądań blokujących rysowanie -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/scrollbar.css">
     <link rel="stylesheet" href="css/fonts.css">
 </head>
 <body>
     <canvas id="rippleCanvas"></canvas>
-    <h1 class="hidden" style="color: white; letter-spacing: 12px; margin-top: 0px;">IMPOSTOR</h1>
+    <!-- Nagłówek dla wyszukiwarek i czytników ekranu; na ekranie widać logo -->
+    <h1 class="visually-hidden">Impostor – gra imprezowa online na telefon</h1>
+    <noscript>
+        <p class="noscript">Impostor to darmowa gra imprezowa w przeglądarce telefonu: wszyscy dostają tajne hasło, tylko impostor go nie zna i musi blefować.
+        Do gry potrzebny jest włączony JavaScript.</p>
+    </noscript>
 
     <div class="card" id="card">
         <div class="blood-container">
@@ -337,18 +382,18 @@
         </div>
     </div>
 
-    <script src="vendor/socket.io.min.js"></script>
-    <script src="js/modes/shared.js"></script>
-    <script src="js/modes/impostor.js"></script>
-    <script src="js/modes/pytania.js"></script>
-    <script src="js/categories.js"></script>
-    <script src="js/customCategories.js"></script>
-    <script src="js/sounds.js"></script>
-    <script src="js/nicks.js"></script>
-    <script src="js/app.js"></script>
-    <script src="js/session.js"></script>
-    <script src="js/invite.js"></script>
-    <script src="js/rules.js"></script>
-    <script src="js/effects.js"></script>
+    <script src="vendor/socket.io.min.js" defer></script>
+    <script src="js/modes/shared.js" defer></script>
+    <script src="js/modes/impostor.js" defer></script>
+    <script src="js/modes/pytania.js" defer></script>
+    <script src="js/categories.js" defer></script>
+    <script src="js/customCategories.js" defer></script>
+    <script src="js/sounds.js" defer></script>
+    <script src="js/nicks.js" defer></script>
+    <script src="js/app.js" defer></script>
+    <script src="js/session.js" defer></script>
+    <script src="js/invite.js" defer></script>
+    <script src="js/rules.js" defer></script>
+    <script src="js/effects.js" defer></script>
 </body>
 </html>
