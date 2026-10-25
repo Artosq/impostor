@@ -145,8 +145,9 @@
                 <div style="margin: 15px 0; color: #999;">— LUB —</div>
                 <div class="input-group">
                     <input type="text" id="input-code" placeholder="Kod pokoju">
-                    <button class="scan-btn" onclick="openScanner()" title="Zeskanuj kod QR" aria-label="Zeskanuj kod QR">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 7h4l2-3h6l2 3h4v13H3z"/><path d="M9 10h6v6H9z"/><path d="M17.5 9.5h1"/></svg>
+                    <button class="scan-btn hidden" id="btn-scan" onclick="openScanner()" title="Zeskanuj kod QR" aria-label="Zeskanuj kod QR">
+                        <!-- Ikona "camera" z Tabler Icons (MIT, https://github.com/tabler/tabler-icons) -->
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2"/><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/></svg>
                     </button>
                 </div>
                 <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>

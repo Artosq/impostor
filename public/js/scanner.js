@@ -160,6 +160,22 @@ function closeScanner() {
     }, INVITE_CLOSE_MS);
 }
 
+// Ikona tylko na telefonach i tabletach z aparatem - na komputerze (nawet z kamerką) menu wygląda jak dawniej.
+// Lista urządzeń mówi, czy jest aparat, bez pytania o zgodę.
+async function updateScanButton() {
+    let hasCamera = false;
+    if (window.matchMedia('(pointer: coarse)').matches && navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+        try {
+            hasCamera = (await navigator.mediaDevices.enumerateDevices()).some(device => device.kind === 'videoinput');
+        } catch (e) {}
+    }
+    byId('btn-scan').classList.toggle('hidden', !hasCamera);
+}
+updateScanButton();
+if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) {
+    navigator.mediaDevices.addEventListener('devicechange', updateScanButton);
+}
+
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape') closeScanner();
 });
