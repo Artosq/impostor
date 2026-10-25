@@ -1088,14 +1088,23 @@ input:focus{
     height: 100%;
     object-fit: cover;
 }
-/* Celownik - gdzie ustawić kod */
+/* Celownik - cztery białe narożniki, gdzie ustawić kod */
 .scanner-frame{
     position: absolute;
-    inset: 16%;
-    border: 3px solid var(--secondary);
-    border-radius: 10px;
-    box-shadow: 0 0 14px var(--secondary), inset 0 0 14px rgba(46, 204, 113, 0.4);
+    inset: 14%;
     pointer-events: none;
+    --corner: 28px;
+    --line: 4px;
+    background:
+        linear-gradient(white, white) top left / var(--corner) var(--line),
+        linear-gradient(white, white) top left / var(--line) var(--corner),
+        linear-gradient(white, white) top right / var(--corner) var(--line),
+        linear-gradient(white, white) top right / var(--line) var(--corner),
+        linear-gradient(white, white) bottom left / var(--corner) var(--line),
+        linear-gradient(white, white) bottom left / var(--line) var(--corner),
+        linear-gradient(white, white) bottom right / var(--corner) var(--line),
+        linear-gradient(white, white) bottom right / var(--line) var(--corner);
+    background-repeat: no-repeat;
 }
 .scanner-hint{
     min-height: 1.4em;

@@ -5,6 +5,8 @@
 
 const SCAN_INTERVAL_MS = 200;
 const SCAN_MAX_SIDE = 640;             // klatka zmniejszana do tylu pikseli - jsQR na telefonie działa wtedy płynnie
+const SCAN_CENTER_SHARE = 0.75;        // druga próba: środek kadru (część krótszego boku)...
+const SCAN_CENTER_SIDE = 480;          // ...zmniejszony do tylu pikseli
 const SCAN_HINT = 'Skieruj aparat na kod QR z ekranu hosta';
 
 let scannerStream = null;
@@ -39,31 +41,51 @@ function loadJsqr() {
     return jsqrLibrary;
 }
 
+// jsQR: najpierw cała klatka (zmniejszona - to uśrednia szum aparatu), a gdy nic - sam środek kadru,
+// gdzie gracz zwykle trzyma kod (więcej pikseli na kwadracik kodu)
+async function createJsqrDecoder() {
+    const jsQR = await loadJsqr();
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+
+    const read = (video, sx, sy, sw, sh, maxSide) => {
+        const scale = Math.min(1, maxSide / Math.max(sw, sh));
+        canvas.width = Math.round(sw * scale);
+        canvas.height = Math.round(sh * scale);
+        context.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+        const image = context.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(image.data, image.width, image.height, { inversionAttempts: 'dontInvert' });
+        return code ? code.data : null;
+    };
+
+    return video => {
+        const width = video.videoWidth, height = video.videoHeight;
+        const side = Math.round(Math.min(width, height) * SCAN_CENTER_SHARE);
+        return read(video, 0, 0, width, height, SCAN_MAX_SIDE)
+            || read(video, (width - side) / 2, (height - side) / 2, side, side, SCAN_CENTER_SIDE);
+    };
+}
+
+// Czytnik przeglądarki bywa "pusty" bez błędu (na części Androidów brakuje modułu z Usług Google Play),
+// więc gdy nic nie znajduje, co drugą klatkę sprawdza też jsQR
 async function createDecoder() {
     if ('BarcodeDetector' in window) {
         try {
             if ((await BarcodeDetector.getSupportedFormats()).includes('qr_code')) {
                 const detector = new BarcodeDetector({ formats: ['qr_code'] });
+                let fallback = null;
+                let frame = 0;
+                createJsqrDecoder().then(decoder => { fallback = decoder; }, () => {});
                 return async video => {
-                    const [code] = await detector.detect(video);
-                    return code ? code.rawValue : null;
+                    const [code] = await detector.detect(video).catch(() => []);
+                    if (code) return code.rawValue;
+                    frame++;
+                    return fallback && frame % 2 === 0 ? fallback(video) : null;
                 };
             }
         } catch (e) {}
     }
-
-    const jsQR = await loadJsqr();
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    return async video => {
-        const scale = Math.min(1, SCAN_MAX_SIDE / Math.max(video.videoWidth, video.videoHeight));
-        canvas.width = Math.round(video.videoWidth * scale);
-        canvas.height = Math.round(video.videoHeight * scale);
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const image = context.getImageData(0, 0, canvas.width, canvas.height);
-        const code = jsQR(image.data, image.width, image.height, { inversionAttempts: 'dontInvert' });
-        return code ? code.data : null;
-    };
+    return createJsqrDecoder();
 }
 
 function isScannerOpen() {
@@ -80,7 +102,11 @@ async function openScanner() {
     byId('scanner').classList.remove('hidden', 'closing');
 
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+        // bez prośby o rozdzielczość przeglądarki często dają 640x480 - za mało na kod pokazany na ekranie telefonu
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+            audio: false
+        });
         if (!isScannerOpen()) {                 // okno zamknięte, zanim aparat się włączył
             stream.getTracks().forEach(track => track.stop());
             return;
