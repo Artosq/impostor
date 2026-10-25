@@ -143,7 +143,12 @@
                 </div>
                 <button class="btn-create" onclick="createRoom()">Stwórz Nowy Pokój</button>
                 <div style="margin: 15px 0; color: #999;">— LUB —</div>
-                <input type="text" id="input-code" placeholder="Kod pokoju">
+                <div class="input-group">
+                    <input type="text" id="input-code" placeholder="Kod pokoju">
+                    <button class="scan-btn" onclick="openScanner()" title="Zeskanuj kod QR" aria-label="Zeskanuj kod QR">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5V7a2 2 0 0 1 2-2h2.2l1.5-2h4.6l1.5 2H18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-1.5"/><circle cx="12" cy="12" r="3.6"/><path d="M2 12h3"/></svg>
+                    </button>
+                </div>
                 <button class="btn-join" onclick="joinRoom()">Dołącz do Pokoju</button>
                 <div id="rooms-list">
                     <!-- szkielet do pierwszej listy z serwera -->
@@ -357,6 +362,19 @@
         </div>
     </div>
 
+    <!-- Skaner kodu QR z zaproszenia (aparat telefonu) -->
+    <div id="scanner" class="picker-overlay hidden" onclick="if (event.target === this) closeScanner()">
+        <div class="picker-window scanner-window">
+            <div class="picker-title">— Zeskanuj kod —</div>
+            <div class="scanner-view">
+                <video id="scanner-video" playsinline muted autoplay></video>
+                <div class="scanner-frame"></div>
+            </div>
+            <div id="scanner-hint" class="scanner-hint"></div>
+            <button class="btn-secondary" onclick="closeScanner()">Zamknij</button>
+        </div>
+    </div>
+
     <!-- Zasady gry w 3 obrazkach -->
     <div id="rules" class="picker-overlay hidden" onclick="if (event.target === this) closeRules()">
         <div class="picker-window rules-window">
@@ -393,6 +411,7 @@
     <script src="js/app.js" defer></script>
     <script src="js/session.js" defer></script>
     <script src="js/invite.js" defer></script>
+    <script src="js/scanner.js" defer></script>
     <script src="js/rules.js" defer></script>
     <script src="js/effects.js" defer></script>
 </body>

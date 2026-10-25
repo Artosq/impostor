@@ -1050,6 +1050,60 @@ input:focus{
     text-shadow: 0 0 10px white;
 }
 
+/* Aparat przy kodzie pokoju - wygląda jak kostka przy nicku */
+.scan-btn{
+    flex: none;
+    width: auto;
+    margin: 0 0 0 10px;
+    padding: 0;
+    background: none;
+    border: none;
+    color: white;
+    line-height: 0;
+    transition: 0.4s;
+}
+.scan-btn svg{
+    width: 45px;            /* szerokość kostki - pola nicku i kodu kończą się równo */
+    height: 45px;
+}
+.scan-btn:hover{
+    background: none;
+    filter: drop-shadow(0 0 6px white);
+}
+
+.scanner-view{
+    position: relative;
+    width: 100%;
+    max-width: 280px;
+    aspect-ratio: 1 / 1;
+    margin: 12px auto;
+    border: 5px solid black;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+}
+.scanner-view video{
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+/* Celownik - gdzie ustawić kod */
+.scanner-frame{
+    position: absolute;
+    inset: 16%;
+    border: 3px solid var(--secondary);
+    border-radius: 10px;
+    box-shadow: 0 0 14px var(--secondary), inset 0 0 14px rgba(46, 204, 113, 0.4);
+    pointer-events: none;
+}
+.scanner-hint{
+    min-height: 1.4em;
+    margin-bottom: 8px;
+    color: #999;
+    font-size: 0.8em;
+}
+
 button { 
     font-family: "Silkscreen", sans-serif;
     width: 100%; 

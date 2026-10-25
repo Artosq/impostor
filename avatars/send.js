@@ -6,6 +6,7 @@
 
 const zlib = require('zlib');
 const crypto = require('crypto');
+const { AVATAR_VERSION } = require('./version');
 
 const MAX_CACHED = 3000;          // ok. 3000 × 3 wersje × ~1 kB - kilka MB pamięci
 const cache = new Map();          // klucz -> { raw, br, gzip, etag } (Map pamięta kolejność - najstarszy wypada pierwszy)
@@ -46,8 +47,10 @@ function sendCached(req, res, { key, type, cacheControl, render }) {
     res.end(encoding ? entry[encoding] : entry.raw);
 }
 
+// Długi cache tylko dla adresu z aktualną wersją awatarów - stary (lub bez wersji) mógłby utrwalić dawny wygląd
 function sendSvg(req, res, key, cacheControl, render) {
-    sendCached(req, res, { key, type: 'image/svg+xml', cacheControl, render: () => slimSvg(render()) });
+    const current = req.query.v === AVATAR_VERSION;
+    sendCached(req, res, { key, type: 'image/svg+xml', cacheControl: current ? cacheControl : 'no-cache', render: () => slimSvg(render()) });
 }
 
 module.exports = { sendSvg, sendCached };

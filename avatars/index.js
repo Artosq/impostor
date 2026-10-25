@@ -11,6 +11,7 @@
 // współistnieć w jednym pokoju, a zmiana aktywnego zestawu niczego nie psuje.
 
 const { sendCached } = require('./send');
+const { AVATAR_VERSION } = require('./version');
 
 const styles = {
     impostor: require('./impostor'),
@@ -64,6 +65,7 @@ function sendCatalog(req, res) {
         cacheControl: 'no-cache',
         render: () => JSON.stringify({
             active: ACTIVE_STYLE,
+            version: AVATAR_VERSION,        // klient dopisuje ją do adresów obrazków (zob. version.js)
             styles: Object.fromEntries(Object.entries(styles).map(([id, style]) => [id, style.catalog()]))
         })
     });

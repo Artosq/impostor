@@ -24,6 +24,7 @@ const SITE_URL = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || 'ht
 const EXTRA_FILES = {
     '/vendor/socket.io.min.js': path.join(path.dirname(require.resolve('socket.io')), '..', 'client-dist', 'socket.io.min.js'),
     '/vendor/qrcode.js': require.resolve('qrcode-generator'),      // kody QR w oknie zaproszenia (MIT)
+    '/vendor/jsqr.js': require.resolve('jsqr'),                    // skaner QR tam, gdzie przeglądarka nie ma własnego (Apache-2.0)
     '/favicon.ico': path.join(PUBLIC_DIR, 'icons', 'favicon-32.png')   // przeglądarki i Google pytają o ten adres same
 };
 

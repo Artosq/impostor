@@ -104,13 +104,15 @@ function impostorWisdom(text) {
 // Osoby z włączonym "ogranicz ruch" w systemie dostają awatary bez animacji
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-// Awatary rysuje serwer gry. Adres: /avatar/<zestaw>/<części po kolei>[?state=kicked|revealed][&motion=off]
+// Awatary rysuje serwer gry. Adres: /avatar/<zestaw>/<części po kolei>?v=<wersja>[&state=kicked|revealed][&motion=off]
+// Wersja (z katalogu) zmienia się z każdą zmianą skórek - obrazki są w pamięci przeglądarki przez rok
 function avatarUrl(avatar, state) {
     const style = avatar && AVATAR_ORDER[avatar.style] ? avatar.style : avatarStyle;
     if (!style) return 'icons/icon-192.png';
 
     const parts = AVATAR_ORDER[style].map(part => encodeURIComponent((avatar && avatar[part]) || '-')).join('/');
     const query = [];
+    if (avatarCatalog && avatarCatalog.version) query.push(`v=${avatarCatalog.version}`);
     if (state) query.push(`state=${state}`);
     if (reducedMotion.matches) query.push('motion=off');
     return `/avatar/${style}/${parts}${query.length ? `?${query.join('&')}` : ''}`;
