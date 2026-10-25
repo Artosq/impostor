@@ -80,7 +80,7 @@ function load(urlPath) {
 
 // Adresy lokalne w index.html dostają odcisk zawartości pliku
 function addVersions(html) {
-    return html.replace(/(src|href|srcset)="([^"?#:]+\.(?:js|css|png|webp|json))"/g, (match, attr, url) => {
+    return html.replace(/(src|href|srcset)="([^"?#:]+\.(?:js|css|png|webp|svg|json))"/g, (match, attr, url) => {
         const target = load('/' + url.replace(/^\//, ''));
         return target ? `${attr}="${url}?v=${target.hash}"` : match;
     });

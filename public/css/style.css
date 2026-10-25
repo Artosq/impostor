@@ -547,11 +547,15 @@ body::before{
 .invite-window{
     max-width: 340px;
 }
+/* Biały margines w ramce: skaner musi widzieć jasny pas wokół kodu, a zaokrąglone rogi nie mogą
+   podcinać znaczników w narożnikach. Wysokość obrazka z proporcji (nie 100% pudełka) - Safari
+   liczy procentową wysokość inaczej i ucinało dół kodu. */
 .invite-qr{
-    width: 220px;
+    box-sizing: border-box;
+    width: 240px;
     aspect-ratio: 1 / 1;
     margin: 12px auto;
-    padding: 0;
+    padding: 14px;
     border: 5px solid black;
     border-radius: 12px;
     background: white;
@@ -559,8 +563,9 @@ body::before{
     line-height: 0;
 }
 .invite-qr svg{
+    display: block;
     width: 100%;
-    height: 100%;
+    height: auto;
 }
 .invite-code{
     font-size: 1.1em;
