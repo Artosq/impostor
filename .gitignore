@@ -9,6 +9,9 @@ brag-output-*/
 propozycje-awatarow/
 propozycje-ikon/
 
+# Oryginały grafik sprzed odchudzenia (w public/ są lżejsze wersje)
+oryginaly-grafik/
+
 # Logi
 *.log
 npm-debug.log*

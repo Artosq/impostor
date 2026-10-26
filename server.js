@@ -22,6 +22,7 @@ const LIST_THROTTLE_MS = 2500;              // zmiany listy z tego czasu idą je
 const MENU = 'menu';                        // pokój Socket.IO osób w menu - tylko one dostają listę pokoi
 
 const MIN_VOTE_MS = 5 * 1000;               // host może zakończyć głosowanie dopiero po tym czasie
+const MAX_SKIPS = 3;                        // ile razy na rundę host może wylosować nowe hasło / pytanie
 const RESULTS_VISIBLE_MS = 60 * 1000;       // czas na kliknięcie "Zagraj ponownie" po wynikach
 const DISCONNECT_GRACE_MS = 2 * 60 * 1000;  // czas na powrót rozłączonego gracza
 const ROOM_IDLE_MS = 10 * 60 * 1000;        // pokój, w którym nikt nie jest połączony
@@ -164,7 +165,8 @@ function defaultSettings() {
 }
 
 function gameView(room, player) {
-    return { mode: room.mode.id, ...room.mode.playerView(room, player) };
+    const skipsLeft = room.mode.reroll ? MAX_SKIPS - room.skipsUsed : 0;
+    return { mode: room.mode.id, ...room.mode.playerView(room, player), skipsLeft };
 }
 
 // Koniec gry: host zakończył głosowanie albo impostor zgadywał hasło
@@ -567,12 +569,31 @@ io.on('connection', (socket) => {
         room.mode = mode;
         room.status = 'playing';
         room.playerChoices = new Map();
+        room.skipsUsed = 0;
 
         room.players.forEach((p) => {
             io.to(p.socketId).emit('game_start', { ...gameView(room, p), countdown: true });
         });
 
         broadcastRoomList();
+    });
+
+    // Host losuje nowe hasło / pytanie (ktoś nie zna hasła, pytanie nie pasuje) - tylko przed głosowaniem.
+    // Role zostają; każdy dostaje nową kartę do odkrycia.
+    handle('skip_content', (roomCode) => {
+        const room = rooms.get(roomCode);
+        const player = room && findBySocket(room, socket);
+        if (!player || room.host !== player.userId || room.status !== 'playing' || !room.mode.reroll) return;
+        if (room.skipsUsed >= MAX_SKIPS) return socket.emit('error', 'Limit nowych haseł w tej rundzie!');
+        touch(room);
+
+        const error = room.mode.reroll(room);
+        if (error) return socket.emit('error', error);
+        room.skipsUsed++;
+
+        room.players.forEach(p => {
+            io.to(p.socketId).emit('game_start', { ...gameView(room, p), skipped: true });
+        });
     });
 
     handle('check_host', (roomCode) => {

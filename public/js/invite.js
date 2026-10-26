@@ -93,9 +93,11 @@ async function copyInviteLink() {
     }
 }
 
+// Sam link, jak przy kopiowaniu: Messenger i inne komunikatory robią podgląd (plakietkę) tylko z gołego linku -
+// z dopisanym tekstem dostawały zwykłą wiadomość bez podglądu. Tytuł i opis i tak są w plakietce.
 async function shareInvite() {
     try {
-        await navigator.share({ title: 'Impostor', text: 'Wbijaj do gry w Impostora!', url: inviteLink() });
+        await navigator.share({ url: inviteLink() });
     } catch (e) {
         // gracz zamknął okno udostępniania - nic się nie dzieje
     }

@@ -50,6 +50,8 @@ gameModes.pytania = {
         if (data.answerType === 'player') renderPlayerAnswer(extra, data.players, data.answer);
         else if (data.answerType === 'scale') renderScaleAnswer(extra, data.scale, data.answer);
         else byId('input-answer').classList.remove('hidden');
+        // nowe pytanie od hosta zeruje odpowiedzi na serwerze - pole też
+        if (data.skipped) byId('input-answer').value = '';
         extra.classList.toggle('hidden', !extra.childElementCount);
 
         byId('role-data').style.fontSize = "120%";

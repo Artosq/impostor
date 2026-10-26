@@ -48,6 +48,19 @@ function answerText(room, answer) {
     return answer;
 }
 
+// Dwa różne pytania z jednego zestawu - za każdym razem inna para, bez pytań, które pokój ostatnio miał.
+// Przy ponownym losowaniu w trakcie rundy (skip) pytanie graczy na pewno się zmienia.
+function drawQuestions(room, previousQuestion) {
+    const round = room.round;
+    const category = categories.find(c => c.id === round.categoryId);
+    const set = shared.pickFresh(room, `questionSet:${category.id}`, category.sets, s => s.cat);
+    const key = `question:${category.id}:${set.cat}`;
+    const pool = set.questions.filter(q => q !== previousQuestion);
+
+    round.playersQuestion = shared.pickFresh(room, key, pool.length >= 2 ? pool : set.questions);
+    round.impostorsQuestion = shared.pickFresh(room, key, set.questions.filter(q => q !== round.playersQuestion));
+}
+
 module.exports = {
     id: 'pytania',
     name: 'Pytania',
@@ -59,20 +72,21 @@ module.exports = {
 
         const category = categories.find(c => c.id === selectedCategory) || categories[0];
 
-        // Dwa różne pytania z jednego zestawu - za każdym razem inna para, bez pytań, które pokój ostatnio miał
-        const set = shared.pickFresh(room, `questionSet:${category.id}`, category.sets, s => s.cat);
-        const key = `question:${category.id}:${set.cat}`;
-        const playersQuestion = shared.pickFresh(room, key, set.questions);
-        const impostorsQuestion = shared.pickFresh(room, key, set.questions.filter(q => q !== playersQuestion));
-
         room.round = {
+            categoryId: category.id,
             categoryName: category.name,
             answerType: category.answer,
-            impostorsQuestion: impostorsQuestion,
-            playersQuestion: playersQuestion,
             answers: new Map(),
             impostors: shared.assignImpostors(room, impostorCount)
         };
+        drawQuestions(room);
+        return null;
+    },
+
+    // Host losuje nową parę pytań z tej samej kategorii - impostorzy zostają, odpowiedzi znikają
+    reroll(room) {
+        drawQuestions(room, room.round.playersQuestion);
+        room.round.answers = new Map();
         return null;
     },
 

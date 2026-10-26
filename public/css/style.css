@@ -489,8 +489,29 @@ body::before{
 }
 
 /* ZGADYWANIE HASŁA przez impostora */
+/* Zgadywanie impostora: wypełniony przycisk z podpisem, a przycisk hosta oddzielony linią */
+.guess-caption{
+    margin-top: 14px;
+    color: var(--danger);
+    font-size: 0.7em;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
 .btn-guess{
-    margin-top: 12px;
+    margin-top: 6px;
+    border: 5px solid var(--danger);
+    background-color: var(--danger);
+    color: #161616;
+    box-shadow: 0 0 14px rgba(231, 76, 60, 0.45);
+}
+.btn-guess:hover{
+    box-shadow: 0 0 24px var(--danger);
+    transform: scale(1.05);
+}
+#vote-mode-extras:not(:empty) ~ #host-end-controls{
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 2px dashed #3a3a3a;
 }
 .guess-window{
     max-width: 340px;
@@ -1007,7 +1028,17 @@ body::before{
     text-shadow: 0 0 20px var(--danger);
     filter: none;
 }
-h1 { 
+#error-display.is-notice{
+    color: var(--secondary);
+    text-shadow: 0 0 20px var(--secondary);
+}
+/* Nowe hasło / pytanie - mniejszy przycisk nad "Zacznij głosowanie" */
+.btn-skip{
+    margin-bottom: 4px;
+    padding: 9px;
+    font-size: 0.8em;
+}
+h1 {
     color: var(--dark); 
     margin-bottom: 20px; 
 }

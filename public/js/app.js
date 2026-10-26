@@ -75,14 +75,16 @@ function showScreen(screenId) {
     updateCornerButtons();
 }
 
-function showError(msg) {
+// isNotice: zwykła informacja (zielona, bez wyszarzania karty) zamiast błędu
+function showError(msg, isNotice = false) {
     const errorDisplay = byId('error-display');
     const errorBlur = byId('error-blur');
 
     errorDisplay.innerText = msg;
+    errorDisplay.classList.toggle('is-notice', isNotice === true);
     errorDisplay.style.opacity = '';
     errorDisplay.style.top = '5%';
-    errorBlur.style.filter = 'saturate(0%)';
+    if (isNotice !== true) errorBlur.style.filter = 'saturate(0%)';
     setTimeout(() => {
         errorDisplay.style.opacity = 0;
         errorDisplay.style.top = '';
@@ -1019,6 +1021,22 @@ function castVote() {
     if (confirm("Zacząć głosowanie?")) socket.emit('cast_vote', currentRoomCode);
 }
 
+// Nowe hasło / pytanie dla wszystkich (ktoś nie zna hasła, pytanie nie pasuje do grupy) - role zostają
+const SKIP_CONTENT = { impostor: 'hasło', pytania: 'pytanie' };
+let skipMode = null;
+
+function updateSkipButton(data) {
+    skipMode = data.mode;
+    const button = byId('btn-skip');
+    const what = SKIP_CONTENT[data.mode];
+    button.classList.toggle('hidden', !what || !data.skipsLeft);
+    if (what) button.textContent = `NOWE ${what.toUpperCase()} (${data.skipsLeft})`;
+}
+
+function skipContent() {
+    if (confirm(`Wylosować nowe ${SKIP_CONTENT[skipMode]} dla wszystkich?`)) socket.emit('skip_content', currentRoomCode);
+}
+
 function endGame() {
     if (confirm("Zakończyć grę?")) socket.emit('end_game', currentRoomCode);
 }
@@ -1415,8 +1433,10 @@ socket.on('is_host', setHostControls);
 socket.on('game_start', (data) => {
     showScreen('screen-game');
     showGame(data);
+    updateSkipButton(data);
     if (data.countdown) startCountdown();
     else sfx.play('roundStart');
+    if (data.skipped) showError(`Host wylosował nowe ${SKIP_CONTENT[data.mode] || 'zadanie'} - sprawdź kartę`, true);
     socket.emit('check_host', currentRoomCode);
 });
 

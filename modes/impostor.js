@@ -75,6 +75,21 @@ function assignExtraRoles(room, enabledRoles) {
     enabledRoles.forEach((role, i) => { regulars[i].role = role; });
 }
 
+// Hasło rundy z kategorii (bez tych, które pokój ostatnio miał) i wszystko, co od niego zależy.
+// Przy ponownym losowaniu w trakcie rundy (skip) poprzednie hasło na pewno nie wraca.
+function drawWord(room, previousWord) {
+    const round = room.round;
+    const pool = round.entries.length > 1 ? round.entries.filter(entry => entry.word !== previousWord) : round.entries;
+    const selected = shared.pickFresh(room, 'word:' + round.category, pool, entry => entry.word);
+    // Podmieniec: inne losowe hasło z tej samej kategorii
+    const others = round.entries.filter(entry => entry.word !== selected.word);
+
+    round.word = selected.word;
+    round.aliases = Array.isArray(selected.aliases) ? selected.aliases.filter(isText) : [];
+    round.hint = selected.hints.length > 0 ? randomItem(selected.hints) : NO_HINT;
+    round.changelingWord = others.length > 0 ? randomItem(others).word : selected.word;
+}
+
 // Granice kategorii wpisanej przez hosta
 const CUSTOM_LIMITS = { name: 20, minEntries: 3, maxEntries: 300, word: 40, hints: 5, hint: 30 };
 
@@ -142,31 +157,30 @@ module.exports = {
             entries = categories.get(category);
         }
 
-        // Losowanie hasła z kategorii (bez tych, które pokój ostatnio miał)
-        const selected = shared.pickFresh(room, 'word:' + category, entries, entry => entry.word);
-
         const impostors = shared.assignImpostors(room, impostorCount);
         assignExtraRoles(room, extraRoles);
 
-        // Podmieniec: inne losowe hasło z tej samej kategorii
-        const others = entries.filter(entry => entry.word !== selected.word);
         // Detektyw: jedna osoba, która na pewno nie jest impostorem (ale może być Wspólnikiem albo Błaznem)
         const detective = room.players.find(p => p.role === ROLE_DETECTIVE);
         const cleared = detective ? randomItem(room.players.filter(p => p !== detective && p.role !== shared.ROLE_IMPOSTOR)) : null;
 
         room.round = {
             category: category,
-            word: selected.word,
-            aliases: Array.isArray(selected.aliases) ? selected.aliases.filter(isText) : [],
+            entries: entries,   // do losowania nowego hasła w trakcie rundy (reroll)
             guess: null,        // { by, text, correct } - próba odgadnięcia hasła przez impostora
             lastChance: Boolean(options.lastChance),
             roles: extraRoles,
-            changelingWord: others.length > 0 ? randomItem(others).word : selected.word,
             clearedName: cleared ? cleared.name : null,
-            hint: selected.hints.length > 0 ? randomItem(selected.hints) : NO_HINT,
             impostors: impostors,
             starter: shared.pickStarter(room)
         };
+        drawWord(room);
+        return null;
+    },
+
+    // Host losuje nowe hasło z tej samej kategorii - role, impostorzy i kto zaczyna zostają
+    reroll(room) {
+        drawWord(room, room.round.word);
         return null;
     },
 

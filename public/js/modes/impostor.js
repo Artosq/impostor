@@ -78,9 +78,11 @@ gameModes.impostor = {
     // Pod kafelkami głosowania: przycisk zgadywania - tylko dla impostora
     voteExtras(vote) {
         if (impostorRole !== 'IMPOSTOR' || !vote.canGuess) return [];
-        const button = createElement('button', 'btn-end btn-guess', 'Zgadnij hasło');
+        // wypełniony i z podpisem - nie do pomylenia z "Zakończ i pokaż wyniki" hosta
+        const caption = createElement('div', 'guess-caption', 'Tylko Ty · ostatnia szansa');
+        const button = createElement('button', 'btn-guess', 'Zgadnij hasło');
         button.onclick = openGuess;
-        return [button];
+        return [caption, button];
     },
 
     // pod nickiem na wynikach: rola (dla specjalnych ról)
