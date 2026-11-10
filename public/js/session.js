@@ -141,7 +141,10 @@ function handleBack() {
             closeCategoryEditor();      // pyta o niezapisane zmiany
             return true;
         case 'screen-customize':
-            showScreen('screen-login');
+            closeCustomize();           // do profilu albo menu - skąd przyszedł
+            return true;
+        case 'screen-profile':
+            closeProfile();
             return true;
         case 'screen-lobby':
             if (confirm('Wyjść z pokoju?')) leaveRoom();

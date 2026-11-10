@@ -93,3 +93,29 @@ shineCard.addEventListener('animationend', event => {
     setTimeout(startShine, SHINE_EVERY_MS - SHINE_MOVE_MS);
 });
 startShine();
+
+// ===== CIEŃ "JEST WIĘCEJ" W PRZEWIJANYCH RAMKACH =====
+// Ramka dostaje klasę has-more tylko wtedy, gdy niżej jest jeszcze coś do przewinięcia
+// (pusta albo przewinięta do końca - bez cienia). Wygląd cienia: style.css.
+
+const SCROLL_BOXES = ['#customize-options', '#profile-content', '#screen-editor .editor-list'];
+
+function updateScrollShadow(box) {
+    const more = box.scrollHeight - box.scrollTop - box.clientHeight > 2;
+    box.classList.toggle('has-more', more);
+}
+
+SCROLL_BOXES.forEach(selector => {
+    const box = document.querySelector(selector);
+    if (!box) return;
+    const update = () => updateScrollShadow(box);
+    box.addEventListener('scroll', update, { passive: true });
+    // zmiana treści (nowa zakładka, części awatara, hasła) albo pokazanie ramki na ekranie
+    new MutationObserver(() => requestAnimationFrame(update)).observe(box, { childList: true, subtree: true });
+    if ('ResizeObserver' in window) {
+        const resize = new ResizeObserver(update);
+        resize.observe(box);
+        [...box.children].forEach(child => resize.observe(child));
+    }
+    update();
+});

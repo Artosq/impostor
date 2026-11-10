@@ -70,7 +70,8 @@ const sfx = (() => {
         go: () => notes([N.A5, N.C6], 'square', 0.06, 0.12, 0.8),                             // start rundy po odliczaniu
         voteIn: () => tone({ type: 'triangle', freq: N.C5, to: N.G5, length: 0.06, volume: 0.6 }),  // głos na wynikach
         hit: () => { tone({ type: 'square', freq: 160, to: 70, length: 0.25, volume: 0.6 }); noise({ length: 0.08, volume: 0.3 }); },
-        reveal: () => { noise({ length: 0.2, volume: 0.6 }); tone({ type: 'sawtooth', freq: 300, to: 80, length: 0.4, volume: 0.5 }); }
+        reveal: () => { noise({ length: 0.2, volume: 0.6 }); tone({ type: 'sawtooth', freq: 300, to: 80, length: 0.4, volume: 0.5 }); },
+        badge: () => { notes([N.G5, N.C6], 'triangle', 0.08, 0.1, 0.8); tone({ type: 'triangle', freq: N.C6, to: 1568, start: 0.16, length: 0.3, volume: 0.7 }); }   // nowa odznaka
     };
 
     function play(name) {

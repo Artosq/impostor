@@ -124,17 +124,18 @@
             <!-- Ekran Logowania -->
             <div id="screen-login" class="screen">
                 <div id="player-stats">
-                    <div class="main-avatar" onclick="customizeAvatar()" title="Zmień wygląd">
+                    <div class="main-avatar" onclick="openProfile()" title="Twój profil">
                         <img id="main-player-avatar" class="skeleton" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E" alt="">
-                        <span class="edit-badge" aria-hidden="true">
+                        <span class="edit-badge" title="Zmień wygląd" onclick="event.stopPropagation(); customizeAvatar()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
                         </span>
                     </div>
-                    <div id="player-stats-rest">
-                        <span id="exp-counter" style="font-size: 14px; color: var(--secondary); text-shadow: 0 0 20px var(--secondary); transition: 1s;">Exp: 947</span>
-                        <div id="main-exp-wrapper">
-                            <canvas id="progressCanvas"></canvas>
+                    <div id="player-stats-rest" onclick="openProfile()" title="Twój profil">
+                        <div class="main-level-row">
+                            <span id="main-level" class="main-level">Poziom 1</span>
+                            <span id="main-exp-text" class="main-exp-text"></span>
                         </div>
+                        <div id="main-exp-bar" class="main-exp-bar"><div id="main-exp-fill" class="main-exp-fill"></div></div>
                     </div>
                 </div>
                 <span id="impostor-thoughts" style="color: var(--danger); text-shadow: 0 0 20px var(--danger); transition: 1s; opacity:0;">Mądrości impostora</span>
@@ -272,6 +273,8 @@
                 </div>
 
                 <div id="res-exp" class="res-exp"></div>
+                <!-- nowe odznaki z tej rundy (profile.js showEarnedBadges) -->
+                <div id="res-badges" class="res-badges hidden"></div>
 
                 <div id="install-offer" class="install-offer hidden">
                     <div>Spodobało się? Zainstaluj Impostora</div>
@@ -299,7 +302,31 @@
                 <div id="customize-options">
                     <div class="customize-category" id="customize-list"></div>
                 </div>
-                <button class="btn-join" onclick="showScreen('screen-login')">Powrót do menu -></button>
+                <button class="btn-join" onclick="closeCustomize()">Powrót -></button>
+            </div>
+
+            <!-- Strona gracza: statystyki, odznaki, historia (profile.js) -->
+            <div id="screen-profile" class="screen hidden">
+                <div class="profile-header">
+                    <div class="profile-avatar" onclick="customizeAvatar()" title="Zmień wygląd">
+                        <img id="profile-avatar" class="skeleton" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'/%3E" alt="">
+                        <span class="edit-badge" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
+                        </span>
+                    </div>
+                    <div class="profile-info">
+                        <div id="profile-nick" class="profile-nick"></div>
+                        <div class="profile-level-row">
+                            <div id="profile-level" class="profile-level"></div>
+                            <div id="profile-exp-text" class="profile-exp-text"></div>
+                        </div>
+                        <div class="profile-exp"><div id="profile-exp-fill" class="profile-exp-fill"></div></div>
+                    </div>
+                </div>
+                <div id="profile-tabs" class="profile-tabs"></div>
+                <div id="profile-content" class="profile-content"></div>
+                <p class="profile-account">Gość - postęp zapisany w tej przeglądarce. Logowanie wkrótce.</p>
+                <button class="btn-join" onclick="closeProfile()">Powrót do menu -></button>
             </div>
 
             <!-- Ekran edytora własnej kategorii (otwierany z okna kategorii) -->
@@ -411,7 +438,10 @@
     <script src="js/customCategories.js" defer></script>
     <script src="js/sounds.js" defer></script>
     <script src="js/nicks.js" defer></script>
+    <script src="js/badges.js" defer></script>
+    <script src="js/profileStore.js" defer></script>
     <script src="js/app.js" defer></script>
+    <script src="js/profile.js" defer></script>
     <script src="js/session.js" defer></script>
     <script src="js/invite.js" defer></script>
     <script src="js/scanner.js" defer></script>

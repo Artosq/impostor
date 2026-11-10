@@ -432,46 +432,80 @@ body::before{
     text-shadow: 0 0 10px var(--secondary);
 }
 .options-window{
-    max-width: 380px;
+    max-width: 340px;
 }
 .options-list{
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 10px 0;
+    margin: 4px -8px;
+    padding: 6px 8px;           /* miejsce na poświatę włączonych kafelków (lista przewija się i ucina to, co wystaje) */
     overflow-y: auto;
+}
+/* nagłówek sekcji: "Zasady", "Dodatkowe role 2 / 4" */
+.options-section{
+    display: flex;
+    justify-content: space-between;
+    margin: 14px 2px 6px;
+    color: #777;
+    font-size: 0.6em;
+    letter-spacing: 1px;
+    text-align: left;
+    text-transform: uppercase;
+}
+.options-section:first-child{
+    margin-top: 0;
+}
+/* każda opcja ma swój kolor (--option-color z modes/impostor.js) - włączona: ramka i tło w tym kolorze */
+.option-row,
+.option-tile{
+    --option-color: var(--secondary);
+    border: 3px solid black;
+    border-radius: 10px;
+    background: #262626;
+    cursor: pointer;
+    transition: border-color 0.25s, background-color 0.25s, box-shadow 0.25s;
+}
+.option-row:hover,
+.option-tile:hover{
+    border-color: #555;
+}
+.option-row.is-on,
+.option-tile.is-on{
+    border-color: var(--option-color);
+    background: color-mix(in srgb, var(--option-color) 10%, #262626);
 }
 .option-row{
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 10px 12px;
-    border: 3px solid black;
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.3);
     text-align: left;
-    cursor: pointer;
-    transition: 0.25s;
 }
-.option-row:hover{
-    border-color: #555;
+.option-row + .option-row{
+    margin-top: 8px;
+}
+.option-icon{
+    flex: none;
+    font-size: 22px;
+    line-height: 1;
 }
 .option-text{
     flex: 1;
+    min-width: 0;
 }
 .option-name{
+    font-size: 0.85em;
     font-weight: 700;
-    color: #ddd;
+    color: #bbb;
+    transition: color 0.25s;
 }
 .option-description{
     margin-top: 3px;
-    font-size: 0.65em;
-    line-height: 1.4;
-    color: #999;
+    font-size: 0.6em;
+    line-height: 1.45;
+    color: #888;
 }
-.option-row.is-on .option-name{
-    color: var(--secondary);
-    text-shadow: 0 0 10px var(--secondary);
+.is-on > .option-name,
+.is-on .option-text .option-name{
+    color: white;
 }
 .option-row .option-switch{
     display: block;
@@ -479,10 +513,71 @@ body::before{
     color: #666;
 }
 .option-row.is-on .option-switch{
-    color: var(--secondary);
+    color: var(--option-color);
 }
 .option-row.is-on .privacy-knob{
     left: 24px;
+}
+/* kafelki dodatkowych ról */
+.option-tiles{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+.option-tile{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 8px 10px;
+}
+.option-tile.is-on{
+    box-shadow: 0 0 12px color-mix(in srgb, var(--option-color) 35%, transparent);
+}
+.option-tile .option-name{
+    font-size: 0.75em;
+}
+.option-tile .option-description{
+    margin-top: 0;
+    font-size: 0.52em;
+    text-align: center;
+}
+.option-tile-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    box-sizing: border-box;
+    border: 3px solid black;
+    border-radius: 10px;
+    background: #1c1c1c;
+    font-size: 24px;
+    filter: grayscale(1);
+    opacity: 0.5;
+    transition: 0.25s;
+}
+.option-tile.is-on .option-tile-icon{
+    border-color: var(--option-color);
+    filter: none;
+    opacity: 1;
+}
+/* kółko zaznaczenia w rogu kafelka */
+.option-check{
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 14px;
+    height: 14px;
+    border: 3px solid black;
+    border-radius: 50%;
+    background: #1c1c1c;
+    transition: 0.25s;
+}
+.option-tile.is-on .option-check{
+    background: var(--option-color);
+    box-shadow: 0 0 8px var(--option-color), inset 0 0 0 2px #262626;
 }
 .options-players{
     margin: 0 0 8px;
@@ -783,7 +878,7 @@ body::before{
     border: 5px solid rgb(22, 22, 22);
     border-radius: 10px;
     background-color: #333333;
-    box-shadow: inset 0 -20px 20px -10px rgba(0, 0, 0, 0.7);
+    transition: box-shadow 0.25s;
 }
 .editor-entry{
     padding: 6px 8px 8px;
@@ -1607,11 +1702,6 @@ animation: fadeIn 0.5s ease-in;
     opacity: 1;
 }
 
-#main-exp-wrapper:hover{
-    box-shadow: 0 0 20px black;
-    transform: scale(1.05);
-}
-
 #player-stats {
     display: flex;
     align-items: end; /* Wyśrodkowanie awatara i statystyk względem siebie */
@@ -1634,28 +1724,59 @@ animation: fadeIn 0.5s ease-in;
     flex: 1;         /* Pozwala statystykom zająć resztę miejsca */
     display: flex;
     justify-content: left;
-    flex-direction: column; /* Napis EXP nad paskiem */
-    gap: 5px;             /* Elegancki odstęp między napisem a paskiem */
-    margin-left: 10px;    /* Teraz ten margines będzie wyraźnie widoczny */
+    flex-direction: column; /* poziom i EXP nad paskiem */
+    min-width: 0;
+    margin-left: 10px;
+    cursor: pointer;
 }
 
-#main-exp-wrapper {
-    width: 100%;          /* Wypełnia całą szerokość player-stats-rest */
+/* Poziom po lewej, EXP po prawej, pod spodem pasek (jak w nagłówku profilu) */
+.main-level-row{
+    display: flex;
+    flex-wrap: wrap;            /* gdy się nie mieści, EXP schodzi pod poziom */
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 8px;
+    margin-bottom: 8px;
+}
+.main-level{
+    color: var(--secondary);
+    font-size: 0.85em;
+    text-shadow: 0 0 12px var(--secondary);
+    white-space: nowrap;
+}
+.main-exp-text{
+    color: #888;
+    font-size: 0.6em;
+    white-space: nowrap;
+}
+.main-exp-bar{
+    box-sizing: border-box;
+    height: 26px;
+    overflow: hidden;
     border: 5px solid black;
-    background-color: #161616;
-    border-radius: 100px;
-    transition: 0.5s;
-    padding: 3px;
-    box-sizing: border-box; /* Ważne: padding nie powiększa wrappera */
+    border-radius: 10px;
+    background: #2a2a2a;
+    transition: transform 0.3s;
 }
-
-/* Canvas musi wypełniać wrapper */
-#progressCanvas {
-    width: 100%;
-    height: 25px;         /* Ustaw stałą wysokość paska */
-    display: block;       /* Usuwa domyślny margines pod obrazkiem */
+.main-exp-fill{
+    width: 0;
+    height: 100%;
+    background: var(--secondary);
     box-shadow: 0 0 10px var(--secondary);
-    border-radius: 50px;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+#player-stats-rest:hover .main-exp-bar{
+    transform: scale(1.03);
+}
+/* wąskie telefony: mniejsze napisy, żeby zmieściły się w jednej linii */
+@media (max-width: 380px){
+    .main-level{
+        font-size: 0.75em;
+    }
+    .main-exp-text{
+        font-size: 0.5em;
+    }
 }
 .customize-preview{
     position: relative;
@@ -1718,7 +1839,7 @@ animation: fadeIn 0.5s ease-in;
     border-radius: 10px;
     background-color: #333333;
     margin-bottom: 10px;
-    box-shadow: inset 0 -20px 20px -10px rgba(0, 0, 0, 0.7);
+    transition: box-shadow 0.25s;
 }
 .customize-category{
     animation: fadeIn 0.5s;
@@ -2503,4 +2624,568 @@ img.skeleton-failed{
 @keyframes nickFlash {
     0% { color: var(--danger); }
     100% { }
+}
+
+/* ===== STRONA GRACZA (profile.js) ===== */
+.profile-header{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 14px;
+    text-align: left;
+}
+.profile-avatar{
+    position: relative;
+    flex: none;
+    cursor: pointer;
+}
+.profile-avatar img{
+    display: block;
+    width: 84px;
+    height: 84px;
+    border: 5px solid black;
+    border-radius: 12px;
+}
+.profile-info{
+    flex: 1;
+    min-width: 0;
+}
+.profile-nick{
+    padding-right: 40px;        /* nie wchodzi pod przycisk dźwięku w rogu karty */
+    overflow: hidden;
+    font-size: 1.1em;
+    font-weight: 700;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+/* najwęższe telefony: mniejszy awatar i nick, żeby nick nie był od razu ucinany */
+@media (max-width: 360px){
+    .profile-header{
+        gap: 12px;
+    }
+    .profile-avatar img{
+        width: 68px;
+        height: 68px;
+    }
+    .profile-nick{
+        font-size: 0.95em;
+    }
+}
+/* zwarty blok obok awatara: poziom po lewej, EXP po prawej, pod spodem cienki pasek */
+.profile-level-row{
+    display: flex;
+    flex-wrap: wrap;            /* gdy się nie mieści, EXP schodzi pod poziom */
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 4px 8px;
+    margin: 6px 0 8px;
+}
+.profile-level{
+    color: var(--secondary);
+    font-size: 0.8em;
+    text-shadow: 0 0 12px var(--secondary);
+    white-space: nowrap;
+}
+.profile-exp-text{
+    color: #888;
+    font-size: 0.55em;
+    white-space: nowrap;
+}
+.profile-exp{
+    box-sizing: border-box;
+    height: 18px;
+    overflow: hidden;
+    border: 4px solid black;
+    border-radius: 8px;
+    background: #2a2a2a;
+}
+.profile-exp-fill{
+    height: 100%;
+    background: var(--secondary);
+    box-shadow: 0 0 10px var(--secondary);
+    transition: width 0.6s ease-out;
+}
+/* wąskie telefony: poziom i EXP mniejsze, żeby zmieściły się w jednej linii */
+@media (max-width: 360px){
+    .profile-level{
+        font-size: 0.7em;
+    }
+    .profile-exp-text{
+        font-size: 0.5em;
+    }
+}
+.profile-tabs{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 5px;
+    margin-bottom: 10px;
+}
+.profile-tabs .has-new::after,
+.main-avatar.has-new::after{
+    content: "";
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    border: 3px solid black;
+    border-radius: 50%;
+    background: var(--danger);
+    box-shadow: 0 0 10px var(--danger);
+}
+.profile-tabs .customize-categories-tile{
+    position: relative;
+    box-sizing: border-box;
+    min-width: 0;              /* trzy zakładki zawsze w karcie ("Statystyki" to długie słowo) */
+    padding: 10px 2px;
+    font-size: clamp(8px, 2.2vw, 0.62em);     /* na wąskich telefonach mniejszy, najmniej 8 px (ostra czcionka) */
+    letter-spacing: 0;
+}
+/* najwęższe telefony: cieńsza ramka, żeby "Statystyki" zmieściły się w równej zakładce */
+@media (max-width: 340px){
+    .profile-tabs .customize-categories-tile{
+        padding: 10px 0;
+        border-width: 3px;
+        letter-spacing: -0.5px;
+    }
+}
+.profile-content{
+    box-sizing: border-box;
+    max-height: 52vh;
+    min-height: 220px;
+    overflow-y: auto;
+    padding: 14px;
+    border: 5px solid rgb(22, 22, 22);
+    border-radius: 10px;
+    background: #333333;
+    margin-bottom: 10px;
+    transition: box-shadow 0.25s;
+    text-align: left;
+    animation: fadeIn 0.5s;
+}
+/* Delikatny cień u dołu ramki tylko wtedy, gdy niżej jest jeszcze coś do przewinięcia (effects.js) */
+#customize-options.has-more,
+.profile-content.has-more,
+#screen-editor .editor-list.has-more{
+    box-shadow: inset 0 -12px 10px -10px rgba(0, 0, 0, 0.35);
+}
+.profile-empty,
+.profile-summary,
+.profile-account{
+    color: #999;
+    font-size: 0.75em;
+    line-height: 1.6;
+    text-align: center;
+}
+.profile-summary{
+    margin: 0 0 10px;
+}
+.profile-account{
+    margin: 4px 0 6px;
+    font-size: 0.65em;
+}
+
+/* Statystyki: bez ramki, treść zanika u góry i u dołu przy przewijaniu */
+.profile-content.is-plain{
+    padding: 10px 2px 22px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 24px), transparent);
+    mask-image: linear-gradient(to bottom, transparent 0, #000 12px, #000 calc(100% - 24px), transparent);
+}
+.profile-content.is-plain::-webkit-scrollbar{
+    display: none;
+}
+.stat-section{
+    margin-bottom: 22px;
+}
+.stat-title{
+    margin: 0 0 10px;
+    color: #777;
+    font-size: 0.6em;
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+.stat-caption{
+    color: #888;
+    font-size: 0.55em;
+    line-height: 1.5;
+}
+.stat-note{
+    margin: 6px 0 0;
+    color: #aaa;
+    font-size: 0.65em;
+    text-align: center;
+}
+
+/* wspólne dla wykresów SVG: tor i wypełnienie */
+.chart-track,
+.chart-fill{
+    fill: none;
+    stroke-linecap: butt;
+}
+.chart-track{
+    stroke: #2a2a2a;
+}
+.chart-fill{
+    stroke: var(--secondary);
+    animation: chartIn 0.9s ease-out both;
+}
+@keyframes chartIn {
+    from { stroke-dasharray: 0 100; }
+}
+
+/* półkole: procent wygranych */
+.stat-gauge{
+    position: relative;
+    width: 78%;
+    margin: 0 auto;
+}
+.stat-gauge svg{
+    display: block;
+    width: 100%;
+}
+.stat-gauge path{
+    stroke-width: 16;
+}
+.stat-gauge .chart-fill{
+    filter: drop-shadow(0 0 6px rgba(46, 204, 113, 0.5));
+}
+.stat-gauge-center{
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    text-align: center;
+}
+.stat-big{
+    color: white;
+    font-size: 1.6em;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* kółka: wygrane w roli */
+.stat-donuts{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    text-align: center;
+}
+.stat-donut-chart{
+    position: relative;
+    width: 70%;
+    margin: 0 auto 6px;
+}
+.stat-donut-chart svg{
+    display: block;
+    width: 100%;
+    transform: rotate(-90deg);
+}
+.stat-donut circle{
+    stroke-width: 11;
+}
+.stat-donut-value{
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85em;
+    font-weight: 700;
+}
+.stat-donut-label{
+    font-size: 0.65em;
+}
+
+/* ostatnie rundy: kratki */
+.stat-form{
+    display: grid;
+    grid-template-columns: repeat(20, minmax(0, 1fr));
+    gap: 3px;
+}
+.stat-form span{
+    aspect-ratio: 1 / 2;
+    border-radius: 2px;
+    background: #2a2a2a;
+}
+.stat-form .is-win{
+    background: var(--secondary);
+}
+.stat-form .is-lose{
+    background: var(--danger);
+}
+
+/* paski */
+.stat-bar{
+    margin-bottom: 12px;
+}
+.stat-bar-head,
+.stat-rank{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 0.65em;
+}
+.stat-bar-head{
+    margin-bottom: 5px;
+}
+.stat-bar-value{
+    color: white;
+    font-weight: 700;
+}
+.stat-bar-track{
+    height: 8px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #2a2a2a;
+}
+.stat-bar-fill{
+    height: 100%;
+    border-radius: 4px;
+    background: var(--secondary);
+    animation: barIn 0.9s ease-out both;
+}
+@keyframes barIn {
+    from { width: 0; }
+}
+.stat-bar .stat-caption{
+    margin-top: 3px;
+}
+
+/* pasek podzielony (role, tryby) z legendą */
+.stat-split{
+    display: flex;
+    gap: 2px;
+    height: 12px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #2a2a2a;
+}
+.stat-split span{
+    flex-basis: 0;
+    animation: barIn 0.9s ease-out both;
+}
+.stat-legend{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin-top: 8px;
+}
+.stat-legend-item{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: #aaa;
+    font-size: 0.55em;
+}
+.stat-legend-item::before{
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    background: var(--dot);
+}
+
+/* ulubione kategorie */
+.stat-rank{
+    margin-bottom: 8px;
+}
+.stat-rank-name{
+    flex: 0 0 38%;
+    overflow: hidden;
+    color: #ccc;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.stat-rank .stat-bar-track{
+    flex: 1;
+}
+.stat-rank .stat-bar-value{
+    flex: 0 0 auto;
+    min-width: 2ch;
+    text-align: right;
+}
+
+/* liczby na dole */
+.stat-numbers{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 10px;
+    padding-top: 14px;
+    border-top: 3px solid #2a2a2a;
+    text-align: center;
+}
+.stat-number-value{
+    margin-bottom: 3px;
+    font-size: 0.95em;
+    font-weight: 700;
+}
+
+/* Odznaki: kolor ramki = poziom */
+.badges-list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.badge-card{
+    --tier: #555;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border: 4px solid var(--tier);
+    border-radius: 10px;
+    background: #2a2a2a;
+}
+.badge-card.tier-bronze{ --tier: #cd7f32; }
+.badge-card.tier-silver{ --tier: #c0c7d0; }
+.badge-card.tier-gold{ --tier: #f1c40f; }
+.badge-card.tier-diamond{ --tier: #4ff0ff; }
+.badge-card.tier-special{ --tier: #b16cf0; }
+.badge-card:not(.locked){
+    box-shadow: 0 0 12px color-mix(in srgb, var(--tier) 45%, transparent);
+}
+.badge-card.locked{
+    border-color: rgb(22, 22, 22);
+}
+.badge-card.locked .badge-icon{
+    filter: grayscale(1) brightness(0.6);
+}
+.badge-card.is-new{
+    animation: badgeNew 1.2s ease-out;
+}
+.badge-icon{
+    flex: none;
+    width: 44px;
+    font-size: 30px;
+    line-height: 1;
+    text-align: center;
+}
+.badge-info{
+    flex: 1;
+    min-width: 0;
+}
+.badge-name{
+    font-size: 0.85em;
+    font-weight: 700;
+}
+.badge-tier{
+    margin-top: 2px;
+    color: var(--tier);
+    font-size: 0.65em;
+}
+.badge-card.locked .badge-tier{
+    color: #777;
+}
+.badge-description{
+    margin-top: 4px;
+    color: #aaa;
+    font-size: 0.6em;
+    line-height: 1.4;
+}
+.badge-progress{
+    height: 6px;
+    margin-top: 6px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #1a1a1a;
+}
+.badge-progress-fill{
+    height: 100%;
+    background: var(--secondary);
+}
+.badge-count{
+    margin-top: 3px;
+    color: #888;
+    font-size: 0.55em;
+}
+@keyframes badgeNew {
+    0% { transform: scale(1.06); box-shadow: 0 0 28px var(--tier); }
+    100% { transform: scale(1); }
+}
+
+/* Historia */
+.history-row{
+    padding: 10px;
+    border: 4px solid rgb(22, 22, 22);
+    border-left-color: var(--danger);
+    border-radius: 10px;
+    background: #2a2a2a;
+}
+.history-row + .history-row{
+    margin-top: 8px;
+}
+.history-row.is-win{
+    border-left-color: var(--secondary);
+}
+.history-top{
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+.history-result{
+    color: var(--danger);
+    font-size: 0.8em;
+    font-weight: 700;
+}
+.history-row.is-win .history-result{
+    color: var(--secondary);
+}
+.history-date{
+    color: #888;
+    font-size: 0.6em;
+}
+.history-details{
+    margin-top: 4px;
+    color: #bbb;
+    font-size: 0.6em;
+    line-height: 1.4;
+}
+.history-subject{
+    margin-top: 4px;
+    color: white;
+    font-size: 0.65em;
+    line-height: 1.4;
+}
+
+/* Nowe odznaki na ekranie wyników - razem z werdyktem */
+.res-badges{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0 12px;
+}
+.res-suspense .res-badges{
+    visibility: hidden;
+}
+.res-badge{
+    --tier: #b16cf0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 4px solid var(--tier);
+    border-radius: 10px;
+    background: #2a2a2a;
+    box-shadow: 0 0 14px color-mix(in srgb, var(--tier) 50%, transparent);
+    font-size: 0.7em;
+    animation: badgePop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.3) backwards;
+}
+.res-badge.tier-bronze{ --tier: #cd7f32; }
+.res-badge.tier-silver{ --tier: #c0c7d0; }
+.res-badge.tier-gold{ --tier: #f1c40f; }
+.res-badge.tier-diamond{ --tier: #4ff0ff; }
+.res-badge-icon{
+    font-size: 20px;
+}
+@keyframes badgePop {
+    from { opacity: 0; transform: scale(0.6); }
+    to { opacity: 1; transform: scale(1); }
 }

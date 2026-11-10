@@ -3,7 +3,7 @@ const REVEAL_DELAY_MS = 2600;    // po tylu ms odkryty impostor zrzuca przebrani
 const HOST_CROWN_SVG = '<svg viewBox="0 0 26 20" fill="#f1c40f" stroke="black" stroke-width="2" stroke-linejoin="round">'
     + '<path d="M3 17L2 5l6 5 5-8 5 8 6-5-1 12z"/>'
     + '<circle cx="13" cy="13" r="1.6" fill="#e74c3c" stroke="none"/></svg>';
-const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results', 'screen-editor'];
+const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results', 'screen-editor', 'screen-profile'];
 const SCREENS_WITH_STATS = ['screen-login', 'screen-customize', 'screen-results'];
 
 // Kolejność części w adresie awatara - taka sama jak w avatars/*.js na serwerze
@@ -37,11 +37,9 @@ let avatarStyle = null;      // aktywny zestaw, ustalany przez serwer
 let avatarCatalogLoading = true;
 let botConfig = {};          // wygląd gracza w aktywnym zestawie (razem z nazwą zestawu w polu style)
 
-let playerExp = parseInt(localStorage.getItem('playerExp'));
-if (!playerExp || playerExp <= 0) playerExp = 0;
-
-let playerLVL = parseInt(localStorage.getItem('playerLVL'));
-if (!playerLVL || playerLVL <= 1) playerLVL = 1;
+// Poziom i doświadczenie trzyma profil gracza (profileStore.js) - razem ze statystykami i odznakami
+let playerExp = Math.max(0, ProfileStore.get().exp || 0);
+let playerLVL = Math.max(1, ProfileStore.get().level || 1);
 
 let currentRoomCode = "";
 let myPlayerId = null;
@@ -113,9 +111,8 @@ function showScreen(screenId) {
     if (screenId === 'screen-lobby' && previous !== 'screen-lobby') lobbyTilesRoom = null;
 
     const showStats = SCREENS_WITH_STATS.includes(screenId);
-    byId('logo').classList.toggle('hidden', showStats || screenId === 'screen-editor');   // edytor potrzebuje miejsca
+    byId('logo').classList.toggle('hidden', showStats || screenId === 'screen-editor' || screenId === 'screen-profile');   // edytor i profil potrzebują miejsca
     byId('player-stats').classList.toggle('hidden', !showStats);
-    if (showStats) refreshProgressBar();
     updateCornerButtons();
 }
 
@@ -256,8 +253,17 @@ async function loadAvatarCatalog() {
 
 let customizeSlot = null;    // aktywna zakładka panelu
 
+// Edycja wyglądu otwierana z menu albo ze strony gracza - powrót tam, skąd przyszedł
+let customizeReturnScreen = 'screen-login';
+
+function closeCustomize() {
+    if (customizeReturnScreen === 'screen-profile') openProfile();
+    else showScreen('screen-login');
+}
+
 function customizeAvatar() {
     if (!avatarCatalog) return;     // katalog jeszcze się wczytuje
+    customizeReturnScreen = currentScreen === 'screen-profile' ? 'screen-profile' : 'screen-login';
 
     renderCustomizeTabs();
     updateCustomizePreview();
@@ -398,14 +404,10 @@ function rollDice(element) {
 
 // ===== EXP =====
 
-const pCanvas = byId('progressCanvas');
-const pCtx = pCanvas.getContext('2d');
-const colorSecondary = '#2ecc71';
-
-let progress = 0;            // Aktualny stan (0 do 100)
-let targetProgress = 100;    // Do ilu ma dobić
-let currentWidth = 0;        // Pomocnicza do płynnej animacji
-let progressAnimation = null;
+// Pasek w menu: wypełnienie przesuwa CSS (transition), a liczba EXP odlicza w górę razem z nim.
+// Rysuje tylko przez chwilę po zmianie - potem nic nie obciąża telefonu.
+const EXP_COUNT_MS = 1000;
+let expAnimation = null;
 
 function getRequiredExp(level) {
     const baseXP = 100;
@@ -419,62 +421,37 @@ function updateExp(exp) {
         return updateExp(exp);
     }
     playerExp = exp;
-    progress = 0;
-    targetProgress = exp / getRequiredExp(playerLVL) * 100;
-    currentWidth = 0;
-    localStorage.setItem('playerExp', exp);
-    localStorage.setItem('playerLVL', playerLVL);
-
-    cancelAnimationFrame(progressAnimation);
-    drawProgressBar();
+    ProfileStore.setProgress(playerLVL, exp);
+    renderExpBar(true);
 }
 
-let lastExpText = '';
+function renderExpBar(animate) {
+    const needed = getRequiredExp(playerLVL);
+    const fill = byId('main-exp-fill');
+    byId('main-level').textContent = `Poziom ${playerLVL}`;
 
-// Rysuje pasek klatka po klatce tylko do chwili, gdy dojedzie do celu - potem nic nie obciąża telefonu
-function drawProgressBar() {
-    // Zmiana rozmiaru czyści płótno i wymusza przeliczenie układu, więc tylko gdy naprawdę się zmienił
-    if (pCanvas.width !== pCanvas.clientWidth || pCanvas.height !== pCanvas.clientHeight) {
-        pCanvas.width = pCanvas.clientWidth;
-        pCanvas.height = pCanvas.clientHeight;
+    if (animate) {          // od zera do aktualnego stanu
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        void fill.offsetWidth;
+        fill.style.transition = '';
     }
+    fill.style.width = `${Math.min(100, playerExp / needed * 100)}%`;
 
-    const w = pCanvas.width;
-    const h = pCanvas.height;
-
-    pCtx.clearRect(0, 0, w, h);
-
-    let targetWidth = w * (progress / 100);
-    currentWidth += (targetWidth - currentWidth) * 0.05;
-
-    if (progress < targetProgress) {
-        progress = Math.min(progress + 0.5, targetProgress); // Prędkość ładowania
+    cancelAnimationFrame(expAnimation);
+    const text = byId('main-exp-text');
+    if (!animate) {
+        text.textContent = `${playerExp} / ${needed} EXP`;
+        return;
     }
-
-    // Koniec animacji: pasek stoi dokładnie na celu
-    const finished = progress >= targetProgress && Math.abs(w * (targetProgress / 100) - currentWidth) < 0.5;
-    if (finished) currentWidth = w * (targetProgress / 100);
-
-    pCtx.fillStyle = colorSecondary;
-    pCtx.fillRect(0, 0, currentWidth, h);
-
-    const text = `
-    LVL: ${playerLVL || 0} <br>
-    EXP: ${Math.floor((playerExp * progress / targetProgress) || 0)} / ${getRequiredExp(playerLVL) || 0}
-`;
-    if (text !== lastExpText) {
-        byId('exp-counter').innerHTML = text;
-        lastExpText = text;
-    }
-
-    progressAnimation = finished ? null : requestAnimationFrame(drawProgressBar);
+    const start = performance.now();
+    const step = now => {
+        const t = Math.min(1, (now - start) / EXP_COUNT_MS);
+        text.textContent = `${Math.round(playerExp * (1 - Math.pow(1 - t, 3)))} / ${needed} EXP`;
+        expAnimation = t < 1 ? requestAnimationFrame(step) : null;
+    };
+    expAnimation = requestAnimationFrame(step);
 }
-
-// Ponowne narysowanie paska (np. po powrocie do menu albo zmianie rozmiaru okna)
-function refreshProgressBar() {
-    if (progressAnimation === null) progressAnimation = requestAnimationFrame(drawProgressBar);
-}
-window.addEventListener('resize', refreshProgressBar);
 
 // ===== POKOJE =====
 
@@ -659,7 +636,7 @@ function enabledRoleNames(mode, options) {
 }
 
 function openGameOptions() {
-    renderGameOptions();
+    renderGameOptions(true);
     byId('game-options').classList.remove('hidden', 'closing');
 }
 
@@ -674,23 +651,86 @@ function closeGameOptions() {
     }, PICKER_CLOSE_MS);
 }
 
-function renderGameOptions() {
+// Okno budowane raz przy otwarciu (elementy wjeżdżają po kolei). Kliknięcie albo zmiana od serwera
+// tylko przełącza klasy - przełącznik, kółko, ramka i kolor przechodzą płynnie (transition w style.css).
+let gameOptionsMode = null;
+
+function renderGameOptions(fresh = false) {
     const mode = findMode(gameMode);
     if (!mode) return;
-    byId('options-list').replaceChildren(...(mode.options || []).map(option => {
-        const row = createElement('div', 'option-row');
-        row.classList.toggle('is-on', Boolean(roomOptions[option.id]));
+    const options = mode.options || [];
+    const roles = options.filter(option => option.players > 0);
+    if (fresh || gameOptionsMode !== mode.id) buildGameOptions(mode, options, roles);
+
+    byId('options-list').querySelectorAll('[data-option]').forEach(element => {
+        element.classList.toggle('is-on', Boolean(roomOptions[element.dataset.option]));
+    });
+    const extra = roles.filter(option => roomOptions[option.id]).length;
+    const count = byId('options-roles-count');
+    if (count) count.textContent = `${extra} / ${roles.length}`;
+    const needed = parseInt(impostors) + (extra > 0 ? extra + 2 : 1);    // jak na serwerze
+    byId('options-players').textContent = `👥 Potrzeba co najmniej ${needed} graczy`;
+}
+
+function buildGameOptions(mode, options, roles) {
+    gameOptionsMode = mode.id;
+    const prepare = (element, option) => {
+        element.dataset.option = option.id;
+        if (option.color) element.style.setProperty('--option-color', option.color);
+        // od razu u siebie (szybkie kliknięcia kilku opcji nie cofają się nawzajem), potem do serwera,
+        // który i tak odsyła ustawienia pokoju wszystkim
+        element.onclick = () => {
+            roomOptions = { ...roomOptions, [option.id]: !roomOptions[option.id] };
+            renderGameOptions();
+            changeSettings({ options: roomOptions });
+        };
+        return element;
+    };
+
+    // Zasady (bez dodatkowych graczy): wiersz z opisem i przełącznikiem
+    const rules = options.filter(option => !option.players).map(option => {
+        const row = prepare(createElement('div', 'option-row'), option);
         const text = createElement('div', 'option-text');
         text.append(createElement('div', 'option-name', option.name), createElement('div', 'option-description', option.description));
-        const toggle = createElement('span', 'privacy-switch option-switch');
-        toggle.append(createElement('span', 'privacy-knob'));
-        row.append(text, toggle);
-        row.onclick = () => changeSettings({ options: { ...roomOptions, [option.id]: !roomOptions[option.id] } });
+        const switcher = createElement('span', 'privacy-switch option-switch');
+        switcher.append(createElement('span', 'privacy-knob'));
+        if (option.icon) row.append(createElement('span', 'option-icon', option.icon));
+        row.append(text, switcher);
         return row;
-    }));
-    const extra = (mode.options || []).filter(o => o.players > 0 && roomOptions[o.id]).length;
-    const needed = parseInt(impostors) + (extra > 0 ? extra + 2 : 1);    // jak na serwerze
-    byId('options-players').textContent = `Potrzeba co najmniej ${needed} graczy`;
+    });
+
+    // Dodatkowe role: kafelki 2x2 z ikoną, krótkim opisem i kółkiem zaznaczenia
+    const tiles = roles.map(option => {
+        const tile = prepare(createElement('div', 'option-tile'), option);
+        tile.title = option.description;
+        tile.append(createElement('span', 'option-check'), createElement('span', 'option-tile-icon', option.icon || '?'),
+            createElement('div', 'option-name', option.name), createElement('div', 'option-description', option.short || option.description));
+        return tile;
+    });
+
+    const section = (title, countId) => {
+        const head = createElement('div', 'options-section');
+        head.append(createElement('span', '', title));
+        if (countId) {
+            const count = createElement('span');
+            count.id = countId;
+            head.append(count);
+        }
+        return head;
+    };
+    const list = [];
+    if (rules.length) list.push(section('Zasady'), ...rules);
+    if (roles.length) {
+        const grid = createElement('div', 'option-tiles');
+        grid.append(...tiles);
+        list.push(section('Dodatkowe role', 'options-roles-count'), grid);
+    }
+    // wjazd po kolei: nagłówki, wiersze i kafelki
+    [...list.filter(element => !element.classList.contains('option-tiles')), ...tiles].forEach((element, i) => {
+        element.classList.add('picker-enter');
+        element.style.animationDelay = `${i * 40}ms`;
+    });
+    byId('options-list').replaceChildren(...list);
 }
 
 function selectCategory(id) {
@@ -1221,7 +1261,6 @@ function voteOn(selectedTile, maxVotes, playerId) {
             selectedTile.classList.add('selected');
             selectedPlayers.push(playerId);
         } else {
-            console.log("Limit głosów osiągnięty!");
             return;
         }
     } else {
@@ -1533,6 +1572,7 @@ function showResults(results) {
     gainedExp = Math.floor(gainedExp);
 
     byId('res-exp').textContent = `+${gainedExp} EXP`;
+    recordFinishedGame(results, wasIKicked);        // profile.js - statystyki, historia, odznaki
     showInstallOffer();
     updateExp(playerExp + gainedExp);
 }
@@ -1592,7 +1632,6 @@ function playLobbySounds(room) {
 }
 
 socket.on('left_room_success', () => {
-    console.log("Pomyślnie opuszczono pokój.");
     closeCategoryPicker();
     currentRoomCode = "";
     lobbySnapshot = null;
@@ -1605,6 +1644,7 @@ socket.on('is_host', setHostControls);
 socket.on('game_start', (data) => {
     showScreen('screen-game');
     showGame(data);
+    noteRoundStart(data);       // profile.js - kategoria i czas rundy do statystyk
     updateSkipButton(data);
     if (data.countdown) startCountdown();
     else sfx.play('roundStart');
@@ -1615,6 +1655,7 @@ socket.on('game_start', (data) => {
 socket.on('start_vote', (vote) => {
     showScreen('screen-vote');
     sfx.play('voteStart');
+    noteVote(vote);             // profile.js - odpowiedzi w "Kto z nas" do statystyk
     renderVoteTiles(vote);
 });
 
@@ -1637,8 +1678,6 @@ changeNick();
 loadAvatarCatalog();
 updateExp(playerExp);
 
-console.log("EXP: " + playerExp);
-console.log('Twoje UID: ' + userId);
 
 // Przyciski w rogach od razu po wczytaniu strony (później odświeża je showScreen)
 updateCornerButtons();

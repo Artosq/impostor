@@ -295,7 +295,6 @@ function assignHost(room, player) {
     room.host = player.userId;
     io.to(player.socketId).emit('is_host', true);
     if (room.status === 'voting') emitVoteStatus(room);    // nowy host dostaje listę głosujących
-    console.log(`Nowy host w pokoju ${room.code}: ${player.name}`);
 }
 
 function attachSocket(socket, room, player) {
@@ -310,7 +309,6 @@ function attachSocket(socket, room, player) {
 function removePlayer(room, player) {
     const wasHost = room.host === player.userId;
     room.players = room.players.filter(p => p !== player);
-    console.log(`Gracz ${player.name} opuścił pokój ${room.code}`);
 
     const tooFewToPlay = room.status === 'playing' && room.players.length < 2;
 
@@ -390,7 +388,6 @@ function handleAbsentPlayer(room, player) {
 }
 
 io.on('connection', (socket) => {
-    console.log(`Połączono: ${socket.id}`);
 
     // Błąd w jednym zdarzeniu nie może wyłączyć całego serwera
     const handle = (event, handler) => {
@@ -483,7 +480,6 @@ io.on('connection', (socket) => {
 
         touch(room);
         attachSocket(socket, room, player);
-        console.log(`Rejoin: Gracz ${player.name} wrócił do pokoju ${room.code}`);
 
         if (room.host === userId) {
             socket.emit('is_host', true);
@@ -628,7 +624,6 @@ io.on('connection', (socket) => {
             if (room.status === 'playing') {
                 room.status = 'voting';
                 room.voteStartedAt = Date.now();
-                console.log(`Głosowanie rozpoczęte przez hosta: ${requester.name}`);
 
                 room.players.forEach(p => {
                     io.to(p.socketId).emit('start_vote', voteView(room, p));
@@ -653,7 +648,6 @@ io.on('connection', (socket) => {
         const choice = [...new Set(selectedIds)].filter(id => validIds.has(id));
 
         room.playerChoices.set(player.userId, choice);
-        console.log(`Gracz ${player.name} zmienił wybór (${choice.length} głosów)`);
         emitVoteStatus(room);
     });
 
@@ -768,7 +762,6 @@ setInterval(() => {
             io.to(room.code).emit('error', 'Pokój wygasł z powodu braku aktywności!');
             io.to(room.code).emit('left_room_success');
             deleteRoom(room.code);
-            console.log(`Sprzątacz usunął pokój widmo: ${room.code}`);
         }
     });
     broadcastRoomList();

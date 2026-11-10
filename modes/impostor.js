@@ -54,12 +54,13 @@ const JESTER_TEAM = 'BLAZEN';
 const MIN_REGULAR_PLAYERS = 2;      // gdy są dodatkowe role, tylu zwykłych graczy musi zostać obok impostorów i ról
 
 // Przełączniki w oknie "Ustawienia gry" (kolejność = kolejność losowania ról)
+// icon, color, short - wygląd w oknie (short: krótki opis na kafelku roli)
 const OPTIONS = [
-    { id: 'lastChance', name: 'Ostatnia szansa impostora', description: 'W trakcie głosowania impostor może raz zgadnąć hasło: trafi - wygrywa, pomyli się - przegrywa', default: true },
-    { id: 'accomplice', name: 'Wspólnik', description: 'Zna hasło i wie, kto jest impostorem. Wygrywa razem z nim', default: false, players: 1, role: ROLE_ACCOMPLICE },
-    { id: 'jester', name: 'Błazen', description: 'Zna hasło, ale wygrywa sam, jeśli zostanie wyrzucony', default: false, players: 1, role: ROLE_JESTER },
-    { id: 'detective', name: 'Detektyw', description: 'Wie o jednej osobie, że na pewno nie jest impostorem', default: false, players: 1, role: ROLE_DETECTIVE },
-    { id: 'changeling', name: 'Podmieniec', description: 'Dostaje inne hasło z tej kategorii i nie wie o tym', default: false, players: 1, role: ROLE_CHANGELING }
+    { id: 'lastChance', name: 'Ostatnia szansa impostora', description: 'W trakcie głosowania impostor może raz zgadnąć hasło: trafi - wygrywa, pomyli się - przegrywa', default: true, icon: '🎯', color: '#e74c3c' },
+    { id: 'accomplice', name: 'Wspólnik', description: 'Zna hasło i wie, kto jest impostorem. Wygrywa razem z nim', short: 'Zna hasło i impostora, gra z nim', default: false, players: 1, role: ROLE_ACCOMPLICE, icon: '🤝', color: '#b16cf0' },
+    { id: 'jester', name: 'Błazen', description: 'Zna hasło, ale wygrywa sam, jeśli zostanie wyrzucony', short: 'Wygrywa, gdy go wyrzucą', default: false, players: 1, role: ROLE_JESTER, icon: '🃏', color: '#f1c40f' },
+    { id: 'detective', name: 'Detektyw', description: 'Wie o jednej osobie, że na pewno nie jest impostorem', short: 'Zna jedną niewinną osobę', default: false, players: 1, role: ROLE_DETECTIVE, icon: '🔍', color: '#3498db' },
+    { id: 'changeling', name: 'Podmieniec', description: 'Dostaje inne hasło z tej kategorii i nie wie o tym', short: 'Ma inne hasło i o tym nie wie', default: false, players: 1, role: ROLE_CHANGELING, icon: '🎭', color: '#1abc9c' }
 ];
 
 // Drużyna roli - kto wygrywa razem
@@ -132,7 +133,7 @@ module.exports = {
     customLimits: CUSTOM_LIMITS,
     cleanCustomCategory: cleanCustomCategory,
 
-    options: OPTIONS.map(({ id, name, description, players }) => ({ id, name, description, default: OPTIONS.find(o => o.id === id).default, players: players || 0 })),
+    options: OPTIONS.map(({ id, name, description, short, players, icon, color }) => ({ id, name, description, short, default: OPTIONS.find(o => o.id === id).default, players: players || 0, icon, color })),
 
     start(room, { category: selectedCategory, impostorCount, customCategory, options = {} }) {
         const error = shared.checkImpostorCount(room, impostorCount);
