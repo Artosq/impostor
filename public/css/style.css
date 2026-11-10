@@ -55,6 +55,36 @@ body::before{
 .screen{
     animation: screenFadeIn 0.5s;
 }
+/* Przejścia między ekranami (showScreen w app.js) - wzorzec Material "fade through":
+   stary ekran blednie (0,1 s, nałożony na nowy), nowy pojawia się i rośnie z 92% do 100%.
+   Tylko przezroczystość i skala (liczy je karta graficzna). Rosnący ekran nie odsłania miejsca, które zajmował,
+   więc przeglądarka nie zostawia smug, a zwykła animacja CSS nie tworzy na siłę warstw (bez migania). */
+.screen.screen-leaving{
+    position: absolute;         /* nad nowym ekranem, na swoim dawnym miejscu (top/left/width z app.js) */
+    pointer-events: none;
+    animation: screenFadeOut 0.1s ease-in forwards;
+}
+.screen.screen-entering{
+    animation: screenFadeThrough 0.25s cubic-bezier(0, 0, 0.2, 1) 0.05s both;
+}
+@keyframes screenFadeOut {
+    to { opacity: 0; }
+}
+@keyframes screenFadeThrough {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+}
+/* Ekran gry bez skali: skala (transform) na chwilę przypięłaby do ekranu odliczanie, które zakrywa całą kartę.
+   Odliczanie i tak zasłania wejście do gry. */
+#screen-game.screen-entering{
+    animation-name: screenFadeIn;
+}
+/* "Ograniczanie ruchu" w systemie: samo przenikanie, bez skali */
+@media (prefers-reduced-motion: reduce){
+    .screen.screen-entering{
+        animation-name: screenFadeIn;
+    }
+}
 /* LISTA POKOI */
 .room-row{
     display: flex;
@@ -1009,7 +1039,8 @@ body::before{
     grid-template-columns: repeat(2, 1fr);
 }
 #error-display{
-    transition: 0.8s ease-in-out;
+    /* płynnie tylko wysuwanie i znikanie - kolor (czerwony błąd / zielona informacja) od razu, bez przejścia */
+    transition: opacity 0.8s ease-in-out, top 0.8s ease-in-out;
     opacity: 0;
     width: fit-content;
     height: auto;
@@ -1031,6 +1062,14 @@ body::before{
 #error-display.is-notice{
     color: var(--secondary);
     text-shadow: 0 0 20px var(--secondary);
+}
+/* Nowy komunikat w miejscu poprzedniego - krótki podskok (translateX jak w #error-display) */
+#error-display.message-bump{
+    animation: messageBump 0.3s ease-out;
+}
+@keyframes messageBump {
+    0% { transform: translateX(-50%) scale(1.15); }
+    100% { transform: translateX(-50%) scale(1); }
 }
 /* Nowe hasło / pytanie - mniejszy przycisk nad "Zacznij głosowanie" */
 .btn-skip{
@@ -1738,9 +1777,12 @@ animation: fadeIn 0.5s ease-in;
     
     transform: skewX(-25deg); /* Pochylenie błysku */
     will-change: transform;
-    
-    /* GŁÓWNA ANIMACJA: Przesunięcie błysku */
-    animation: shine-effect 10s infinite;
+}
+/* Błysk przechodzi przez kartę raz na 10 s: 3 s ruchu, potem 7 s przerwy odmierzanej w effects.js (startShine).
+   Przerwa poza animacją = przeglądarka nie rysuje wtedy klatek i telefon może zwolnić odświeżanie ekranu
+   (animacja w pętli, nawet stojąca w miejscu, wymuszała ok. 30 klatek na sekundę bez przerwy) */
+.card.shine::before {
+    animation: shine-effect 3s;
 }
 
 .select-category {
@@ -2192,8 +2234,8 @@ animation: fadeIn 0.5s ease-in;
     0% {
         transform: translateX(0) skewX(-25deg); /* Start poza kartą */
     }
-    30%, 100% {
-        transform: translateX(300%) skewX(-25deg); /* Szybkie przejście na prawą stronę i długie czekanie */
+    100% {
+        transform: translateX(300%) skewX(-25deg); /* Przejście na prawą stronę, poza kartę */
     }
 }
 
@@ -2303,6 +2345,11 @@ animation: fadeIn 0.5s ease-in;
     opacity: 0;
     pointer-events: none;
 }
+/* Ukryty pasek (przezroczysty, żeby mógł płynnie wjechać) nie animuje kropek - zmiana "content"
+   przelicza style w każdej klatce: na słabym telefonie to było ok. 20% procesora przez cały czas gry */
+.connection-banner.hidden::after{
+    animation: none;
+}
 #card.disconnected #error-blur{
     filter: saturate(0%);
 }
@@ -2392,4 +2439,68 @@ img.skeleton-failed{
     color: var(--secondary);
     text-align: center;
     line-height: 1.6;
+}
+
+/* Nick, który nie mieści się nawet na najmniejszej czytelnej czcionce, kończy się wielokropkiem
+   (pełny nick w podpowiedzi) - żeby w rzędzie zawsze mieściło się 3 graczy */
+.player-tag.clipped{
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: var(--tag-height, 26px);
+}
+
+/* WĄSKIE TELEFONY (do 380 px): mniejsze kafelki graczy w poczekalni (3 w rzędzie)
+   i werdykt na wynikach dopasowany do szerokości (PRZEGRANA wychodziła poza kartę) */
+@media (max-width: 380px){
+    #players-list{
+        --tag-height: 22px;
+    }
+    #players-list .player-avatar,
+    #players-list .invite-slot-icon{
+        width: 42px;
+        height: 42px;
+    }
+    #players-list .invite-slot-icon svg{
+        width: 18px;
+        height: 18px;
+    }
+    #players-list .player-tag{
+        height: var(--tag-height);
+        min-width: 46px;
+        padding-left: 8px;
+        padding-right: 8px;
+        font-size: 0.7em;
+    }
+    #players-list .host-crown{
+        top: -13px;
+        width: 21px;
+        height: 16px;
+    }
+    .res-outcome{
+        font-size: calc(12.8vw - 17.5px);
+    }
+}
+
+/* Poczekalnia odświeża tylko zmienione kafelki (app.js renderLobby): odświeżony kafelek gracza, który już był
+   w pokoju, nie "wchodzi" drugi raz - animacja wejścia tylko dla nowych graczy */
+.avatar-container.no-enter .player-tag,
+.avatar-container.no-enter .player-avatar{
+    animation: none;
+}
+/* Nick zmieniony przez filtr przy przełączeniu pokoju publiczny/prywatny: cały kafelek podskakuje, nick błyska */
+.avatar-container.nick-changed{
+    animation: nickChange 0.7s ease-out;
+}
+.avatar-container.nick-changed .player-tag{
+    animation: nickFlash 0.7s ease-out;
+}
+@keyframes nickChange {
+    0% { transform: scale(1.25); }
+    40% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+}
+@keyframes nickFlash {
+    0% { color: var(--danger); }
+    100% { }
 }

@@ -74,3 +74,22 @@ window.addEventListener('mousedown', (e) => {
     ripples.push(new Ripple(e.clientX, e.clientY));
     if (rippleLoop === null) rippleLoop = requestAnimationFrame(animate);
 });
+
+// ===== BŁYSK KARTY =====
+// Raz na SHINE_EVERY_MS: animacja (3 s, style.css .card.shine) i przerwa odmierzana tutaj - w przerwie nic się
+// nie animuje, więc przeglądarka nie rysuje klatek, a telefon może obniżyć odświeżanie ekranu i oszczędzać baterię.
+const SHINE_EVERY_MS = 10000;
+const SHINE_MOVE_MS = 3000;
+const shineCard = document.getElementById('card');
+
+function startShine() {
+    shineCard.classList.remove('shine');
+    void shineCard.offsetWidth;          // ponowne dodanie klasy zaczyna animację od początku
+    shineCard.classList.add('shine');
+}
+shineCard.addEventListener('animationend', event => {
+    if (event.animationName !== 'shine-effect') return;
+    shineCard.classList.remove('shine');
+    setTimeout(startShine, SHINE_EVERY_MS - SHINE_MOVE_MS);
+});
+startShine();

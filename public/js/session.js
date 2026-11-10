@@ -161,3 +161,12 @@ window.addEventListener('popstate', () => {
     backTrapSet = false;
     if (handleBack()) setBackTrap();
 });
+
+// ===== SERVICE WORKER =====
+// Szybsze kolejne wejścia i ekran "Brak internetu" (zob. sw.js). Rejestrowany po załadowaniu strony,
+// żeby nie zabierał łącza pierwszemu wczytaniu gry.
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(e => console.warn('Service worker niedostępny', e));
+    });
+}

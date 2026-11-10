@@ -61,12 +61,56 @@ function generateUID() {
 
 let currentScreen = 'screen-login';    // ekran widoczny zaraz po wczytaniu strony
 
+// Ekran, który właśnie blednie (przejście "fade through", style.css): leży na swoim dawnym miejscu nad nowym
+// i po animacji wraca do zwykłego ukrytego stanu
+const SCREEN_LEAVE_MAX_MS = 250;    // animacja wyjścia trwa 100 ms
+
+function finishLeaving(screen) {
+    screen.classList.remove('screen-leaving');
+    screen.classList.add('hidden');
+    screen.style.top = screen.style.left = screen.style.width = '';
+}
+
+// Klasa "screen-entering" zostaje na ekranie do następnej zmiany ekranu - zdjęta zaraz po animacji przywracała
+// podstawową animację .screen (screenFadeIn), która ruszała od zera: ekran znikał i pojawiał się drugi raz (mignięcie)
+document.addEventListener('animationend', event => {
+    if (event.animationName === 'screenFadeOut' && event.target.classList.contains('screen-leaving')) finishLeaving(event.target);
+});
+
 function showScreen(screenId) {
+    const previous = currentScreen;
     currentScreen = screenId;
+
+    // poprzednie przejście jeszcze trwa - kończymy je od razu
+    document.querySelectorAll('.screen-leaving').forEach(finishLeaving);
+
+    // Przejście tylko przy faktycznej zmianie ekranu (np. odświeżenie poczekalni pokazuje ten sam ekran).
+    // Stary ekran zostaje na chwilę widoczny w swoim miejscu i blednie, nowy od razu zajmuje swoje miejsce w karcie.
+    const old = previous && previous !== screenId ? byId(previous) : null;
+    const animate = old && !old.classList.contains('hidden');
+    if (animate) {
+        old.style.top = `${old.offsetTop}px`;
+        old.style.left = `${old.offsetLeft}px`;
+        old.style.width = `${old.offsetWidth}px`;
+        old.classList.remove('screen-entering');     // w tej samej chwili zaczyna blednąć - nic nie rusza od nowa
+        old.classList.add('screen-leaving');
+        // zabezpieczenie, gdyby przeglądarka nie zgłosiła końca animacji (karta w tle, animacje wyłączone)
+        setTimeout(() => { if (old.classList.contains('screen-leaving')) finishLeaving(old); }, SCREEN_LEAVE_MAX_MS);
+    }
+
     SCREENS.forEach(id => {
-        byId(id).classList.add('hidden');
+        if (!(animate && id === previous)) byId(id).classList.add('hidden');
     });
-    byId(screenId).classList.remove('hidden');
+    const screen = byId(screenId);
+    screen.classList.remove('hidden');
+    if (animate) {
+        screen.classList.remove('screen-entering');
+        void screen.offsetWidth;            // ponowne dodanie klasy zaczyna animację od początku
+        screen.classList.add('screen-entering');
+    }
+
+    // wejście do poczekalni (z menu, gry, wyników, edytora) - wszystkie kafelki graczy wchodzą od nowa
+    if (screenId === 'screen-lobby' && previous !== 'screen-lobby') lobbyTilesRoom = null;
 
     const showStats = SCREENS_WITH_STATS.includes(screenId);
     byId('logo').classList.toggle('hidden', showStats || screenId === 'screen-editor');   // edytor potrzebuje miejsca
@@ -76,20 +120,37 @@ function showScreen(screenId) {
 }
 
 // isNotice: zwykła informacja (zielona, bez wyszarzania karty) zamiast błędu
+// Jeden komunikat naraz i jeden wspólny licznik: nowy komunikat podmienia poprzedni (z podskokiem, żeby było widać
+// zmianę) i liczy 3 s od nowa. Wcześniej każdy miał własny licznik, który chował też późniejsze komunikaty.
+const MESSAGE_VISIBLE_MS = 3000;
+let messageTimer = null;
+
 function showError(msg, isNotice = false) {
     const errorDisplay = byId('error-display');
     const errorBlur = byId('error-blur');
+    const notice = isNotice === true;
+    const visible = messageTimer !== null;
 
     errorDisplay.innerText = msg;
-    errorDisplay.classList.toggle('is-notice', isNotice === true);
+    errorDisplay.classList.toggle('is-notice', notice);
     errorDisplay.style.opacity = '';
     errorDisplay.style.top = '5%';
-    if (isNotice !== true) errorBlur.style.filter = 'saturate(0%)';
-    setTimeout(() => {
+    errorBlur.style.filter = notice ? '' : 'saturate(0%)';     // informacja nie wyszarza karty, także w trakcie błędu
+
+    if (visible) {
+        errorDisplay.classList.remove('message-bump');
+        void errorDisplay.offsetWidth;                          // ponowne dodanie klasy zaczyna animację od początku
+        errorDisplay.classList.add('message-bump');
+    }
+
+    clearTimeout(messageTimer);
+    messageTimer = setTimeout(() => {
+        messageTimer = null;
         errorDisplay.style.opacity = 0;
         errorDisplay.style.top = '';
         errorBlur.style.filter = '';
-    }, 3000);
+        errorDisplay.classList.remove('message-bump');
+    }, MESSAGE_VISIBLE_MS);
 }
 
 function impostorWisdom(text) {
@@ -219,7 +280,8 @@ function renderCustomizeTabs() {
         tab.classList.toggle('selected', slot.id === customizeSlot);
         tab.onclick = () => {
             customizeSlot = slot.id;
-            renderCustomizeTabs();
+            panel.querySelectorAll('.customize-categories-tile').forEach(t => t.classList.toggle('selected', t === tab));
+            renderCustomizeOptions(true);
         };
         return tab;
     }));
@@ -241,10 +303,27 @@ function createCustomizeTile(slot, item) {
     return tile;
 }
 
-// Rysujemy tylko aktywną zakładkę; każdy kafelek pokazuje jedną część, niezależnie od reszty wyglądu
-function renderCustomizeOptions() {
+// Rysujemy tylko aktywną zakładkę; każdy kafelek pokazuje jedną część, niezależnie od reszty wyglądu,
+// więc raz zrobione kafelki zakładki są zapamiętywane - przy powrocie zmienia się tylko zaznaczenie
+const customizeTiles = new Map();   // "zestaw:część" -> kafelki
+
+// flyIn: zmiana zakładki - kafelki "wlatują z góry" (przy otwarciu panelu robi to już animacja ekranu)
+function renderCustomizeOptions(flyIn = false) {
     const slot = activeCatalog().slots.find(s => s.id === customizeSlot);
-    byId('customize-list').replaceChildren(...activeCatalog().parts[slot.id].map(item => createCustomizeTile(slot, item)));
+    const key = `${avatarStyle}:${slot.id}`;
+    if (!customizeTiles.has(key)) customizeTiles.set(key, activeCatalog().parts[slot.id].map(item => createCustomizeTile(slot, item)));
+
+    const tiles = customizeTiles.get(key);
+    tiles.forEach(tile => tile.classList.toggle('selected', botConfig[slot.id] === tile.dataset.part));
+    const list = byId('customize-list');
+    list.replaceChildren(...tiles);
+
+    // kafelki "wlatują z góry" przy zmianie zakładki (animacja fadeIn siatki zaczyna się od nowa)
+    if (flyIn) {
+        list.style.animation = 'none';
+        void list.offsetWidth;
+        list.style.animation = '';
+    }
 }
 
 function updatePart(slotId, value) {
@@ -833,13 +912,38 @@ function renderRoomList(rooms) {
     listContainer.append(header, ...rooms.map(createRoomRow));
 }
 
+// Nicki pokazane w poczekalni - w pokoju publicznym serwer zamienia wulgaryzmy na gwiazdki (nickFilter.js),
+// w prywatnym pokazuje je w całości. Zmieniony nick miga, a jego właściciel dostaje wyjaśnienie.
+const shownNames = new Map();     // id gracza -> ostatnio pokazany nick
+let shownNamesRoom = null;
+
+function noteNameChanges(room) {
+    if (shownNamesRoom !== room.code) {
+        shownNames.clear();
+        shownNamesRoom = room.code;
+    }
+    const me = room.players.find(p => p.id === myPlayerId);
+    const myBefore = shownNames.get(myPlayerId);
+    if (me && me.name !== myBefore) {
+        const typed = byId('input-name').value;
+        if (me.name.includes('*') && !typed.includes('*')) {
+            showError(`W pokoju publicznym Twój nick wyświetla się jako ${me.name}`, true);
+        } else if (myBefore && myBefore.includes('*') && !me.name.includes('*')) {
+            showError('Pokój prywatny - Twój nick wyświetla się w całości', true);
+        }
+    }
+    const changed = new Set(room.players.filter(p => shownNames.has(p.id) && shownNames.get(p.id) !== p.name).map(p => p.id));
+    room.players.forEach(p => shownNames.set(p.id, p.name));
+    return changed;
+}
+
 function renderLobby(room) {
     const isHost = room.hostId === myPlayerId;
     const list = byId('players-list');
+    const changedNames = noteNameChanges(room);
 
     amIHost = isHost;
     roomIsPrivate = room.isPrivate;
-    list.replaceChildren();
 
     byId('room-code-display').innerText = room.code;
     byId('room-privacy').classList.toggle('is-private', room.isPrivate);
@@ -848,48 +952,87 @@ function renderLobby(room) {
 
     applySettings(room.settings);
 
-    room.players.forEach(p => {
-        const container = createElement('div', 'avatar-container');
-        container.id = `player-${p.id}`;
-        container.style.position = 'relative';
-        container.onclick = () => sendFuck(p.id);
-        if (p.away) {
-            container.classList.add('away');
-            container.title = 'Ogląda jeszcze wyniki';
-        }
+    // Nowy pokój (albo powrót do niego) - wszystkie kafelki wchodzą od nowa
+    if (lobbyTilesRoom !== room.code) {
+        lobbyTiles.clear();
+        lobbyTilesRoom = room.code;
+        list.replaceChildren();
+    }
 
-        const avatar = createElement('img', 'player-avatar skeleton');
-        avatar.src = avatarUrl(p.avatar);
+    const tiles = room.players.map(p => {
+        const key = JSON.stringify([p.name, avatarUrl(p.avatar), p.id === room.hostId, Boolean(p.away), p.id === myPlayerId, isHost]);
+        const known = lobbyTiles.get(p.id);
+        if (known && known.key === key) return known.element;      // nic się nie zmieniło - kafelek zostaje, bez animacji
 
-        // Znaczniki trzymają się rogów samego awatara, a nie szerszej plakietki z nickiem
-        const frame = createElement('div', 'avatar-frame');
-        frame.append(avatar);
-
-        if (p.id === room.hostId) {
-            const crown = createElement('span', 'host-crown');
-            crown.innerHTML = HOST_CROWN_SVG;
-            crown.title = 'Host';
-            frame.append(crown);
-        }
-
-        const tag = createElement('span', p.id === myPlayerId ? 'player-tag this-player' : 'player-tag', p.name);
-        container.append(frame, tag);
-
-        if (isHost && p.id !== myPlayerId) {
-            const kick = createElement('button', 'kick-button', '✕');
-            kick.title = 'Wyrzuć gracza';
-            kick.onclick = (event) => {
-                event.stopPropagation();
-                kickPlayer(p);
-            };
-            frame.append(kick);
-        }
-
-        list.append(container, ' ');
+        const element = createPlayerTile(p, room, isHost, known && known.element);
+        if (known) element.classList.add('no-enter');                // był już w pokoju - nie "wchodzi" drugi raz
+        if (changedNames.has(p.id)) element.classList.add('nick-changed');
+        lobbyTiles.set(p.id, { key, element });
+        return element;
     });
 
-    list.append(createInviteSlot());
+    const present = new Set(room.players.map(p => p.id));
+    lobbyTiles.forEach((tile, id) => { if (!present.has(id)) lobbyTiles.delete(id); });
+
+    // Na liście zostają te same elementy: przeniesienie albo ponowne wstawienie elementu odpaliłoby jego animację od nowa
+    if (!lobbyInviteSlot) lobbyInviteSlot = createInviteSlot();
+    const wanted = [...tiles, lobbyInviteSlot];
+    [...list.children].forEach(child => { if (!wanted.includes(child)) child.remove(); });
+    wanted.forEach((element, i) => {
+        const current = list.children[i];
+        if (current !== element) list.insertBefore(element, current || null);
+    });
     fitPlayerTags(list);
+}
+
+// Kafelki poczekalni wg id gracza: odświeżane tylko wtedy, gdy coś się w nich zmieniło
+const lobbyTiles = new Map();     // id gracza -> { key, element }
+let lobbyTilesRoom = null;
+let lobbyInviteSlot = null;
+
+function createPlayerTile(p, room, isHost, previous) {
+    const container = createElement('div', 'avatar-container');
+    container.id = `player-${p.id}`;
+    container.style.position = 'relative';
+    container.onclick = () => sendFuck(p.id);
+    if (p.away) {
+        container.classList.add('away');
+        container.title = 'Ogląda jeszcze wyniki';
+    }
+
+    // ten sam wygląd - ten sam obrazek (nowy wczytywałby się i mignął szkieletem)
+    const url = avatarUrl(p.avatar);
+    const oldAvatar = previous && previous.querySelector('.player-avatar');
+    let avatar = oldAvatar && oldAvatar.getAttribute('src') === url ? oldAvatar : null;
+    if (!avatar) {
+        avatar = createElement('img', 'player-avatar skeleton');
+        avatar.src = url;
+    }
+
+    // Znaczniki trzymają się rogów samego awatara, a nie szerszej plakietki z nickiem
+    const frame = createElement('div', 'avatar-frame');
+    frame.append(avatar);
+
+    if (p.id === room.hostId) {
+        const crown = createElement('span', 'host-crown');
+        crown.innerHTML = HOST_CROWN_SVG;
+        crown.title = 'Host';
+        frame.append(crown);
+    }
+
+    const tag = createElement('span', p.id === myPlayerId ? 'player-tag this-player' : 'player-tag', p.name);
+    container.append(frame, tag);
+
+    if (isHost && p.id !== myPlayerId) {
+        const kick = createElement('button', 'kick-button', '✕');
+        kick.title = 'Wyrzuć gracza';
+        kick.onclick = (event) => {
+            event.stopPropagation();
+            kickPlayer(p);
+        };
+        frame.append(kick);
+    }
+    return container;
 }
 
 // Długie nicki dostają mniejszą czcionkę, żeby w rzędzie mieściło się 3 graczy (krótkie zostają bez zmian).
@@ -902,6 +1045,8 @@ function fitPlayerTags(list) {
     list.querySelectorAll('.avatar-container:not(.invite-slot) .player-tag').forEach(tag => {
         tag.style.fontSize = '';
         tag.style.paddingLeft = tag.style.paddingRight = '';
+        tag.style.maxWidth = '';
+        tag.classList.remove('clipped');
         if (tag.offsetWidth <= maxWidth) return;
 
         tag.style.paddingLeft = tag.style.paddingRight = '6px';
@@ -911,7 +1056,34 @@ function fitPlayerTags(list) {
             tag.style.fontSize = `${size}px`;
         }
     });
+    clipWidestTags(list);
     breakPlayerRows(list);
+}
+
+// Ostateczność (wąski telefon, długie nicki): gdy trzy kafelki rzędu nie mieszczą się nawet z najmniejszą czcionką,
+// najszersze plakietki rzędu dostają wspólną maksymalną szerokość i wielokropek - tylko tyle, ile trzeba,
+// żeby w rzędzie zostało 3 graczy. Pełny nick w podpowiedzi.
+function clipWidestTags(list) {
+    const width = list.clientWidth;
+    const tiles = [...list.querySelectorAll('.avatar-container')];
+    for (let i = 0; i < tiles.length; i += PLAYERS_PER_ROW) {
+        const row = tiles.slice(i, i + PLAYERS_PER_ROW);
+        const room = width - (row.length - 1) * PLAYERS_GAP;
+        const widths = row.map(tile => tile.offsetWidth);
+        if (widths.reduce((sum, w) => sum + w, 0) <= room) continue;
+
+        // wspólny limit c: suma min(szerokość, c) = miejsce w rzędzie ("Zaproś +" się nie skraca)
+        const clippable = row.map(tile => !tile.classList.contains('invite-slot'));
+        let limit = Math.max(...widths);
+        while (limit > 0 && row.reduce((sum, tile, k) => sum + (clippable[k] ? Math.min(widths[k], limit) : widths[k]), 0) > room) limit--;
+        row.forEach((tile, k) => {
+            const tag = tile.querySelector('.player-tag');
+            if (!clippable[k] || widths[k] <= limit || !tag) return;
+            tag.classList.add('clipped');
+            tag.style.maxWidth = `${limit}px`;
+            tag.title = tag.textContent;
+        });
+    }
 }
 
 // Rzędy po najwyżej 3 kafelki: kolejny trafia do rzędu, jeśli się zmieści, inaczej zaczyna nowy rząd

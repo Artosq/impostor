@@ -1,0 +1,9 @@
+{
+    "_opis": "Słowa maskowane gwiazdkami w nickach w pokojach publicznych (nickFilter.js). Zapis bez polskich znaków, małymi literami, bez powtórzonych liter (kuuurwa = kurwa). 'rdzenie' łapią też odmiany i złożenia (kurw -> skurwiel), 'cale_slowa' tylko osobne słowo (suka - ale nie sukces).",
+    "rdzenie": [
+        "kurw", "chuj", "huj", "jeb", "pierdol", "pierdal", "pizd", "kutas", "fiut", "dziwk", "cwel", "cipk", "cipa", "cipy", "cipe", "cipsk", "czarnuch", "ciapat", "ciapak", "fuck", "cunt", "bitch", "whore", "slut", "nigg", "faggot", "retard", "hitler", "heil", "nazist"
+    ],
+    "cale_slowa": [
+        "suka", "suki", "szmata", "szmato", "fag", "downie", "downa", "pedal", "pedaly", "pedale", "pedalek", "pedzio", "ciota", "cioty", "cioto", "lesba", "lesby", "nazi"
+    ]
+}

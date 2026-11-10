@@ -8,6 +8,7 @@ const { getMode, listModes, cleanOptions } = require('./modes');
 const avatars = require('./avatars');
 const assets = require('./assets');
 const nicks = require('./public/js/nicks');
+const { maskNick } = require('./nickFilter');
 
 // USTAWIENIA
 const PORT = process.env.PORT || 10000;
@@ -107,22 +108,32 @@ function cleanLevel(level) {
 }
 
 function createPlayer(socket, { userId, playerName, avatar, level }) {
+    const name = cleanText(playerName, MAX_NAME_LENGTH) || 'Gracz';
     return {
         userId: userId,                     // sekret gracza - nigdy nie trafia do innych klientów
         publicId: crypto.randomBytes(6).toString('base64url'),  // identyfikator widoczny dla wszystkich (krótki - powtarza się w wielu wiadomościach)
         socketId: socket.id,
         connected: true,
-        name: cleanText(playerName, MAX_NAME_LENGTH) || 'Gracz',
+        rawName: name,                      // pełny nick (zostaje na serwerze)
+        name: name,                         // nick pokazywany innym - w pokoju publicznym z gwiazdkami (applyRoomNames)
         avatar: avatars.cleanAvatar(avatar),
         level: cleanLevel(level)
     };
+}
+
+// Pokój publiczny widzą obcy: wulgaryzmy i obelgi w nickach zamieniają się na gwiazdki (nickFilter.js).
+// W prywatnym (znajomi z kodem) nicki w całości. Wołane przy wejściu do pokoju i przy zmianie prywatności.
+function applyRoomNames(room) {
+    room.players.forEach(p => {
+        p.name = room.isPrivate ? p.rawName : maskNick(p.rawName);
+    });
 }
 
 // Pusty nick albo wylosowany, który już jest w pokoju, zamienia się na inny losowy.
 // Nick wpisany ręcznie zostaje, nawet jeśli ktoś ma taki sam.
 function roomNickname(room, playerName, randomName) {
     const name = cleanText(playerName, MAX_NAME_LENGTH);
-    const taken = room ? room.players.map(p => p.name) : [];
+    const taken = room ? room.players.map(p => p.rawName) : [];
     const isTaken = taken.some(other => other.toLowerCase() === name.toLowerCase());
     if (name && !(randomName === true && isTaken)) return name;
     return nicks.randomNick(nicks.NICK_LANGUAGE, taken);
@@ -414,6 +425,7 @@ io.on('connection', (socket) => {
             lastActivity: Date.now()
         };
         rooms.set(room.code, room);
+        applyRoomNames(room);
 
         attachSocket(socket, room, player);
         emitLobby(room);
@@ -449,6 +461,7 @@ io.on('connection', (socket) => {
         if (!player) {
             player = createPlayer(socket, { userId, playerName: roomNickname(room, playerName, randomName), avatar, level });
             room.players.push(player);
+            applyRoomNames(room);
         }
 
         touch(room);
@@ -689,6 +702,7 @@ io.on('connection', (socket) => {
 
         touch(room);
         room.isPrivate = Boolean(isPrivate);
+        applyRoomNames(room);           // nicki z gwiazdkami tylko w pokoju publicznym
         emitLobby(room);
         broadcastRoomList();
     });

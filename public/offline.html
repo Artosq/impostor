@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#161616">
+    <title>Impostor – brak internetu</title>
+    <!-- Strona podawana przez service worker (sw.js), gdy telefon nie ma internetu - wszystko w środku, bez innych plików poza logo i czcionką -->
+    <style>
+        @font-face { font-family: "Silkscreen"; font-weight: 400; src: url("/fonts/silkscreen-400-latin.woff2") format("woff2"); unicode-range: U+0000-00FF, U+2000-206F; }
+        @font-face { font-family: "Silkscreen"; font-weight: 400; src: url("/fonts/silkscreen-400-pl.woff2") format("woff2"); unicode-range: U+0104-0107, U+0118-0119, U+0141-0144, U+015A-015B, U+0179-017C; }
+        html, body { margin: 0; height: 100%; }
+        body {
+            display: flex; align-items: center; justify-content: center;
+            background: #161616; color: white; font-family: "Silkscreen", sans-serif; text-align: center;
+            background-image: linear-gradient(0deg, transparent 24%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 27%, transparent 28%, transparent 74%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2) 77%, transparent 78%, transparent),
+                linear-gradient(90deg, transparent 24%, rgba(255,255,255,.2) 25%, rgba(255,255,255,.2) 27%, transparent 28%, transparent 74%, rgba(255,255,255,.2) 75%, rgba(255,255,255,.2) 77%, transparent 78%, transparent);
+            background-size: 70px 70px;
+        }
+        .card { width: min(340px, calc(100% - 32px)); box-sizing: border-box; padding: 28px 20px; background: #1f1f1f; border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+        img { width: 200px; height: auto; }
+        h1 { margin: 18px 0 8px; font-size: 1.2em; color: #e74c3c; text-shadow: 0 0 20px #e74c3c; letter-spacing: 1px; }
+        p { margin: 0 0 22px; color: #999; font-size: 0.8em; line-height: 1.6; }
+        button {
+            width: 100%; padding: 12px; font: inherit; font-weight: bold; cursor: pointer;
+            border: 5px solid #2ecc71; border-radius: 5px; background: transparent; color: #2ecc71; transition: 0.4s;
+        }
+        button:hover { background: #2ecc71; color: white; box-shadow: 0 0 20px #2ecc71; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <img src="/logo.svg" width="200" height="104" alt="Impostor">
+        <h1>Brak internetu</h1>
+        <p>Impostor działa tylko online. Sprawdź połączenie - gra wróci sama, gdy internet się pojawi.</p>
+        <button onclick="location.reload()">Spróbuj ponownie</button>
+    </div>
+    <script>
+        window.addEventListener('online', () => location.reload());
+    </script>
+</body>
+</html>
