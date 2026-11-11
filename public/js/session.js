@@ -32,6 +32,12 @@ socket.on('connect', () => {
     setConnectionBanner(false);
 });
 
+// Na serwerze jest nowsza wersja gry (np. po wdrożeniu poprawki, serwer się zrestartował).
+// Nie odświeżamy sami - gracz może być w trakcie rundy. Odświeżenie wraca do tego samego pokoju.
+socket.on('new_version', () => {
+    byId('update-banner').classList.remove('hidden');
+});
+
 // Czy połączenie naprawdę działa? Jeśli serwer nie odpowie na ping, zaczynamy od nowa
 function checkConnection() {
     if (!socket.connected) {
@@ -133,6 +139,7 @@ function handleBack() {
     if (isOpen('invite')) return closeInvite(), true;
     if (isOpen('guess')) return closeGuess(), true;
     if (isOpen('game-options')) return closeGameOptions(), true;
+    if (isOpen('install-offer')) return dismissInstallOffer(), true;
     if (isOpen('category-picker')) return closeCategoryPicker(), true;
     if (!byId('install-help').classList.contains('hidden')) return byId('install-help').classList.add('hidden'), true;
 

@@ -410,8 +410,7 @@ const EXP_COUNT_MS = 1000;
 let expAnimation = null;
 
 function getRequiredExp(level) {
-    const baseXP = 100;
-    return Math.floor(baseXP + (level - 1) * 50);
+    return ProgressCore.requiredExp(level);     // progress.js - te same progi u gościa i na serwerze
 }
 
 function updateExp(exp) {
@@ -455,16 +454,47 @@ function renderExpBar(animate) {
 
 // ===== POKOJE =====
 
+const ACCOUNT_TOKEN_WAIT_MS = 3000;
+
+// Wersja tej strony (wpisuje ją serwer, zob. assets.js) - porównywana z wersją na serwerze przy każdym połączeniu
+const APP_VERSION = (document.querySelector('meta[name="app-version"]') || {}).content || '';
+
 // Od razu WebSocket - oszczędza kilka wymian z serwerem przy łączeniu. Gdy sieć go blokuje, zostaje odpytywanie.
 // Przy każdym (ponownym) połączeniu serwer dostaje nasz pokój i id - od razu przywraca nas do gry
 const socket = io({
     transports: ['websocket', 'polling'],
     tryAllTransports: true,
-    auth: callback => callback({
-        userId: userId,
-        roomCode: localStorage.getItem('lastRoomCode') || '',
-        modesVersion: availableModes.length ? (savedModes() || {}).version : undefined
-    })
+    // token konta (auth.js) - przy pierwszym wejściu chwilę trwa założenie konta tymczasowego,
+    // ale gra nie czeka na nie dłużej niż ACCOUNT_TOKEN_WAIT_MS (wtedy łączy się jako gość)
+    auth: callback => Promise.race([Auth.getToken(), new Promise(r => setTimeout(r, ACCOUNT_TOKEN_WAIT_MS))])
+        .catch(() => null)
+        .then(token => callback({
+            userId: userId,
+            roomCode: localStorage.getItem('lastRoomCode') || '',
+            modesVersion: availableModes.length ? (savedModes() || {}).version : undefined,
+            appVersion: APP_VERSION,       // inna niż na serwerze = komunikat "Dostępna nowa wersja" (session.js)
+            accessToken: token || undefined
+        }))
+});
+
+// ===== KONTO =====
+// Serwer wczytał konto (accounts.js): od teraz postęp liczy i zapisuje serwer, przeglądarka tylko go pokazuje.
+// Za pierwszym razem przenosimy na konto postęp gościa z tej przeglądarki (raz na konto).
+socket.on('account', data => {
+    if (!data || !data.profile) return;
+    ProfileStore.useAccount({ send: (event, payload) => socket.emit(event, payload) }, data.profile);
+    playerLVL = ProfileStore.get().level;
+    playerExp = ProfileStore.get().exp;
+    renderExpBar(false);
+    if (typeof updateProfileDot === 'function') updateProfileDot();
+    if (data.needsImport) socket.emit('account_import', ProfileStore.localProfile());
+    else rewardInstall();           // odznaka za uruchomienie z ikony - także na koncie
+});
+
+// Pełny profil (statystyki, historia) - o który prosi strona gracza (profile.js)
+socket.on('account_profile', profile => {
+    ProfileStore.applyAccount(profile);
+    if (currentScreen === 'screen-profile' && typeof renderProfileTabs === 'function') renderProfileTabs();
 });
 
 function createRoom() {
@@ -494,7 +524,9 @@ function updateCornerButtons() {
     byId('btn-sound').classList.toggle('hidden', currentScreen === 'screen-results');   // na wynikach zasłaniałby napis
     if (typeof updateWakeLock === 'function') updateWakeLock();     // session.js
     byId('btn-download').classList.toggle('hidden', !(canInstall() && currentScreen === 'screen-login'));
+    byId('btn-download').classList.toggle('has-new', installOfferState().dismissed && canInstall());   // przypomnienie po "Nie teraz"
     byId('install-help').classList.add('hidden');
+    if (currentScreen !== 'screen-results') closeInstallOffer();     // np. host od razu zaczął kolejną rundę
 }
 
 function resetLeaveConfirm() {
@@ -538,32 +570,106 @@ window.addEventListener('beforeinstallprompt', event => {
 
 window.addEventListener('appinstalled', () => {
     installPrompt = null;
-    byId('install-offer').classList.add('hidden');
+    closeInstallOffer();
     updateCornerButtons();
 });
 
 async function installApp() {
     if (!installPrompt) {
-        byId('install-help').classList.toggle('hidden');
+        const help = byId('install-help');
+        // iPad: "Udostępnij" u góry po prawej (strzałka w górę), iPhone: na dolnym pasku Safari
+        help.classList.toggle('is-ipad', /ipad/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1));
+        help.classList.toggle('hidden');
         return;
     }
     installPrompt.prompt();
     await installPrompt.userChoice;
     installPrompt = null;
-    byId('install-offer').classList.add('hidden');
     updateCornerButtons();
 }
 
-// Propozycja na ekranie wyników pojawia się tylko raz
-function showInstallOffer() {
-    let shown = false;
-    try { shown = localStorage.getItem(INSTALL_OFFER_KEY) === '1'; } catch (e) { /* bez pamięci: pokaż */ }
-    const show = canInstall() && !shown;
-    byId('install-offer').classList.toggle('hidden', !show);
-    if (show) {
-        try { localStorage.setItem(INSTALL_OFFER_KEY, '1'); } catch (e) { /* bez pamięci */ }
-    }
+function closeInstallHelp() {
+    byId('install-help').classList.add('hidden');
 }
+
+// ===== PROPOZYCJA INSTALACJI PO GRZE =====
+// Okno po wynikach: po 2. grze, potem po kolejnych 5 i 10 (najwyżej 3 razy). Od drugiego razu można wybrać
+// "Nie pokazuj więcej". Po "Nie teraz" przycisk instalacji w rogu menu ma czerwoną kropkę i co jakiś czas podskakuje.
+// Nagroda: odznaka "Stały bywalec" przy pierwszym uruchomieniu gry z ikony.
+
+const INSTALL_OFFER_GAPS = [2, 5, 10];     // ile gier przed kolejnym pokazaniem okna
+const INSTALL_OFFER_DELAY_MS = 2500;       // po werdykcie - najpierw wynik, potem propozycja
+let installOfferTimer = null;
+
+function installOfferState() {
+    let state = null;
+    try { state = JSON.parse(localStorage.getItem(INSTALL_OFFER_KEY)); } catch (e) { /* bez pamięci */ }
+    // starsza wersja gry zapisywała tylko "1" (okno pokazane raz) - liczymy to jako pierwsze pokazanie
+    if (state === 1) state = { shows: 1, games: 0 };
+    return state && typeof state === 'object' ? { shows: 0, games: 0, never: false, dismissed: false, ...state } : { shows: 0, games: 0, never: false, dismissed: false };
+}
+
+function saveInstallOfferState(state) {
+    try { localStorage.setItem(INSTALL_OFFER_KEY, JSON.stringify(state)); } catch (e) { /* bez pamięci */ }
+}
+
+// Wywoływane po każdej grze (ekran wyników)
+function showInstallOffer() {
+    const state = installOfferState();
+    if (state.never || state.shows >= INSTALL_OFFER_GAPS.length || !canInstall()) return;
+    state.games++;
+    saveInstallOfferState(state);
+    if (state.games < INSTALL_OFFER_GAPS[state.shows]) return;
+
+    // liczy się dopiero, gdy okno naprawdę się pokaże (gracz mógł już wyjść z wyników - wtedy po następnej grze)
+    clearTimeout(installOfferTimer);
+    installOfferTimer = setTimeout(() => {
+        if (currentScreen !== 'screen-results' || !canInstall()) return;
+        const shown = installOfferState();
+        shown.games = 0;
+        shown.shows++;
+        saveInstallOfferState(shown);
+        byId('install-never').classList.toggle('hidden', shown.shows < 2);
+        byId('install-offer').classList.remove('hidden', 'closing');
+    }, RESULTS_SUSPENSE_MS + INSTALL_OFFER_DELAY_MS);
+}
+
+function closeInstallOffer() {
+    clearTimeout(installOfferTimer);
+    const panel = byId('install-offer');
+    if (panel.classList.contains('hidden') || panel.classList.contains('closing')) return;
+    panel.classList.add('closing');
+    setTimeout(() => {
+        if (!panel.classList.contains('closing')) return;
+        panel.classList.add('hidden');
+        panel.classList.remove('closing');
+    }, PICKER_CLOSE_MS);
+}
+
+function acceptInstallOffer() {
+    closeInstallOffer();
+    installApp();
+}
+
+// "Nie teraz" albo "Nie pokazuj więcej": okno znika, a przycisk w rogu menu dostaje przypominającą kropkę
+function dismissInstallOffer(never = false) {
+    const state = installOfferState();
+    state.dismissed = true;
+    if (never) state.never = true;
+    saveInstallOfferState(state);
+    closeInstallOffer();
+    updateCornerButtons();
+}
+
+// Gra uruchomiona z ikony: odznaka "Stały bywalec" (raz) i komunikat na zachętę
+async function rewardInstall() {
+    if (!isInstalled() || typeof ProfileStore === 'undefined') return;
+    const earned = await ProfileStore.recordFeat('installed');
+    if (!earned.length) return;
+    if (typeof updateProfileDot === 'function') updateProfileDot();
+    showError('📲 Nowa odznaka: Stały bywalec', true);
+}
+document.addEventListener('DOMContentLoaded', rewardInstall);
 
 function leaveRoom() {
     socket.emit('leave_room');
@@ -1154,7 +1260,8 @@ const INVITE_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" 
 function createInviteSlot() {
     const container = createElement('div', 'avatar-container invite-slot');
     container.title = 'Zaproś do gry';
-    container.onclick = openInvite;
+    // przy kliknięciu, nie przy rysowaniu: po odświeżeniu serwer potrafi przywrócić poczekalnię, zanim wczyta się invite.js
+    container.onclick = () => openInvite();
 
     const icon = createElement('div', 'invite-slot-icon');
     icon.innerHTML = INVITE_ICON;
@@ -1562,18 +1669,25 @@ function showResults(results) {
     renderResultPlayers('res-impostors', results.impostors, results, 'Brak impostorów');
     renderResultVotes(results);
 
-    let gainedExp = 0;
+    showInstallOffer();
 
-    gainedExp += 10;
-    gainedExp += (results.players.length * 5);
-    if (!wasIKicked) gainedExp += 10;
+    // Konto: EXP, poziom i odznaki policzył i zapisał serwer (accounts.js)
+    if (results.progress) {
+        const progress = results.progress;
+        byId('res-exp').textContent = `+${progress.gainedExp} EXP`;
+        ProfileStore.applyAccount({ level: progress.level, exp: progress.exp, unseenBadges: progress.unseenBadges });
+        playerLVL = progress.level;
+        playerExp = progress.exp;
+        renderExpBar(true);
+        showEarnedBadges(progress.earned);       // profile.js
+        updateProfileDot();
+        return;
+    }
 
-    if (won) gainedExp *= 1.5;
-    gainedExp = Math.floor(gainedExp);
-
+    // Gość: wszystko liczy przeglądarka (te same zasady - progress.js)
+    const gainedExp = ProgressCore.expForGame(results, wasIKicked);
     byId('res-exp').textContent = `+${gainedExp} EXP`;
     recordFinishedGame(results, wasIKicked);        // profile.js - statystyki, historia, odznaki
-    showInstallOffer();
     updateExp(playerExp + gainedExp);
 }
 

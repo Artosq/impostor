@@ -19,6 +19,8 @@ function openProfile() {
     renderProfileHeader();
     renderProfileTabs();
     showScreen('screen-profile');
+    // konto: świeże statystyki i historia z serwera (przychodzą jako "account_profile", app.js)
+    if (ProfileStore.isAccount()) socket.emit('get_profile');
 }
 
 function closeProfile() {
@@ -299,40 +301,20 @@ function noteVote(vote) {
     if (roundInfo) roundInfo.vote = vote;
 }
 
-// "Kto z nas": ile osób (poza mną) wskazało mnie w odpowiedzi
-function countPointedAtMe(vote) {
-    if (!roundInfo || roundInfo.answerType !== 'player' || !vote) return 0;
-    const me = vote.players.find(p => p.id === myPlayerId);
-    return me ? vote.players.filter(p => p.id !== myPlayerId && p.answer === me.name).length : 0;
-}
-
-async function recordFinishedGame(results, wasIKicked) {
-    const me = results.players.find(p => p.id === myPlayerId);
-    if (!me) return;
-    const impostorIds = new Set(results.impostors.map(p => p.id));
-    const impostorVoters = new Set(results.players.filter(p => impostorIds.has(p.id)).flatMap(p => p.voters || []));
-    const innocent = results.players.filter(p => !impostorIds.has(p.id));
-    const guess = results.guess && results.guess.by && results.guess.by.id === myPlayerId ? (results.guess.correct ? 'correct' : 'wrong') : null;
-
-    const earned = await ProfileStore.recordGame({
+// Runda gościa: rekord liczy progress.js (te same zasady co serwer dla kont), zapisuje profileStore.js.
+// Gracz z kontem tu nie trafia - jego rundę zapisał serwer (app.js: showResults, results.progress).
+async function recordFinishedGame(results) {
+    const game = ProgressCore.gameRecord(results, myPlayerId, {
         at: Date.now(),
-        mode: results.mode,
-        category: roundInfo && roundInfo.category,
-        role: results.role,
-        won: Boolean(results.won),
-        kicked: wasIKicked,
         host: amIHost,
-        players: results.players.length,
-        playerNames: results.players.filter(p => p.id !== myPlayerId).map(p => p.name),
-        votedImpostor: impostorVoters.has(myPlayerId),
-        votesAgainstMe: me.votes || 0,
-        unanimous: innocent.length >= 2 && innocent.every(p => impostorVoters.has(p.id)),
-        guess,
-        subject: results.word || results.playersQuestion || null,
-        durationMs: roundInfo ? Date.now() - roundInfo.startedAt : 0,
-        pointedAt: countPointedAtMe(roundInfo && roundInfo.vote)
+        category: roundInfo && roundInfo.category,
+        startedAt: roundInfo && roundInfo.startedAt,
+        answerType: roundInfo && roundInfo.answerType,
+        votePlayers: roundInfo && roundInfo.vote && roundInfo.vote.players
     });
     roundInfo = null;
+    if (!game) return;
+    const earned = await ProfileStore.recordGame(game);
     showEarnedBadges(earned);
     updateProfileDot();
 }

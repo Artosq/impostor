@@ -20,6 +20,11 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 const WATCH_FILES = !process.env.RENDER && process.env.NODE_ENV !== 'production';
 const SITE_URL = (process.env.SITE_URL || process.env.RENDER_EXTERNAL_URL || 'https://impostor-3uk0.onrender.com').replace(/\/+$/, '');
 
+// Bez obu wartości konta są wyłączone (przeglądarka nie łączy się z Supabase, postęp zostaje w przeglądarce)
+const SUPABASE_PUBLIC = process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY && process.env.DATABASE_URL
+    ? { url: process.env.SUPABASE_URL.replace(/\/+$/, ''), key: process.env.SUPABASE_ANON_KEY.replace(/[^\w.-]/g, '') }
+    : { url: '', key: '' };
+
 // Pliki spoza public/ podawane pod własnym adresem
 const EXTRA_FILES = {
     '/vendor/socket.io.min.js': path.join(path.dirname(require.resolve('socket.io')), '..', 'client-dist', 'socket.io.min.js'),
@@ -56,9 +61,16 @@ function build(urlPath, file, stat) {
     let raw = fs.readFileSync(file);
     if (ext === '.html') raw = Buffer.from(inlineStyles(addVersions(raw.toString('utf8'))));
     if (WITH_SITE_URL.has(ext)) raw = Buffer.from(raw.toString('utf8').replaceAll('%SITE_URL%', SITE_URL));
+    // Konta: adres projektu Supabase i klucz publiczny (anon) - jawne z założenia, chroni je RLS (supabase/schema.sql)
+    if (ext === '.html') raw = Buffer.from(raw.toString('utf8')
+        .replaceAll('%SUPABASE_URL%', SUPABASE_PUBLIC.url)
+        .replaceAll('%SUPABASE_ANON_KEY%', SUPABASE_PUBLIC.key));
+    const hash = crypto.createHash('sha1').update(raw).digest('hex').slice(0, 10);
+    // %APP_VERSION% w stronie = jej odcisk (obejmuje odciski wszystkich skryptów i stylów) - zob. appVersion()
+    if (ext === '.html') raw = Buffer.from(raw.toString('utf8').replaceAll('%APP_VERSION%', hash));
     const entry = {
         file, mtime: stat.mtimeMs, type: TYPES[ext] || 'application/octet-stream',
-        hash: crypto.createHash('sha1').update(raw).digest('hex').slice(0, 10), raw,
+        hash, raw,
         compressible: COMPRESSIBLE.has(ext) && raw.length > 1024
     };
     cache.set(urlPath, entry);
@@ -149,4 +161,10 @@ function warmUp() {
     });
 }
 
-module.exports = { serve, warmUp };
+// Wersja gry = odcisk index.html. Gracz z otwartą starą wersją dostaje komunikat "Dostępna nowa wersja" (server.js)
+function appVersion() {
+    const entry = load('/index.html');
+    return entry ? entry.hash : '';
+}
+
+module.exports = { serve, warmUp, appVersion };

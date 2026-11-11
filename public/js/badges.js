@@ -1,7 +1,7 @@
 // ODZNAKI: definicje w jednym miejscu. Dwa rodzaje:
 // - z poziomami (brąz, srebro, złoto, diament) - licznik ze statystyk i progi,
 // - jednorazowe - wyczyn z profilu (profileStore.js, "feats"); sekretne do zdobycia pokazują się jako "???".
-// Nowa odznaka = jeden wpis w BADGES. Ładowany przed profileStore.js.
+// Nowa odznaka = jeden wpis w BADGES. W przeglądarce ładowany przed progress.js, serwer bierze go przez require().
 
 (function (root) {
     'use strict';
@@ -35,7 +35,8 @@
         { id: 'unanimous', icon: '🗳️', name: 'Jednomyślność', description: 'Wszyscy zagłosowali na impostora', feat: 'unanimous', secret: true },
         { id: 'betrayal', icon: '🗡️', name: 'Zdrada', description: 'Jako Wspólnik doprowadź impostora do wygranej', feat: 'betrayal', secret: true },
         { id: 'fullHouse', icon: '🏠', name: 'Pełna chata', description: 'Zagraj w pokoju z 10 lub więcej osobami', feat: 'fullHouse' },
-        { id: 'nightOwl', icon: '🦉', name: 'Nocny marek', description: 'Zagraj między północą a 4:00', feat: 'nightOwl', secret: true }
+        { id: 'nightOwl', icon: '🦉', name: 'Nocny marek', description: 'Zagraj między północą a 4:00', feat: 'nightOwl', secret: true },
+        { id: 'installed', icon: '📲', name: 'Stały bywalec', description: 'Zainstaluj grę i uruchom ją z ikony', feat: 'installed' }
     ];
 
     // Najwyższy zdobyty poziom odznaki (-1 = jeszcze nie) i postęp do następnego
@@ -55,7 +56,9 @@
         BADGES,
         status,
         byId: id => BADGES.find(badge => badge.id === id),
-        // zdobyte odznaki z poziomem - porównuje je profileStore.js z tym, co gracz już miał
+        // zdobyte odznaki z poziomem - porównuje je progress.js z tym, co gracz już miał
         evaluate: profile => BADGES.map(badge => ({ id: badge.id, tier: status(badge, profile).tier })).filter(b => b.tier >= 0)
     };
-})(window);
+    // serwer liczy odznaki kont tym samym plikiem (accounts.js)
+    if (typeof module === 'object' && module.exports) module.exports = root.Badges;
+})(typeof window !== 'undefined' ? window : globalThis);

@@ -9,6 +9,7 @@ const avatars = require('./avatars');
 const assets = require('./assets');
 const nicks = require('./public/js/nicks');
 const { maskNick } = require('./nickFilter');
+const accounts = require('./accounts');
 
 // USTAWIENIA
 const PORT = process.env.PORT || 10000;
@@ -56,8 +57,52 @@ const io = new Server(server, {
     serveClient: false,
     pingInterval: 10000,
     pingTimeout: 8000,
-    perMessageDeflate: { threshold: 256 }
+    perMessageDeflate: { threshold: 256 },
+    maxHttpBufferSize: 256 * 1024     // największa wiadomość to własna kategoria hosta (~60 KB); domyślnie 1 MB
 });
+
+// ===== OCHRONA PRZED SPAMEM =====
+// Każde zdarzenie od gracza ma limit: ile razy (count) w danym czasie (ms). Nadmiar jest po cichu pomijany -
+// zwykły gracz nigdy go nie dobija. Połączenie, które zalewa serwer (ponad FLOOD_LIMIT zdarzeń w FLOOD_WINDOW_MS),
+// jest zrywane: to skrypt, nie człowiek.
+const RATE_LIMITS = {
+    create_room: { count: 4, ms: 10000 },
+    join_room: { count: 8, ms: 10000 },
+    rejoin_room: { count: 8, ms: 10000 },
+    set_room_settings: { count: 20, ms: 5000 },
+    send_fuck: { count: 5, ms: 3000 },          // reakcje
+    kick_player: { count: 5, ms: 5000 },
+    set_room_privacy: { count: 6, ms: 5000 },
+    ping_check: { count: 10, ms: 10000 },
+    account_import: { count: 2, ms: 60000 },
+    get_profile: { count: 10, ms: 10000 },
+    default: { count: 20, ms: 5000 }
+};
+const FLOOD_LIMIT = 150;
+const FLOOD_WINDOW_MS = 10000;
+const RATE_LIMITED_MESSAGE = { create_room: 'Za dużo prób, poczekaj chwilę', join_room: 'Za dużo prób, poczekaj chwilę' };
+
+// Licznik na jedno połączenie: zdarzenie -> czasy ostatnich wywołań (tylko z okna limitu)
+function createRateLimiter() {
+    const recent = new Map();
+    let floodCount = 0;
+    let floodStart = Date.now();
+    return {
+        // false = zdarzenie pominąć
+        allow(event) {
+            const now = Date.now();
+            if (now - floodStart > FLOOD_WINDOW_MS) { floodStart = now; floodCount = 0; }
+            floodCount++;
+            const limit = RATE_LIMITS[event] || RATE_LIMITS.default;
+            const times = (recent.get(event) || []).filter(t => now - t < limit.ms);
+            if (times.length >= limit.count) { recent.set(event, times); return false; }
+            times.push(now);
+            recent.set(event, times);
+            return true;
+        },
+        flooding: () => floodCount > FLOOD_LIMIT
+    };
+}
 
 const rooms = new Map();
 
@@ -182,16 +227,26 @@ function gameView(room, player) {
 
 // Koniec gry: host zakończył głosowanie albo impostor zgadywał hasło
 function finishGame(room) {
+    // "Kto z nas": odpowiedzi graczy (do statystyki "wskazany przez innych") - zanim runda się zamknie
+    const votePlayers = room.round && room.round.answerType === 'player' ? room.mode.voteView(room).players : null;
     const results = room.mode.finish(room);
     room.status = 'finished';
+    const at = Date.now();
 
     room.players.forEach(p => {
         p.away = true;
-        io.to(p.socketId).emit('game_over', {
-            mode: room.mode.id,
-            ...results,
-            ...room.mode.playerResult(room, p, results)
-        });
+        const result = { mode: room.mode.id, ...results, ...room.mode.playerResult(room, p, results) };
+        // gracz z kontem: postęp liczy i zapisuje serwer (accounts.js), przeglądarka dostaje gotowe EXP i odznaki
+        const socket = io.sockets.sockets.get(p.socketId);
+        const account = socket && socket.data.account;
+        if (account) {
+            result.progress = accounts.recordRound(account, result, p.publicId, {
+                at, host: room.host === p.userId, startedAt: room.roundStartedAt, votePlayers,
+                category: room.round && (room.round.category || room.round.categoryName),
+                answerType: room.round && room.round.answerType
+            });
+        }
+        io.to(p.socketId).emit('game_over', result);
     });
 
     // Kto do tego czasu nie kliknie "Zagraj ponownie", odpada; pusty pokój znika
@@ -389,9 +444,17 @@ function handleAbsentPlayer(room, player) {
 
 io.on('connection', (socket) => {
 
-    // Błąd w jednym zdarzeniu nie może wyłączyć całego serwera
+    // Błąd w jednym zdarzeniu nie może wyłączyć całego serwera; każde zdarzenie przechodzi przez limit (zob. RATE_LIMITS)
+    const limiter = createRateLimiter();
     const handle = (event, handler) => {
         socket.on(event, (...args) => {
+            if (event !== 'disconnect') {
+                if (limiter.flooding()) return socket.disconnect(true);
+                if (!limiter.allow(event)) {
+                    if (RATE_LIMITED_MESSAGE[event]) socket.emit('error', RATE_LIMITED_MESSAGE[event]);
+                    return;
+                }
+            }
             try {
                 handler(...args);
             } catch (err) {
@@ -402,6 +465,27 @@ io.on('connection', (socket) => {
 
     const auth = socket.handshake.auth || {};
     if (auth.modesVersion !== MODES_VERSION) socket.emit('mode_list', modeList, MODES_VERSION);
+    // gracz ma otwartą starszą wersję gry (np. po wdrożeniu poprawki) - pasek "Dostępna nowa wersja"
+    if (typeof auth.appVersion === 'string' && auth.appVersion && auth.appVersion !== assets.appVersion()) socket.emit('new_version');
+
+    // KONTO (Supabase): przeglądarka przysłała token - wczytujemy postęp z bazy (accounts.js)
+    if (accounts.enabled && typeof auth.accessToken === 'string' && auth.accessToken.length < 4096) {
+        accounts.attach(socket, auth.accessToken)
+            .then(account => { if (account) socket.emit('account', accounts.welcome(account)); })
+            .catch(err => console.error('Konto:', err.message));
+    }
+    const withAccount = fn => (...args) => { if (socket.data.account) fn(socket.data.account, ...args); };
+
+    // Jednorazowe przeniesienie postępu gościa z przeglądarki na konto
+    handle('account_import', withAccount((account, localProfile) => {
+        accounts.importGuest(account, localProfile)
+            .then(done => { if (done) socket.emit('account', accounts.welcome(account)); })
+            .catch(err => console.error('Przeniesienie postępu:', err.message));
+    }));
+    // Pełny profil (statystyki, historia) - przy otwarciu strony gracza
+    handle('get_profile', withAccount(account => socket.emit('account_profile', account.profile)));
+    handle('badges_seen', withAccount(account => accounts.markBadgesSeen(account)));
+    handle('account_feat', withAccount((account, id) => accounts.recordFeat(account, id)));
 
     // Tworzenie pokoju
     handle('create_room', ({ playerName, randomName, avatar, level, userId } = {}) => {
@@ -579,6 +663,7 @@ io.on('connection', (socket) => {
         room.status = 'playing';
         room.playerChoices = new Map();
         room.skipsUsed = 0;
+        room.roundStartedAt = Date.now();
 
         room.players.forEach((p) => {
             io.to(p.socketId).emit('game_start', { ...gameView(room, p), countdown: true });
@@ -738,6 +823,7 @@ io.on('connection', (socket) => {
     });
 
     handle('disconnect', () => {
+        accounts.detach(socket);
         const room = rooms.get(socket.data.roomCode);
         const player = room && findBySocket(room, socket);
         if (!player) return;
@@ -770,6 +856,7 @@ setInterval(() => {
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Serwer działa na porcie ${PORT}`);
     if (process.env.RENDER) assets.warmUp();
+    if (accounts.enabled) console.log('Konta: włączone (Supabase)');
     startKeepAlive();
 });
 
@@ -793,3 +880,9 @@ function startKeepAlive() {
     }, KEEP_ALIVE_MS).unref();
     console.log(`Budzik: co 10 min odpytuję ${url}`);
 }
+
+// Render przy wdrożeniu nowej wersji wysyła SIGTERM - zapisujemy jeszcze niezapisany postęp kont
+process.on('SIGTERM', () => {
+    accounts.flushAll().finally(() => process.exit(0));
+    setTimeout(() => process.exit(0), 5000).unref();
+});

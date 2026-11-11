@@ -1439,53 +1439,227 @@ button {
     display: inline;
 }
 @media (display-mode: standalone) {
-    #btn-download, .install-offer{
+    #btn-download, #install-offer{
         display: none;
     }
 }
-.install-help{
+/* przypomnienie po "Nie teraz": czerwona kropka i podskok co kilka sekund */
+#btn-download.has-new{
+    position: relative;
+    animation: installNudge 6s ease-in-out 1s infinite;
+}
+#btn-download.has-new::after{
+    content: "";
     position: absolute;
-    top: 60px;
-    right: 12px;
-    z-index: 6;
-    max-width: 220px;
-    padding: 10px 12px;
-    background: #161616;
-    border: 3px solid var(--secondary);
-    border-radius: 8px;
-    color: white;
-    font-size: 0.8em;
-    text-align: left;
-    animation: fadeIn 0.3s;
+    top: -6px;
+    right: -6px;
+    width: 10px;
+    height: 10px;
+    border: 3px solid black;
+    border-radius: 50%;
+    background: var(--danger);
+    box-shadow: 0 0 10px var(--danger);
+}
+@keyframes installNudge {
+    0%, 88%, 100% { transform: translateY(0); }
+    91% { transform: translateY(-6px); }
+    94% { transform: translateY(0); }
+    96% { transform: translateY(-3px); }
+}
+
+/* Instrukcja na iPhonie: okienko z dwoma krokami i strzałka na przycisk "Udostępnij" na dolnym pasku Safari */
+.install-help{
+    position: fixed;
+    inset: 0;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 15px 15px 10px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+    animation: pickerFadeIn 0.35s ease-out;
     cursor: pointer;
 }
 .install-help.hidden{
     display: none;
 }
-.install-offer{
-    margin: 5px 0 15px;
-    padding: 12px;
-    border: 3px solid var(--secondary);
-    border-radius: 8px;
-    color: var(--secondary);
-    animation: fadeIn 0.5s;
-}
-.install-offer.hidden{
-    display: none;
-}
-.install-offer-actions{
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-}
-.install-offer-yes{
-    background: var(--secondary);
+.install-help-box{
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 340px;
+    padding: 18px;
+    border: 3px solid black;
+    border-radius: 15px;
+    background: rgb(31, 31, 31);
+    box-shadow: 0 10px 25px black;
     color: white;
+    text-align: left;
+    animation: pickerWindowIn 0.45s cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
-.install-offer-no{
+.install-help-title{
+    margin-bottom: 14px;
+    color: var(--secondary);
+    font-size: 0.9em;
+    text-align: center;
+    text-shadow: 0 0 12px var(--secondary);
+}
+.install-help-step{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 0.7em;
+    line-height: 1.4;
+}
+.install-help-step b{
+    color: var(--secondary);
+}
+.install-help-num{
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border: 3px solid black;
+    border-radius: 8px;
+    background: #2a2a2a;
+    color: var(--secondary);
+    font-weight: 700;
+}
+.install-help-step > span:nth-child(2){
+    flex: 1;
+}
+.install-help-icon{
+    flex: none;
+    width: 26px;
+    height: 26px;
+    color: #4ea1ff;      /* kolor przycisków Safari - łatwiej znaleźć */
+}
+.install-help-close{
+    margin-top: 6px;
+    color: #777;
+    font-size: 0.55em;
+    text-align: center;
+}
+.install-help-arrow{
+    width: 40px;
+    height: 40px;
+    margin-top: 8px;
+    color: var(--secondary);
+    filter: drop-shadow(0 0 8px var(--secondary));
+    animation: installArrow 1.2s ease-in-out infinite;
+}
+@keyframes installArrow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+}
+/* iPad: "Udostępnij" jest u góry po prawej */
+.install-help.is-ipad{
+    justify-content: flex-start;
+    align-items: flex-end;
+    flex-direction: column-reverse;
+}
+.install-help.is-ipad .install-help-arrow{
+    margin: 0 30px 8px 0;
+    transform: rotate(180deg);
+    animation: none;
+}
+
+/* Okno propozycji instalacji po grze */
+.install-window{
+    max-width: 340px;
+    align-items: center;
+}
+.install-app-icon{
+    width: 72px;
+    height: 72px;
+    margin: 4px 0 12px;
+    border: 4px solid black;
+    border-radius: 18px;
+    box-shadow: 0 0 20px rgba(46, 204, 113, 0.35);
+}
+.install-title{
+    margin-bottom: 14px;
+    color: var(--secondary);
+    font-size: 1em;
+    font-weight: 700;
+    text-shadow: 0 0 12px var(--secondary);
+}
+.install-benefits{
+    width: 100%;
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+.install-benefits li{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    color: #ccc;
+    font-size: 0.65em;
+}
+.install-benefits li span{
+    flex: none;
+    width: 24px;
+    font-size: 18px;
+    text-align: center;
+}
+.install-reward{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 14px;
+    padding: 10px 12px;
+    border: 3px solid #b16cf0;
+    border-radius: 10px;
+    background: color-mix(in srgb, #b16cf0 10%, #262626);
+    color: white;
+    font-size: 0.65em;
+    text-align: left;
+}
+.install-reward b{
+    color: #d4a6ff;
+}
+.install-reward-icon{
+    font-size: 22px;
+}
+.install-yes{
+    width: 100%;
+    margin: 0;
+}
+.install-later{
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 10px;
+}
+.install-link{
+    width: auto;
+    margin: 0;
+    padding: 6px 4px;
+    border: none;
     background: transparent;
-    border: 3px solid #444;
-    color: #aaa;
+    box-shadow: none;
+    color: #888;
+    font-size: 0.6em;
+    text-decoration: underline;
+}
+.install-link:hover{
+    color: #ccc;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+}
+.install-link.hidden{
+    display: none;
 }
 .avatar-container {
     display: inline-flex;
@@ -2064,9 +2238,6 @@ animation: fadeIn 0.5s ease-in;
 .res-suspense #res-impostors,
 .res-suspense .res-section:has(#res-impostors),
 .res-suspense .res-exp,
-.res-suspense .install-offer{
-    visibility: hidden;
-}
 /* w trakcie liczenia nic nie zdradza wyniku: impostor bez czerwonego nicku, bez dopisku "Wyrzucony" */
 .res-suspense .res-vote-impostor .res-vote-name{
     color: inherit;
@@ -2470,6 +2641,66 @@ animation: fadeIn 0.5s ease-in;
    przelicza style w każdej klatce: na słabym telefonie to było ok. 20% procesora przez cały czas gry */
 .connection-banner.hidden::after{
     animation: none;
+}
+/* PASEK NOWEJ WERSJI: mała karta gry (czarna ramka, cień) wjeżdżająca od dołu,
+   świecący zielony napis jak komunikaty u góry i przycisk jak "Dołącz do pokoju" */
+.update-banner{
+    position: fixed;
+    left: 50%;
+    bottom: 16px;
+    z-index: 998;
+    box-sizing: border-box;
+    width: calc(100% - 32px);
+    max-width: 360px;
+    padding: 16px 18px 18px;
+    border: 5px solid black;
+    border-radius: 15px;
+    background: rgb(31, 31, 31);
+    box-shadow: 0 0 20px black;
+    text-align: center;
+    transform: translateX(-50%);
+    animation: updateIn 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+.update-banner.hidden{
+    display: none;
+}
+.update-title{
+    color: var(--secondary);
+    font-size: 0.95em;
+    text-shadow: 0 0 20px var(--secondary);
+}
+.update-title::after{
+    content: "";
+    display: inline-block;
+    width: 1.5em;
+    text-align: left;
+    animation: countingDots 1s steps(4) infinite;     /* jak "Łączenie z serwerem…" */
+}
+.update-text{
+    margin: 6px 0 12px;
+    color: #888;
+    font-size: 0.55em;
+}
+.update-reload{
+    margin: 0;
+    padding: 10px;
+    font-size: 0.8em;
+}
+.update-close{
+    top: 8px;
+    right: 8px;
+    left: auto;
+    height: 30px;
+    min-width: 30px;
+    padding: 0 5px;
+}
+.update-close svg{
+    width: 14px;
+    height: 14px;
+}
+@keyframes updateIn {
+    from { transform: translate(-50%, 140%); }
+    to { transform: translateX(-50%); }
 }
 #card.disconnected #error-blur{
     filter: saturate(0%);

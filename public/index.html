@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="app-version" content="%APP_VERSION%">
+    <!-- Konta (Supabase): adres projektu i klucz publiczny - wpisuje je serwer z ustawień (assets.js) -->
+    <meta name="supabase-url" content="%SUPABASE_URL%">
+    <meta name="supabase-key" content="%SUPABASE_ANON_KEY%">
     <title>Impostor – darmowa gra imprezowa online na telefon</title>
     <!-- Znacznik adresu strony podmienia serwer (assets.js) na publiczny adres gry -->
     <meta name="description" content="Darmowa gra imprezowa na telefon dla grupy znajomych (do 16 osób). Wszyscy znają tajne hasło, tylko impostor blefuje. Bez instalacji i rejestracji – stwórz pokój i zaproś znajomych.">
@@ -95,6 +99,15 @@
             <span>Obróć telefon pionowo</span>
         </div>
         <div id="connection-banner" class="connection-banner hidden" role="status">Łączenie z serwerem</div>
+        <!-- Nowa wersja gry na serwerze (session.js) - odświeżenie wraca do tego samego pokoju -->
+        <div id="update-banner" class="update-banner hidden" role="status">
+            <button class="corner-btn update-close" onclick="byId('update-banner').classList.add('hidden')" title="Później" aria-label="Później">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+            <div class="update-title">Nowa wersja gry</div>
+            <div class="update-text">Odśwież - wrócisz do tego samego pokoju</div>
+            <button class="btn-join update-reload" onclick="location.reload()">Odśwież -></button>
+        </div>
 
         <!-- Lewy róg: wyjście z pokoju -->
         <button class="corner-btn corner-left hidden" id="btn-leave" onclick="leaveClick()" title="Wyjdź z pokoju" aria-label="Wyjdź z pokoju">
@@ -113,8 +126,25 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 17v3h16v-3"/></svg>
             </button>
         </div>
-        <div id="install-help" class="install-help hidden" onclick="this.classList.add('hidden')">
-            Na iPhonie: <b>Udostępnij</b> &rarr; <b>Do ekranu początkowego</b>
+        <!-- Instrukcja instalacji na iPhonie/iPadzie (Safari nie ma okna instalacji) - strzałka wskazuje przycisk "Udostępnij" -->
+        <div id="install-help" class="install-help hidden" onclick="closeInstallHelp()">
+            <div class="install-help-box">
+                <div class="install-help-title">Zainstaluj na iPhonie</div>
+                <div class="install-help-step">
+                    <span class="install-help-num">1</span>
+                    <span>Kliknij <b>Udostępnij</b></span>
+                    <svg class="install-help-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11H5v10h14V11h-1"/></svg>
+                </div>
+                <div class="install-help-step">
+                    <span class="install-help-num">2</span>
+                    <span>Wybierz <b>Do ekranu początkowego</b></span>
+                    <svg class="install-help-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>
+                </div>
+                <div class="install-help-close">Dotknij, aby zamknąć</div>
+            </div>
+            <div class="install-help-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M6 13l6 6 6-6"/></svg>
+            </div>
         </div>
 
         <div id="error-blur" style="transition: 0.8s ease-in-out;">
@@ -276,14 +306,6 @@
                 <!-- nowe odznaki z tej rundy (profile.js showEarnedBadges) -->
                 <div id="res-badges" class="res-badges hidden"></div>
 
-                <div id="install-offer" class="install-offer hidden">
-                    <div>Spodobało się? Zainstaluj Impostora</div>
-                    <div class="install-offer-actions">
-                        <button class="install-offer-yes" onclick="installApp()">Zainstaluj</button>
-                        <button class="install-offer-no" onclick="byId('install-offer').classList.add('hidden')">Nie teraz</button>
-                    </div>
-                </div>
-
                 <button class="btn-join" onclick="playAgain()">Zagraj ponownie</button>
                 <button class="btn-secondary" onclick="leaveRoom()">Powrót do menu</button>
             </div>
@@ -354,6 +376,25 @@
                     <button class="btn-join" onclick="importEditorPaste()">Dodaj hasła</button>
                     <button onclick="showEditorPaste(false)">Anuluj</button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Propozycja instalacji po grze (app.js: showInstallOffer) -->
+    <div id="install-offer" class="picker-overlay hidden" onclick="if (event.target === this) dismissInstallOffer()">
+        <div class="picker-window install-window">
+            <img class="install-app-icon" src="icons/icon-192.png" width="72" height="72" alt="">
+            <div class="install-title">Zainstaluj Impostora</div>
+            <ul class="install-benefits">
+                <li><span>🎮</span>Pełny ekran, bez paska przeglądarki</li>
+                <li><span>⚡</span>Szybsze wejście do gry</li>
+                <li><span>📱</span>Ikona na ekranie telefonu</li>
+            </ul>
+            <div class="install-reward"><span class="install-reward-icon">📲</span><span>Odbierz odznakę <b>Stały bywalec</b></span></div>
+            <button class="btn-join install-yes" onclick="acceptInstallOffer()">Zainstaluj</button>
+            <div class="install-later">
+                <button class="install-link" onclick="dismissInstallOffer()">Nie teraz</button>
+                <button id="install-never" class="install-link hidden" onclick="dismissInstallOffer(true)">Nie pokazuj więcej</button>
             </div>
         </div>
     </div>
@@ -439,7 +480,9 @@
     <script src="js/sounds.js" defer></script>
     <script src="js/nicks.js" defer></script>
     <script src="js/badges.js" defer></script>
+    <script src="js/progress.js" defer></script>
     <script src="js/profileStore.js" defer></script>
+    <script src="js/auth.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/profile.js" defer></script>
     <script src="js/session.js" defer></script>
