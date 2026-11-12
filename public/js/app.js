@@ -990,10 +990,11 @@ function openCategoryPicker() {
     byId('picker-search').value = "";
     renderCategoryPicker();
 
-    // Kafelki wjeżdżają po kolei tylko przy otwarciu, nie przy każdym wyszukiwaniu
+    // Kafelki pojawiają się kaskadą tylko przy otwarciu, nie przy każdym wyszukiwaniu.
+    // Krótko i szybko: 25 ms odstępu, całość najwyżej ok. 0,3 s nawet przy wielu kategoriach.
     byId('picker-list').querySelectorAll('.category-card').forEach((tile, index) => {
-        tile.classList.add('picker-enter');
-        tile.style.animationDelay = `${0.1 + index * 0.04}s`;
+        tile.classList.add('picker-tile-enter');
+        tile.style.animationDelay = `${Math.min(0.08 + index * 0.025, 0.3)}s`;
     });
 
     byId('category-picker').classList.remove('hidden', 'closing');

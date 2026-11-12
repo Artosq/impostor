@@ -45,11 +45,13 @@ function createCustomCategoryTile(customCategory, isSelected) {
 }
 
 function createNewCategoryTile() {
-    return createCategoryTile(
+    const tile = createCategoryTile(
         { id: 'nowa', name: 'Nowa kategoria' },
         'Wpisz własne hasła',
         () => openCategoryEditor(null)
     );
+    tile.classList.add('category-new');       // przerywana ramka (style.css)
+    return tile;
 }
 
 function selectCustomCategory(customCategory) {

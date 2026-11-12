@@ -125,7 +125,7 @@ body::before{
     min-width: 0;
 }
 .room-row-name{
-    font-size: 0.9em;
+    font-size: clamp(11px, 3.6vw, 0.9em);     /* 12-znakowy nick mieści się w całości od 360 px */
     font-weight: 700;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1049,6 +1049,80 @@ body::before{
 .picker-empty{
     font-size: 0.8em;
     color: #999;
+}
+
+/* WYBÓR KATEGORII: siatka kafelków (ikona nad nazwą). Wybrana - czerwona ramka i ikona,
+   "Nowa kategoria" - przerywana ramka. Kafelek bieżącej kategorii w poczekalni zostaje listowy. */
+#picker-list{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    align-content: start;
+}
+#picker-list .category-card{
+    flex-direction: column;
+    justify-content: center;
+    min-height: 116px;
+    margin: 0;
+    padding: 12px 8px;
+    border: 3px solid #111;
+    background: #262626;
+    text-align: center;
+}
+#picker-list .category-card:hover{
+    border-color: #444;
+    transform: none;
+}
+#picker-list .category-art{
+    position: static;
+    width: 46px;
+    height: 46px;
+    margin-bottom: 8px;
+    transform: none;
+    opacity: 0.55;
+    color: #ddd;
+}
+#picker-list .category-card:hover .category-art{
+    opacity: 0.8;
+    color: #ddd;
+    transform: scale(1.06);
+}
+#picker-list .category-card.selected{
+    border-color: var(--danger);
+    background: color-mix(in srgb, var(--danger) 10%, #262626);
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.4);
+}
+#picker-list .category-card.selected .category-art{
+    opacity: 1;
+    color: var(--danger);
+    transform: none;
+}
+#picker-list .category-name{
+    font-size: 0.8em;
+}
+#picker-list .category-new{
+    border-style: dashed;
+    border-color: #555;
+    background: transparent;
+}
+#picker-list .category-edit{
+    top: 8px;
+    right: 8px;
+    transform: none;
+}
+#picker-list .category-edit:hover{
+    transform: scale(1.15);
+}
+#picker-list .picker-empty{
+    grid-column: 1 / -1;
+}
+/* wejście kafelków: krótka kaskada (opóźnienia ustawia openCategoryPicker) */
+.picker-tile-enter{
+    animation: pickerTileIn 0.28s cubic-bezier(0.2, 0.8, 0.3, 1) backwards;
+}
+@keyframes pickerTileIn {
+    from { opacity: 0; transform: translateY(10px) scale(0.96); }
+    to { opacity: 1; transform: none; }
 }
 
 .avatar-container.away{
