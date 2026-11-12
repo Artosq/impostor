@@ -321,7 +321,15 @@ function renderCustomizeOptions(flyIn = false) {
     if (!customizeTiles.has(key)) customizeTiles.set(key, activeCatalog().parts[slot.id].map(item => createCustomizeTile(slot, item)));
 
     const tiles = customizeTiles.get(key);
-    tiles.forEach(tile => tile.classList.toggle('selected', botConfig[slot.id] === tile.dataset.part));
+    tiles.forEach(tile => {
+        tile.classList.toggle('selected', botConfig[slot.id] === tile.dataset.part);
+        // obrazek nie przyszedł mimo ponowień (np. brak zasięgu) - przy kolejnym otwarciu zakładki próbujemy od nowa
+        if (tile.classList.contains('skeleton-failed')) {
+            tile.classList.replace('skeleton-failed', 'skeleton');
+            delete tile.dataset.retry;
+            tile.src = avatarUrl({ style: botConfig.style, [slot.id]: tile.dataset.part });
+        }
+    });
     const list = byId('customize-list');
     list.replaceChildren(...tiles);
 
@@ -1019,8 +1027,24 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('load', event => {
     if (event.target.tagName === 'IMG' && !event.target.src.startsWith('data:')) event.target.classList.remove('skeleton');
 }, true);
+// Awatar nie przyszedł (np. chwilowa przerwa w sieci na telefonie): dwie kolejne próby, dopiero potem szary kafelek.
+// Ważne w panelu wyglądu - jego kafelki są zapamiętywane, więc bez ponowienia zostałyby szare do odświeżenia strony.
+const IMAGE_RETRIES = 2;
+const IMAGE_RETRY_MS = 1500;
 document.addEventListener('error', event => {
-    if (event.target.tagName === 'IMG' && event.target.classList.contains('skeleton')) event.target.classList.replace('skeleton', 'skeleton-failed');
+    const img = event.target;
+    if (img.tagName !== 'IMG' || img.src.startsWith('data:')) return;
+    const tries = Number(img.dataset.retry || 0);
+    if (tries < IMAGE_RETRIES && new URL(img.src).pathname.startsWith('/avatar/')) {
+        img.dataset.retry = String(tries + 1);
+        setTimeout(() => {
+            const url = new URL(img.src);
+            url.searchParams.set('retry', String(tries + 1));     // inny adres = przeglądarka naprawdę pyta jeszcze raz
+            img.src = url.toString();
+        }, IMAGE_RETRY_MS * (tries + 1));
+        return;
+    }
+    if (img.classList.contains('skeleton')) img.classList.replace('skeleton', 'skeleton-failed');
 }, true);
 
 function createElement(tag, className, text) {
