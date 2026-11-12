@@ -1154,9 +1154,15 @@ body::before{
     text-shadow: 0 0 20px var(--danger);
     filter: none;
 }
+/* informacja (np. "Zalogowano"): żółta w ramce z ciemnym tłem - czytelna także nad awatarem i przyciskami */
 #error-display.is-notice{
-    color: var(--secondary);
-    text-shadow: 0 0 20px var(--secondary);
+    padding: 8px 14px;
+    border: 3px solid #f1c40f;
+    border-radius: 10px;
+    background: #161616;
+    box-shadow: 0 0 18px rgba(241, 196, 15, 0.45), 0 6px 18px black;
+    color: #f1c40f;
+    text-shadow: none;
 }
 /* Nowy komunikat w miejscu poprzedniego - krótki podskok (translateX jak w #error-display) */
 #error-display.message-bump{
@@ -3019,31 +3025,46 @@ img.skeleton-failed{
     display: none;
 }
 
-/* KONTO (login.js): przycisk pod paskiem poziomu - żółty przy koncie tymczasowym, zielony po zalogowaniu */
+/* KONTO (login.js): pasek pod nagłówkiem profilu - żółty przy koncie gościa, zielony po zalogowaniu */
 .account-chip{
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    max-width: 100%;
-    width: auto;
-    margin: 8px 0 0;
-    padding: 5px 10px;
-    overflow: hidden;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    width: 100%;
+    margin: -4px 0 12px;
+    padding: 8px 10px;
     border: 3px solid var(--secondary);
-    border-radius: 8px;
-    background: transparent;
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--secondary) 8%, transparent);
+    color: #ccc;
+    font-size: 0.6em;
+    cursor: pointer;
+}
+.account-chip svg{
+    flex: none;
+    width: 16px;
+    height: 16px;
     color: var(--secondary);
-    font-size: 0.55em;
+}
+.account-chip-text{
+    min-width: 0;
+    overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    cursor: pointer;
 }
 .account-chip.is-anonymous{
     border-color: #f1c40f;
+    background: color-mix(in srgb, #f1c40f 8%, transparent);
+}
+.account-chip.is-anonymous svg,
+.account-chip b{
     color: #f1c40f;
-    box-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+    font-weight: 400;
 }
 .account-chip:hover{
-    background: color-mix(in srgb, currentColor 15%, transparent);
+    background: color-mix(in srgb, currentColor 12%, transparent);
     transform: none;
     box-shadow: none;
 }

@@ -1,4 +1,4 @@
-// LOGOWANIE W GRZE: przycisk "Zapisz postęp" przy pasku poziomu w profilu i okienko "Zapisz postęp" (Google albo link z maila).
+// LOGOWANIE W GRZE: pasek "Konto gościa · Zaloguj się" pod nagłówkiem profilu i okienko "Zapisz postęp" (Google albo link z maila).
 // Samo logowanie robi auth.js, postęp przenosi serwer (accounts.js). Ładowany po profile.js.
 //
 // Zachęta: okienko pokazuje się samo (w menu) raz po osiągnięciu poziomu 3 i raz po poziomie 10,
@@ -7,6 +7,7 @@
 const LOGIN_PROMPT_LEVELS = [3, 10];
 const LOGIN_PROMPT_KEY = 'loginPromptLevel';
 const LOGIN_DOT_LEVEL = 3;
+const ACCOUNT_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>';
 let loginView = 'choose';
 let loginPromptPending = false;
 
@@ -98,8 +99,12 @@ function updateAccountChip() {
     if (!on) return;
     const anonymous = Auth.isAnonymous();
     chip.classList.toggle('is-anonymous', anonymous);
-    chip.textContent = anonymous ? '⚠ Zapisz postęp' : `✓ ${Auth.email() || 'Zalogowano'}`;
-    chip.title = anonymous ? 'Konto tymczasowe - postęp tylko na tym urządzeniu. Zaloguj się, żeby go nie stracić.' : 'Twoje konto';
+    const text = createElement('span', 'account-chip-text');
+    if (anonymous) text.append('Konto gościa · ', createElement('b', '', 'Zaloguj się'));
+    else text.textContent = Auth.email() || 'Twoje konto';
+    chip.innerHTML = ACCOUNT_ICON;
+    chip.append(text);
+    chip.title = anonymous ? 'Postęp jest zapisany tylko na tym urządzeniu. Zaloguj się, żeby go nie stracić i grać na innych.' : 'Twoje konto';
 }
 
 // Kropka przy awatarze: konto tymczasowe od poziomu 3 (profile.js łączy ją z kropką nowych odznak)
