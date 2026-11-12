@@ -113,6 +113,7 @@ function showScreen(screenId) {
     const showStats = SCREENS_WITH_STATS.includes(screenId);
     byId('logo').classList.toggle('hidden', showStats || screenId === 'screen-editor' || screenId === 'screen-profile');   // edytor i profil potrzebują miejsca
     byId('player-stats').classList.toggle('hidden', !showStats);
+    if (screenId === 'screen-login' && typeof maybeShowLoginPrompt === 'function') maybeShowLoginPrompt();   // login.js
     updateCornerButtons();
 }
 
@@ -480,15 +481,45 @@ const socket = io({
 // ===== KONTO =====
 // Serwer wczytał konto (accounts.js): od teraz postęp liczy i zapisuje serwer, przeglądarka tylko go pokazuje.
 // Za pierwszym razem przenosimy na konto postęp gościa z tej przeglądarki (raz na konto).
+const IMPORTED_KEY = 'impostorProfileImported';     // postęp gościa z tej przeglądarki już raz przeniesiony
+let accountMergeSent = false;
+
 socket.on('account', data => {
     if (!data || !data.profile) return;
+    const firstTime = !ProfileStore.isAccount();
     ProfileStore.useAccount({ send: (event, payload) => socket.emit(event, payload) }, data.profile);
     playerLVL = ProfileStore.get().level;
     playerExp = ProfileStore.get().exp;
     renderExpBar(false);
+    // login.js i profile.js wczytują się po app.js - zdarzenie z serwera może przyjść wcześniej
+    if (typeof updateAccountChip === 'function') updateAccountChip();
     if (typeof updateProfileDot === 'function') updateProfileDot();
-    if (data.needsImport) socket.emit('account_import', ProfileStore.localProfile());
-    else rewardInstall();           // odznaka za uruchomienie z ikony - także na koncie
+
+    // Przeniesienie postępu gościa: raz na przeglądarkę (po wylogowaniu nowe konto tymczasowe nie dostaje go drugi raz)
+    if (data.needsImport) {
+        let imported = false;
+        try { imported = localStorage.getItem(IMPORTED_KEY) === '1'; } catch (e) { /* bez pamięci */ }
+        socket.emit('account_import', imported ? {} : ProfileStore.localProfile());
+        try { localStorage.setItem(IMPORTED_KEY, '1'); } catch (e) { /* bez pamięci */ }
+        return;
+    }
+    rewardInstall();                 // odznaka za uruchomienie z ikony - także na koncie
+
+    if (accountMergeSent) {
+        accountMergeSent = false;
+        showError('Postęp z tego urządzenia dodany do konta', true);
+    }
+    if (!firstTime) return;
+    // powrót z Google / linku z maila
+    const redirect = Auth.takeRedirectResult();
+    if (redirect && redirect.ok && !Auth.isAnonymous()) showError(`Zalogowano: ${Auth.email() || 'konto Google'}`, true);
+    else if (redirect && !redirect.ok) showError(/expired|invalid/i.test(redirect.code + redirect.message) ? 'Link wygasł - wyślij nowy' : 'Logowanie nie powiodło się');
+    // zalogowanie na istniejące konto: dopisanie postępu z konta tymczasowego tego urządzenia
+    Auth.takeMergeToken().then(token => {
+        if (!token) return;
+        accountMergeSent = true;
+        socket.emit('account_merge', token);
+    });
 });
 
 // Pełny profil (statystyki, historia) - o który prosi strona gracza (profile.js)
@@ -1681,6 +1712,7 @@ function showResults(results) {
         renderExpBar(true);
         showEarnedBadges(progress.earned);       // profile.js
         updateProfileDot();
+        if (typeof noteLevelForLogin === 'function') noteLevelForLogin(progress.level);   // login.js - zachęta po poziomie 3 i 10
         return;
     }
 

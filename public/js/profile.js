@@ -18,6 +18,7 @@ function openProfile() {
     if (!avatarCatalog) return;     // katalog awatarów jeszcze się wczytuje
     renderProfileHeader();
     renderProfileTabs();
+    updateAccountChip();             // login.js
     showScreen('screen-profile');
     // konto: świeże statystyki i historia z serwera (przychodzą jako "account_profile", app.js)
     if (ProfileStore.isAccount()) socket.emit('get_profile');
@@ -283,7 +284,8 @@ function renderHistoryTab(profile) {
 
 function updateProfileDot() {
     const unseen = ProfileStore.get().unseenBadges.length > 0;
-    byId('player-stats').querySelector('.main-avatar').classList.toggle('has-new', unseen);
+    // kropka: nowe odznaki albo konto tymczasowe do zalogowania (login.js)
+    byId('player-stats').querySelector('.main-avatar').classList.toggle('has-new', unseen || (typeof needsLoginDot === 'function' && needsLoginDot()));
     byId('profile-tabs').querySelectorAll('.has-new').forEach(tab => tab.classList.toggle('has-new', unseen));
 }
 
@@ -334,5 +336,8 @@ function showEarnedBadges(earned) {
     if (earned.length) setTimeout(() => sfx.play('badge'), RESULTS_SUSPENSE_MS + 500);
 }
 
-ProfileStore.onChange(() => { if (currentScreen === 'screen-profile') renderProfileHeader(); });
+ProfileStore.onChange(() => {
+    if (currentScreen === 'screen-profile') renderProfileHeader();
+    updateProfileDot();          // nowe odznaki albo konto tymczasowe od poziomu 3
+});
 updateProfileDot();

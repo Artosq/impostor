@@ -343,11 +343,13 @@
                             <div id="profile-exp-text" class="profile-exp-text"></div>
                         </div>
                         <div class="profile-exp"><div id="profile-exp-fill" class="profile-exp-fill"></div></div>
+                        <!-- konto: "Konto tymczasowe · Zaloguj" albo e-mail zalogowanego (login.js) -->
+                        <button id="account-chip" class="account-chip hidden" onclick="openLogin()"></button>
                     </div>
                 </div>
                 <div id="profile-tabs" class="profile-tabs"></div>
                 <div id="profile-content" class="profile-content"></div>
-                <p class="profile-account">Gość - postęp zapisany w tej przeglądarce. Logowanie wkrótce.</p>
+                <p id="profile-account" class="profile-account">Gość - postęp zapisany w tej przeglądarce.</p>
                 <button class="btn-join" onclick="closeProfile()">Powrót do menu -></button>
             </div>
 
@@ -377,6 +379,33 @@
                     <button onclick="showEditorPaste(false)">Anuluj</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Logowanie do konta (login.js): Google albo link z maila; po zalogowaniu e-mail i "Wyloguj" -->
+    <div id="login" class="picker-overlay hidden" onclick="if (event.target === this) closeLogin()">
+        <div class="picker-window login-window">
+            <div id="login-title" class="picker-title">— Zapisz postęp —</div>
+            <div id="login-choose" class="login-view">
+                <p class="login-text">Zaloguj się, żeby nie stracić poziomu i odznak oraz grać na innych urządzeniach.</p>
+                <button class="login-btn login-google" onclick="loginGoogleClick()"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.2-2.1 3.5-5.1 3.5-8.8z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3a7.2 7.2 0 0 1-10.8-3.8h-4v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6h-4a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1A7.2 7.2 0 0 1 12 4.8z"/></svg><span>Zaloguj przez Google</span></button>
+                <button class="login-btn login-mail" onclick="showLoginView('email')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Zaloguj przez e-mail</span></button>
+            </div>
+            <form id="login-email" class="login-view hidden" onsubmit="event.preventDefault(); loginEmailSubmit()">
+                <p class="login-text">Wyślemy Ci link do logowania - bez hasła.</p>
+                <input type="email" id="login-email-input" placeholder="twoj@email.pl" autocomplete="email" maxlength="254" required>
+                <button type="submit" id="login-send" class="btn-join login-send">Wyślij link</button>
+            </form>
+            <div id="login-sent" class="login-view hidden">
+                <div class="login-big-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+                <p class="login-text">Sprawdź skrzynkę <b id="login-sent-email"></b> i kliknij link w mailu. Jeśli go nie widzisz, zajrzyj do spamu.</p>
+            </div>
+            <div id="login-account" class="login-view hidden">
+                <p class="login-text">Zalogowano jako <b id="login-account-email"></b>. Postęp jest zapisany na koncie i dostępny na każdym urządzeniu.</p>
+                <button class="btn-secondary login-logout" onclick="logoutClick()">Wyloguj</button>
+            </div>
+            <p id="login-error" class="login-error hidden" role="alert"></p>
+            <button id="login-close" class="btn-secondary login-close" onclick="loginBackOrClose()">Nie teraz</button>
         </div>
     </div>
 
@@ -485,6 +514,7 @@
     <script src="js/auth.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/profile.js" defer></script>
+    <script src="js/login.js" defer></script>
     <script src="js/session.js" defer></script>
     <script src="js/invite.js" defer></script>
     <script src="js/scanner.js" defer></script>

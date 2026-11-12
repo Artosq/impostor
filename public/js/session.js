@@ -140,6 +140,7 @@ function handleBack() {
     if (isOpen('guess')) return closeGuess(), true;
     if (isOpen('game-options')) return closeGameOptions(), true;
     if (isOpen('install-offer')) return dismissInstallOffer(), true;
+    if (isOpen('login')) return loginBackOrClose(), true;
     if (isOpen('category-picker')) return closeCategoryPicker(), true;
     if (!byId('install-help').classList.contains('hidden')) return byId('install-help').classList.add('hidden'), true;
 

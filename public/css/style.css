@@ -3015,6 +3015,124 @@ img.skeleton-failed{
     margin: 4px 0 6px;
     font-size: 0.65em;
 }
+.profile-account.hidden{
+    display: none;
+}
+
+/* KONTO (login.js): przycisk pod paskiem poziomu - żółty przy koncie tymczasowym, zielony po zalogowaniu */
+.account-chip{
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    width: auto;
+    margin: 8px 0 0;
+    padding: 5px 10px;
+    overflow: hidden;
+    border: 3px solid var(--secondary);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--secondary);
+    font-size: 0.55em;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    cursor: pointer;
+}
+.account-chip.is-anonymous{
+    border-color: #f1c40f;
+    color: #f1c40f;
+    box-shadow: 0 0 10px rgba(241, 196, 15, 0.3);
+}
+.account-chip:hover{
+    background: color-mix(in srgb, currentColor 15%, transparent);
+    transform: none;
+    box-shadow: none;
+}
+.account-chip.hidden{
+    display: none;
+}
+
+/* Okienko logowania */
+.login-window{
+    max-width: 340px;
+}
+.login-view.hidden,
+.login-error.hidden{
+    display: none;
+}
+.login-text{
+    margin: 10px 0 14px;
+    color: #aaa;
+    font-size: 0.65em;
+    line-height: 1.6;
+}
+.login-text b{
+    color: white;
+    word-break: break-all;
+}
+.login-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+    border-radius: 10px;
+    font-size: 0.75em;
+}
+.login-btn + .login-btn{
+    margin-top: 8px;
+}
+.login-btn svg{
+    flex: none;
+    width: 18px;
+    height: 18px;
+}
+.login-google{
+    border: 5px solid black;
+    background: white;
+    color: #222;
+}
+.login-google:hover{
+    background: #eee;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.3);
+}
+.login-mail{
+    border: 5px solid var(--secondary);
+    background: transparent;
+    color: var(--secondary);
+}
+.login-mail:hover{
+    background: var(--secondary);
+    color: white;
+    box-shadow: 0 0 20px var(--secondary);
+}
+#login-email-input{
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 10px;
+    text-transform: none;
+}
+.login-send{
+    margin: 0;
+}
+.login-big-icon{
+    width: 48px;
+    height: 48px;
+    margin: 12px auto 0;
+    color: var(--secondary);
+    filter: drop-shadow(0 0 10px var(--secondary));
+}
+.login-error{
+    margin: 10px 0 0;
+    color: var(--danger);
+    font-size: 0.65em;
+    text-shadow: 0 0 12px var(--danger);
+}
+.login-close,
+.login-logout{
+    margin: 12px 0 0;
+}
 
 /* Statystyki: bez ramki, treść zanika u góry i u dołu przy przewijaniu */
 .profile-content.is-plain{

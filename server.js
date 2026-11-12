@@ -75,6 +75,7 @@ const RATE_LIMITS = {
     set_room_privacy: { count: 6, ms: 5000 },
     ping_check: { count: 10, ms: 10000 },
     account_import: { count: 2, ms: 60000 },
+    account_merge: { count: 3, ms: 60000 },
     get_profile: { count: 10, ms: 10000 },
     default: { count: 20, ms: 5000 }
 };
@@ -485,6 +486,12 @@ io.on('connection', (socket) => {
     // Pełny profil (statystyki, historia) - przy otwarciu strony gracza
     handle('get_profile', withAccount(account => socket.emit('account_profile', account.profile)));
     handle('badges_seen', withAccount(account => accounts.markBadgesSeen(account)));
+    // Zalogowanie na istniejące konto: dopisanie postępu z konta tymczasowego tego urządzenia (token udowadnia, że jest jego)
+    handle('account_merge', withAccount((account, anonToken) => {
+        accounts.mergeAnonymous(account, anonToken)
+            .then(done => { if (done) socket.emit('account', accounts.welcome(account)); })
+            .catch(err => console.error('Łączenie kont:', err.message));
+    }));
     handle('account_feat', withAccount((account, id) => accounts.recordFeat(account, id)));
 
     // Tworzenie pokoju

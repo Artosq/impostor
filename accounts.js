@@ -166,6 +166,45 @@ async function importGuest(account, localProfile) {
     return true;
 }
 
+// Gracz zalogował się na istniejące konto (np. Google z innego telefonu), a na tym urządzeniu miał konto tymczasowe:
+// postęp z tymczasowego dopisujemy do stałego, a tymczasowe usuwamy. anonToken udowadnia, że konto tymczasowe jest jego.
+async function mergeAnonymous(account, anonToken) {
+    if (account.isAnonymous || typeof anonToken !== 'string' || anonToken.length > 4096) return false;
+    let anon;
+    try {
+        anon = await verifyToken(anonToken);
+    } catch (err) {
+        return false;
+    }
+    if (!anon.isAnonymous || anon.id === account.id) return false;
+
+    // konto tymczasowe może być jeszcze wczytane (inna karta) - bierzemy najświeższy stan
+    const cached = loaded.get(anon.id);
+    let anonProfile = cached && cached.profile;
+    let anonImported = cached && cached.importedAt;
+    if (!anonProfile) {
+        const { rows } = await db().query(
+            `select data, level, exp, imported_at from public.profiles where id = $1`, [anon.id]);
+        if (!rows.length) return false;
+        anonProfile = Core.normalize({ ...rows[0].data, level: rows[0].level, exp: rows[0].exp });
+        anonImported = rows[0].imported_at;
+    }
+    // usunięcie przed zapisem: drugie takie samo zgłoszenie (np. dwie karty) nie doda postępu dwa razy
+    const { rowCount } = await db().query(`delete from auth.users where id = $1 and is_anonymous`, [anon.id]);
+    if (rowCount === 0) return false;
+    if (cached) { clearTimeout(cached.saveTimer); loaded.delete(anon.id); }
+
+    const merged = Core.mergeProfiles(account.profile, anonProfile);
+    Core.updateBadges(merged, Badges);
+    account.profile = merged;
+    if (anonImported && !account.importedAt) {
+        account.importedAt = anonImported;
+        await db().query(`update public.profiles set imported_at = $2 where id = $1 and imported_at is null`, [account.id, anonImported]);
+    }
+    await flush(account);
+    return true;
+}
+
 function markBadgesSeen(account) {
     if (!account.profile.unseenBadges.length) return;
     account.profile.unseenBadges = [];
@@ -189,7 +228,7 @@ function welcome(account) {
 }
 
 module.exports = {
-    enabled, attach, detach, recordRound, importGuest, markBadgesSeen, recordFeat, welcome, flushAll,
+    enabled, attach, detach, recordRound, importGuest, mergeAnonymous, markBadgesSeen, recordFeat, welcome, flushAll,
     // do testów
     verifyToken, loaded
 };
