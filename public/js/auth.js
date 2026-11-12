@@ -53,6 +53,8 @@ const Auth = (() => {
                 expiresAt: Number(data.expires_at) ? Number(data.expires_at) * 1000 : Date.now() + expiresIn * 1000,
                 userId: info.sub,
                 email: info.email || null,
+                // sposób logowania (ikona w oknie konta): Google albo link z maila
+                provider: ((info.app_metadata || {}).providers || []).includes('google') ? 'google' : 'email',
                 isAnonymous: info.is_anonymous === true
             };
         }
@@ -228,6 +230,7 @@ const Auth = (() => {
         pendingEmail: () => (storage.get(FLOW_KEY) || {}).email || null,
         isAnonymous: () => !session || session.isAnonymous,
         email: () => session && session.email,
+        provider: () => session && session.provider,
         userId: () => session && session.userId
     };
 })();

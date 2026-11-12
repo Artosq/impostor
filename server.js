@@ -76,6 +76,7 @@ const RATE_LIMITS = {
     ping_check: { count: 10, ms: 10000 },
     account_import: { count: 2, ms: 60000 },
     account_merge: { count: 3, ms: 60000 },
+    account_merge_preview: { count: 3, ms: 60000 },
     get_profile: { count: 10, ms: 10000 },
     default: { count: 20, ms: 5000 }
 };
@@ -486,10 +487,16 @@ io.on('connection', (socket) => {
     // Pełny profil (statystyki, historia) - przy otwarciu strony gracza
     handle('get_profile', withAccount(account => socket.emit('account_profile', account.profile)));
     handle('badges_seen', withAccount(account => accounts.markBadgesSeen(account)));
-    // Zalogowanie na istniejące konto: dopisanie postępu z konta tymczasowego tego urządzenia (token udowadnia, że jest jego)
-    handle('account_merge', withAccount((account, anonToken) => {
-        accounts.mergeAnonymous(account, anonToken)
-            .then(done => { if (done) socket.emit('account', accounts.welcome(account)); })
+    // Zalogowanie na istniejące konto, a na tym urządzeniu jest konto gościa (token udowadnia, że jest jego):
+    // najpierw podgląd jego postępu, potem decyzja gracza - dodać do konta albo pominąć
+    handle('account_merge_preview', withAccount((account, anonToken) => {
+        accounts.previewAnonymous(account, anonToken)
+            .then(offer => { if (offer) socket.emit('account_merge_offer', offer); })
+            .catch(err => console.error('Podgląd konta gościa:', err.message));
+    }));
+    handle('account_merge', withAccount((account, anonToken, add) => {
+        accounts.mergeAnonymous(account, anonToken, add === true)
+            .then(done => { if (done && add === true) socket.emit('account', accounts.welcome(account)); })
             .catch(err => console.error('Łączenie kont:', err.message));
     }));
     handle('account_feat', withAccount((account, id) => accounts.recordFeat(account, id)));

@@ -514,13 +514,27 @@ socket.on('account', data => {
     const redirect = Auth.takeRedirectResult();
     if (redirect && redirect.ok && !Auth.isAnonymous()) showError(`Zalogowano: ${Auth.email() || 'konto Google'}`, true);
     else if (redirect && !redirect.ok) showError(/expired|invalid/i.test(redirect.code + redirect.message) ? 'Link wygasł - wyślij nowy' : 'Logowanie nie powiodło się');
-    // zalogowanie na istniejące konto: dopisanie postępu z konta tymczasowego tego urządzenia
+    // zalogowanie na istniejące konto: serwer pokaże, co jest na koncie gościa tego urządzenia (login.js pyta gracza)
     Auth.takeMergeToken().then(token => {
         if (!token) return;
-        accountMergeSent = true;
-        socket.emit('account_merge', token);
+        pendingMergeToken = token;
+        socket.emit('account_merge_preview', token);
     });
 });
+
+let pendingMergeToken = null;
+socket.on('account_merge_offer', offer => {
+    if (!offer || offer.empty || !pendingMergeToken) { pendingMergeToken = null; return; }
+    if (typeof showMergeOffer === 'function') showMergeOffer(offer);
+});
+
+// Odpowiedź z okienka "Postęp z tego urządzenia" (login.js)
+function sendMergeAnswer(add) {
+    if (!pendingMergeToken) return;
+    accountMergeSent = add;
+    socket.emit('account_merge', pendingMergeToken, add);
+    pendingMergeToken = null;
+}
 
 // Pełny profil (statystyki, historia) - o który prosi strona gracza (profile.js)
 socket.on('account_profile', profile => {
@@ -698,7 +712,7 @@ async function rewardInstall() {
     const earned = await ProfileStore.recordFeat('installed');
     if (!earned.length) return;
     if (typeof updateProfileDot === 'function') updateProfileDot();
-    showError('📲 Nowa odznaka: Stały bywalec', true);
+    showError('Nowa odznaka: Stały bywalec', true);
 }
 document.addEventListener('DOMContentLoaded', rewardInstall);
 
@@ -806,7 +820,7 @@ function renderGameOptions(fresh = false) {
     const count = byId('options-roles-count');
     if (count) count.textContent = `${extra} / ${roles.length}`;
     const needed = parseInt(impostors) + (extra > 0 ? extra + 2 : 1);    // jak na serwerze
-    byId('options-players').textContent = `👥 Potrzeba co najmniej ${needed} graczy`;
+    byId('options-players').replaceChildren(GameIcons.element('ui_players', 'options-players-icon'), `Potrzeba co najmniej ${needed} graczy`);
 }
 
 function buildGameOptions(mode, options, roles) {
@@ -831,7 +845,7 @@ function buildGameOptions(mode, options, roles) {
         text.append(createElement('div', 'option-name', option.name), createElement('div', 'option-description', option.description));
         const switcher = createElement('span', 'privacy-switch option-switch');
         switcher.append(createElement('span', 'privacy-knob'));
-        if (option.icon) row.append(createElement('span', 'option-icon', option.icon));
+        if (GameIcons.has(option.id)) row.append(GameIcons.element(option.id, 'option-icon'));      // icons.js
         row.append(text, switcher);
         return row;
     });
@@ -840,7 +854,7 @@ function buildGameOptions(mode, options, roles) {
     const tiles = roles.map(option => {
         const tile = prepare(createElement('div', 'option-tile'), option);
         tile.title = option.description;
-        tile.append(createElement('span', 'option-check'), createElement('span', 'option-tile-icon', option.icon || '?'),
+        tile.append(createElement('span', 'option-check'), GameIcons.element(GameIcons.has(option.id) ? option.id : 'secret', 'option-tile-icon'),
             createElement('div', 'option-name', option.name), createElement('div', 'option-description', option.short || option.description));
         return tile;
     });

@@ -166,40 +166,65 @@ async function importGuest(account, localProfile) {
     return true;
 }
 
-// Gracz zalogował się na istniejące konto (np. Google z innego telefonu), a na tym urządzeniu miał konto tymczasowe:
-// postęp z tymczasowego dopisujemy do stałego, a tymczasowe usuwamy. anonToken udowadnia, że konto tymczasowe jest jego.
-async function mergeAnonymous(account, anonToken) {
-    if (account.isAnonymous || typeof anonToken !== 'string' || anonToken.length > 4096) return false;
+// Gracz zalogował się na istniejące konto (np. Google z innego telefonu), a na tym urządzeniu miał konto gościa
+// (tymczasowe). anonToken udowadnia, że konto gościa jest jego. Najpierw pokazujemy, co na nim jest
+// (previewAnonymous), a gracz decyduje: dodać postęp do konta czy pominąć (mergeAnonymous, add = true / false).
+// W obu przypadkach konto gościa jest potem usuwane.
+
+async function findAnonymous(account, anonToken) {
+    if (account.isAnonymous || typeof anonToken !== 'string' || anonToken.length > 4096) return null;
     let anon;
     try {
         anon = await verifyToken(anonToken);
     } catch (err) {
-        return false;
+        return null;
     }
-    if (!anon.isAnonymous || anon.id === account.id) return false;
-
-    // konto tymczasowe może być jeszcze wczytane (inna karta) - bierzemy najświeższy stan
+    if (!anon.isAnonymous || anon.id === account.id) return null;
+    // konto gościa może być jeszcze wczytane (inna karta) - bierzemy najświeższy stan
     const cached = loaded.get(anon.id);
-    let anonProfile = cached && cached.profile;
-    let anonImported = cached && cached.importedAt;
-    if (!anonProfile) {
-        const { rows } = await db().query(
-            `select data, level, exp, imported_at from public.profiles where id = $1`, [anon.id]);
-        if (!rows.length) return false;
-        anonProfile = Core.normalize({ ...rows[0].data, level: rows[0].level, exp: rows[0].exp });
-        anonImported = rows[0].imported_at;
-    }
-    // usunięcie przed zapisem: drugie takie samo zgłoszenie (np. dwie karty) nie doda postępu dwa razy
-    const { rowCount } = await db().query(`delete from auth.users where id = $1 and is_anonymous`, [anon.id]);
-    if (rowCount === 0) return false;
-    if (cached) { clearTimeout(cached.saveTimer); loaded.delete(anon.id); }
+    if (cached) return { id: anon.id, cached, profile: cached.profile, importedAt: cached.importedAt };
+    const { rows } = await db().query(`select data, level, exp, imported_at from public.profiles where id = $1`, [anon.id]);
+    if (!rows.length) return { id: anon.id, profile: Core.emptyProfile(), importedAt: null };
+    return { id: anon.id, profile: Core.normalize({ ...rows[0].data, level: rows[0].level, exp: rows[0].exp }), importedAt: rows[0].imported_at };
+}
 
-    const merged = Core.mergeProfiles(account.profile, anonProfile);
+async function deleteAnonymous(anon) {
+    const { rowCount } = await db().query(`delete from auth.users where id = $1 and is_anonymous`, [anon.id]);
+    if (anon.cached) { clearTimeout(anon.cached.saveTimer); loaded.delete(anon.id); }
+    return rowCount > 0;
+}
+
+const isEmptyProfile = profile => profile.stats.games === 0 && profile.level === 1 && profile.exp === 0;
+
+// Co jest na koncie gościa. Puste konto gościa usuwamy od razu (nie ma o co pytać) -> { empty: true }
+async function previewAnonymous(account, anonToken) {
+    const anon = await findAnonymous(account, anonToken);
+    if (!anon) return null;
+    if (isEmptyProfile(anon.profile)) {
+        await deleteAnonymous(anon);
+        return { empty: true };
+    }
+    return {
+        empty: false,
+        level: anon.profile.level,
+        games: anon.profile.stats.games,
+        badges: Object.keys(anon.profile.badges).length
+    };
+}
+
+async function mergeAnonymous(account, anonToken, add) {
+    const anon = await findAnonymous(account, anonToken);
+    if (!anon) return false;
+    // usunięcie przed zapisem: drugie takie samo zgłoszenie (np. dwie karty) nie doda postępu dwa razy
+    if (!(await deleteAnonymous(anon))) return false;
+    if (!add) return true;
+
+    const merged = Core.mergeProfiles(account.profile, anon.profile);
     Core.updateBadges(merged, Badges);
     account.profile = merged;
-    if (anonImported && !account.importedAt) {
-        account.importedAt = anonImported;
-        await db().query(`update public.profiles set imported_at = $2 where id = $1 and imported_at is null`, [account.id, anonImported]);
+    if (anon.importedAt && !account.importedAt) {
+        account.importedAt = anon.importedAt;
+        await db().query(`update public.profiles set imported_at = $2 where id = $1 and imported_at is null`, [account.id, anon.importedAt]);
     }
     await flush(account);
     return true;
@@ -228,7 +253,7 @@ function welcome(account) {
 }
 
 module.exports = {
-    enabled, attach, detach, recordRound, importGuest, mergeAnonymous, markBadgesSeen, recordFeat, welcome, flushAll,
+    enabled, attach, detach, recordRound, importGuest, previewAnonymous, mergeAnonymous, markBadgesSeen, recordFeat, welcome, flushAll,
     // do testów
     verifyToken, loaded
 };

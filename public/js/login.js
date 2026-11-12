@@ -45,8 +45,20 @@ function showLoginView(view) {
     ['choose', 'email', 'sent', 'account'].forEach(name => byId(`login-${name}`).classList.toggle('hidden', name !== view));
     showLoginError('');
     byId('login-close').textContent = { choose: 'Nie teraz', email: '<- Wróć', sent: 'Zamknij', account: 'Zamknij' }[view];
+    byId('login-close').classList.toggle('hidden', view === 'account');     // widok konta ma własne przyciski
     if (view === 'email') setTimeout(() => byId('login-email-input').focus(), 50);
-    if (view === 'account') byId('login-account-email').textContent = Auth.email() || 'konto Google';
+    if (view === 'account') renderAccountView();
+}
+
+// Widok "Twoje konto": awatar, nick i poziom, adres z ikoną sposobu logowania
+function renderAccountView() {
+    byId('login-account-avatar').src = avatarUrl(botConfig);
+    byId('login-account-nick').textContent = byId('input-name').value.trim() || 'Gracz';
+    byId('login-account-level').textContent = `Poziom ${ProfileStore.get().level}`;
+    byId('login-account-email').textContent = Auth.email() || 'konto Google';
+    // ta sama ikona co na przycisku logowania (Google albo koperta)
+    const source = document.querySelector(Auth.provider() === 'google' ? '.login-google svg' : '.login-mail svg');
+    byId('login-account-icon').replaceChildren(source.cloneNode(true));
 }
 
 function showLoginError(text) {
@@ -129,4 +141,23 @@ function maybeShowLoginPrompt() {
     if (!loginPromptPending || !accountsOn() || !Auth.isAnonymous()) return;
     loginPromptPending = false;
     setTimeout(() => { if (currentScreen === 'screen-login') openLogin('— Nie strać postępu —'); }, 600);
+}
+
+// ===== POSTĘP GOŚCIA PO ZALOGOWANIU NA ISTNIEJĄCE KONTO =====
+// Serwer pyta tylko, gdy konto gościa tego urządzenia ma jakiś postęp (puste usuwa sam)
+function showMergeOffer(offer) {
+    byId('merge-level').textContent = offer.level;
+    byId('merge-games').textContent = offer.games;
+    byId('merge-badges').textContent = offer.badges;
+    byId('merge-offer').classList.remove('hidden', 'closing');
+}
+
+function answerMergeOffer(add) {
+    sendMergeAnswer(add);            // app.js
+    const panel = byId('merge-offer');
+    panel.classList.add('closing');
+    setTimeout(() => {
+        panel.classList.add('hidden');
+        panel.classList.remove('closing');
+    }, PICKER_CLOSE_MS);
 }

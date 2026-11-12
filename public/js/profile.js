@@ -231,7 +231,7 @@ function badgeCard(badge, profile) {
     const card = createElement('div', `badge-card ${earned ? 'tier-' + (badge.feat ? 'special' : tier.id) : 'locked'}`);
     if (profile.unseenBadges.includes(badge.id)) card.classList.add('is-new');
 
-    card.append(createElement('div', 'badge-icon', hidden ? '❓' : badge.icon));
+    card.append(GameIcons.element(hidden ? 'secret' : badge.id, 'badge-icon'));      // icons.js
     const info = createElement('div', 'badge-info');
     info.append(createElement('div', 'badge-name', hidden ? '???' : badge.name));
     info.append(createElement('div', 'badge-tier', !earned ? (hidden ? 'Sekretna odznaka' : 'Do zdobycia') : badge.feat ? 'Zdobyta' : tier.name));
@@ -328,7 +328,7 @@ function showEarnedBadges(earned) {
         const badge = Badges.byId(id);
         const item = createElement('div', `res-badge tier-${badge.feat ? 'special' : Badges.TIERS[tier].id}`);
         item.style.animationDelay = `${0.5 + i * 0.25}s`;
-        item.append(createElement('span', 'res-badge-icon', badge.icon),
+        item.append(GameIcons.element(badge.id, 'res-badge-icon'),
             createElement('span', 'res-badge-text', `${badge.name}${badge.feat ? '' : ' · ' + Badges.TIERS[tier].name}`));
         return item;
     }));

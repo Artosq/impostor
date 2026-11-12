@@ -401,11 +401,36 @@
                 <p class="login-text">Sprawdź skrzynkę <b id="login-sent-email"></b> i kliknij link w mailu. Jeśli go nie widzisz, zajrzyj do spamu.</p>
             </div>
             <div id="login-account" class="login-view hidden">
-                <p class="login-text">Zalogowano jako <b id="login-account-email"></b>. Postęp jest zapisany na koncie i dostępny na każdym urządzeniu.</p>
-                <button class="btn-secondary login-logout" onclick="logoutClick()">Wyloguj</button>
+                <div class="account-who">
+                    <img id="login-account-avatar" alt="">
+                    <div><b id="login-account-nick"></b><span id="login-account-level"></span></div>
+                </div>
+                <div class="account-mail"><span id="login-account-icon" class="account-mail-icon"></span><span id="login-account-email"></span></div>
+                <div class="account-ok">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+                    <span>Postęp zapisany na koncie - na każdym urządzeniu</span>
+                </div>
+                <button class="btn-join account-close" onclick="closeLogin()">Zamknij</button>
+                <button class="account-logout" onclick="logoutClick()">Wyloguj się</button>
             </div>
             <p id="login-error" class="login-error hidden" role="alert"></p>
             <button id="login-close" class="btn-secondary login-close" onclick="loginBackOrClose()">Nie teraz</button>
+        </div>
+    </div>
+
+    <!-- Po zalogowaniu na istniejące konto: czy dodać postęp gościa z tego urządzenia (login.js) -->
+    <div id="merge-offer" class="picker-overlay hidden">
+        <div class="picker-window login-window">
+            <div class="picker-title">— Postęp gościa —</div>
+            <p class="login-text">Na tym urządzeniu grano jako gość. Dodać ten postęp do Twojego konta?</p>
+            <div class="merge-stats">
+                <div><b id="merge-level"></b><span>poziom</span></div>
+                <div><b id="merge-games"></b><span>gier</span></div>
+                <div><b id="merge-badges"></b><span>odznak</span></div>
+            </div>
+            <button class="btn-join login-send" onclick="answerMergeOffer(true)">Dodaj do konta</button>
+            <button class="btn-secondary login-close" onclick="answerMergeOffer(false)">Pomiń</button>
+            <p class="merge-note">Pomiń, jeśli na tym urządzeniu grał ktoś inny - postęp gościa zostanie usunięty.</p>
         </div>
     </div>
 
@@ -415,11 +440,11 @@
             <img class="install-app-icon" src="icons/icon-192.png" width="72" height="72" alt="">
             <div class="install-title">Zainstaluj Impostora</div>
             <ul class="install-benefits">
-                <li><span>🎮</span>Pełny ekran, bez paska przeglądarki</li>
-                <li><span>⚡</span>Szybsze wejście do gry</li>
-                <li><span>📱</span>Ikona na ekranie telefonu</li>
+                <li><span data-icon="ui_fullscreen"></span>Pełny ekran, bez paska przeglądarki</li>
+                <li><span data-icon="ui_fast"></span>Szybsze wejście do gry</li>
+                <li><span data-icon="ui_phone"></span>Ikona na ekranie telefonu</li>
             </ul>
-            <div class="install-reward"><span class="install-reward-icon">📲</span><span>Odbierz odznakę <b>Stały bywalec</b></span></div>
+            <div class="install-reward"><span class="install-reward-icon" data-icon="installed"></span><span>Odbierz odznakę <b>Stały bywalec</b></span></div>
             <button class="btn-join install-yes" onclick="acceptInstallOffer()">Zainstaluj</button>
             <div class="install-later">
                 <button class="install-link" onclick="dismissInstallOffer()">Nie teraz</button>
@@ -508,6 +533,7 @@
     <script src="js/customCategories.js" defer></script>
     <script src="js/sounds.js" defer></script>
     <script src="js/nicks.js" defer></script>
+    <script src="js/icons.js" defer></script>
     <script src="js/badges.js" defer></script>
     <script src="js/progress.js" defer></script>
     <script src="js/profileStore.js" defer></script>
