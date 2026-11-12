@@ -503,7 +503,20 @@ socket.on('account', data => {
     if (typeof updateAccountChip === 'function') updateAccountChip();
     if (typeof updateProfileDot === 'function') updateProfileDot();
 
-    // Przeniesienie postępu gościa: raz na przeglądarkę (po wylogowaniu nowe konto tymczasowe nie dostaje go drugi raz)
+    // powrót z Google / linku z maila (przy pierwszym połączeniu z kontem po przeładowaniu strony)
+    if (firstTime) {
+        const redirect = Auth.takeRedirectResult();
+        if (redirect && redirect.ok && !Auth.isAnonymous()) showError(`Zalogowano: ${Auth.email() || 'konto Google'}`, true);
+        else if (redirect && !redirect.ok) showError(/expired|invalid/i.test(redirect.code + redirect.message) ? 'Link wygasł - wyślij nowy' : 'Logowanie nie powiodło się');
+        // zalogowanie na konto inne niż tymczasowe: serwer pokaże, co jest na koncie gościa tego urządzenia
+        Auth.takeMergeToken().then(token => {
+            if (!token) return;
+            pendingMergeToken = token;
+            socket.emit('account_merge_preview', token);
+        });
+    }
+
+    // Przeniesienie postępu gościa sprzed kont: raz na przeglądarkę (po wylogowaniu nowe konto go nie dostaje)
     if (data.needsImport) {
         let imported = false;
         try { imported = localStorage.getItem(IMPORTED_KEY) === '1'; } catch (e) { /* bez pamięci */ }
@@ -517,21 +530,15 @@ socket.on('account', data => {
         accountMergeSent = false;
         showError('Postęp z tego urządzenia dodany do konta', true);
     }
-    if (!firstTime) return;
-    // powrót z Google / linku z maila
-    const redirect = Auth.takeRedirectResult();
-    if (redirect && redirect.ok && !Auth.isAnonymous()) showError(`Zalogowano: ${Auth.email() || 'konto Google'}`, true);
-    else if (redirect && !redirect.ok) showError(/expired|invalid/i.test(redirect.code + redirect.message) ? 'Link wygasł - wyślij nowy' : 'Logowanie nie powiodło się');
-    // zalogowanie na istniejące konto: serwer pokaże, co jest na koncie gościa tego urządzenia (login.js pyta gracza)
-    Auth.takeMergeToken().then(token => {
-        if (!token) return;
-        pendingMergeToken = token;
-        socket.emit('account_merge_preview', token);
-    });
 });
 
 let pendingMergeToken = null;
 socket.on('account_merge_offer', offer => {
+    if (offer && offer.merged) {
+        pendingMergeToken = null;
+        showError('Postęp z tego urządzenia przeniesiony na konto', true);
+        return;
+    }
     if (!offer || offer.empty || !pendingMergeToken) { pendingMergeToken = null; return; }
     if (typeof showMergeOffer === 'function') showMergeOffer(offer);
 });

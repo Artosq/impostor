@@ -491,7 +491,11 @@ io.on('connection', (socket) => {
     // najpierw podgląd jego postępu, potem decyzja gracza - dodać do konta albo pominąć
     handle('account_merge_preview', withAccount((account, anonToken) => {
         accounts.previewAnonymous(account, anonToken)
-            .then(offer => { if (offer) socket.emit('account_merge_offer', offer); })
+            .then(offer => {
+                if (!offer) return;
+                if (offer.merged) socket.emit('account', accounts.welcome(account));     // nowe konto: przeniesione od razu
+                socket.emit('account_merge_offer', offer);
+            })
             .catch(err => console.error('Podgląd konta gościa:', err.message));
     }));
     handle('account_merge', withAccount((account, anonToken, add) => {

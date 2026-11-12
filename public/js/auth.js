@@ -4,9 +4,10 @@
 //
 // Konta:
 // - na start każdy gracz ma konto anonimowe (tymczasowe, przypisane do tej przeglądarki),
-// - Google albo link z e-maila zamienia je w stałe: najpierw próbujemy podpiąć Google / adres do konta tymczasowego
-//   (to samo konto, nic nie trzeba przenosić); gdy to konto Google / ten adres ma już swoje konto (np. z innego
-//   telefonu), logujemy się na nie, a serwer dopisuje do niego postęp z konta tymczasowego (account_merge).
+// - Google: zwykłe logowanie, a serwer przenosi postęp z konta tymczasowego (na puste konto od razu, na konto
+//   z postępem po pytaniu gracza - account_merge_preview / account_merge),
+// - link z maila: nowy adres zostaje dopisany do konta tymczasowego (to samo konto, nic nie trzeba przenosić);
+//   adres, który ma już konto - logowanie na nie i przeniesienie postępu jak przy Google.
 // Google i link z maila wracają do gry z tokenami w adresie (#access_token=...) - readRedirect().
 //
 // Adres projektu i klucz publiczny wpisuje do strony serwer (assets.js). Bez nich konta są wyłączone
@@ -137,30 +138,14 @@ const Auth = (() => {
     let redirectResult = enabled ? readRedirect() : null;
     let flow = storage.get(FLOW_KEY);
 
-    // Google odmówił podpięcia, bo to konto Google ma już swoje konto w grze - logujemy się na nie
-    if (redirectResult && !redirectResult.ok && flow && flow.kind === 'google' && flow.step === 'link'
-        && /identity_already_exists|already/i.test(redirectResult.code + redirectResult.message)) {
-        storage.set(FLOW_KEY, { ...flow, step: 'signin' });
-        location.replace(`${url}/auth/v1/authorize?provider=google&redirect_to=${enc(redirectTo())}`);
-        redirectResult = null;
-    }
-
     // ===== LOGOWANIE =====
+    // Jedno przejście do Google: zwykłe logowanie (nowe albo istniejące konto). Postęp z konta tymczasowego
+    // tego urządzenia przenosi potem serwer (account_merge_preview): na nowe, puste konto od razu, a na konto
+    // z postępem - po pytaniu gracza. (Wcześniej: najpierw próba podpięcia Google do konta tymczasowego, a gdy
+    // konto Google już grało - drugie przejście do Google; gracz musiał wybierać konto dwa razy.)
     async function loginGoogle() {
-        const token = await getToken();
+        await getToken();
         const anonRefresh = session && session.isAnonymous ? session.refreshToken : null;
-        if (token && session.isAnonymous) {
-            // próba podpięcia Google do konta tymczasowego (wymaga "Manual linking" w Supabase)
-            try {
-                const data = await request(`/user/identities/authorize?provider=google&skip_http_redirect=true&redirect_to=${enc(redirectTo())}`,
-                    null, { method: 'GET', token });
-                if (data.url) {
-                    storage.set(FLOW_KEY, { kind: 'google', step: 'link', anonRefresh });
-                    location.href = data.url;
-                    return;
-                }
-            } catch (err) { /* podpinanie wyłączone - zwykłe logowanie i dopisanie postępu */ }
-        }
         storage.set(FLOW_KEY, { kind: 'google', step: 'signin', anonRefresh });
         location.href = `${url}/auth/v1/authorize?provider=google&redirect_to=${enc(redirectTo())}`;
     }

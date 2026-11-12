@@ -196,13 +196,17 @@ async function deleteAnonymous(anon) {
 
 const isEmptyProfile = profile => profile.stats.games === 0 && profile.level === 1 && profile.exp === 0;
 
-// Co jest na koncie gościa. Puste konto gościa usuwamy od razu (nie ma o co pytać) -> { empty: true }
+// Co jest na koncie gościa. Bez pytania: puste konto gościa usuwamy (-> { empty: true }), a gdy konto, na które
+// gracz się zalogował, jest puste (nowe konto Google), przenosimy postęp od razu (-> { merged: true }).
 async function previewAnonymous(account, anonToken) {
     const anon = await findAnonymous(account, anonToken);
     if (!anon) return null;
     if (isEmptyProfile(anon.profile)) {
         await deleteAnonymous(anon);
         return { empty: true };
+    }
+    if (isEmptyProfile(account.profile)) {
+        return (await mergeAnonymous(account, anonToken, true)) ? { merged: true } : null;
     }
     return {
         empty: false,
