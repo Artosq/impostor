@@ -14,6 +14,7 @@
 
 const Core = require('./public/js/progress.js');
 const Badges = require('./public/js/badges.js');
+const { db } = require('./db');
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
 const DATABASE_URL = process.env.DATABASE_URL || '';
@@ -23,24 +24,8 @@ const enabled = Boolean(SUPABASE_URL && DATABASE_URL);
 const SAVE_DELAY_MS = 3000;
 const TIME_ZONE = 'Europe/Warsaw';           // godzina rundy do odznaki "Nocny marek"
 
-let pool = null;
 let jose = null;
 let keys = null;
-
-function db() {
-    if (!pool) {
-        const { Pool } = require('pg');
-        pool = new Pool({
-            connectionString: DATABASE_URL,
-            max: Number(process.env.DATABASE_POOL_MAX) || 5,
-            idleTimeoutMillis: 30000,
-            // Supabase wymaga szyfrowanego połączenia; DATABASE_SSL=off dla bazy lokalnej
-            ssl: process.env.DATABASE_SSL === 'off' ? false : { rejectUnauthorized: false }
-        });
-        pool.on('error', err => console.error('Baza:', err.message));
-    }
-    return pool;
-}
 
 // ===== TOKEN Z PRZEGLĄDARKI =====
 async function verifyToken(token) {
@@ -49,7 +34,7 @@ async function verifyToken(token) {
         : jose.createRemoteJWKSet(new URL(`${SUPABASE_URL}/auth/v1/.well-known/jwks.json`));
     const { payload } = await jose.jwtVerify(token, keys, { issuer: `${SUPABASE_URL}/auth/v1`, audience: 'authenticated' });
     if (typeof payload.sub !== 'string') throw new Error('Token bez identyfikatora');
-    return { id: payload.sub, isAnonymous: payload.is_anonymous === true };
+    return { id: payload.sub, isAnonymous: payload.is_anonymous === true, email: typeof payload.email === 'string' ? payload.email.toLowerCase() : null };
 }
 
 // ===== KONTA W PAMIĘCI =====

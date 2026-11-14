@@ -10,6 +10,7 @@ const assets = require('./assets');
 const nicks = require('./public/js/nicks');
 const { maskNick } = require('./nickFilter');
 const accounts = require('./accounts');
+const analytics = require('./analytics');
 
 // USTAWIENIA
 const PORT = process.env.PORT || 10000;
@@ -40,6 +41,31 @@ avatars.register(app);
 
 // Link zaproszenia: /1234 otwiera menu z wpisanym kodem pokoju
 app.get(/^\/(\d{4})$/, (req, res) => res.redirect(302, `/?kod=${req.params[0]}`));
+
+// Strona analityki (tylko dla admina - dane sprawdza /api/analytics)
+app.get('/analityka', (req, res) => res.redirect(302, '/analityka.html'));
+
+// ANALITYKA: dane dla strony /analityka - tylko dla admina (konto z e-mailem z ADMIN_EMAILS w ustawieniach Render)
+app.get('/api/analytics', async (req, res) => {
+    res.set('Cache-Control', 'no-store');
+    if (!analytics.enabled || !accounts.enabled) return res.status(503).json({ error: 'Analityka wyłączona (brak bazy)' });
+    const token = (req.get('authorization') || '').replace(/^Bearer /, '');
+    let identity = null;
+    try { identity = token ? await accounts.verifyToken(token) : null; } catch (e) { /* zły token */ }
+    if (!identity) return res.status(401).json({ error: 'Zaloguj się w grze' });
+    if (!analytics.isAdmin(identity)) return res.status(403).json({ error: 'To konto nie ma dostępu do analityki' });
+
+    const day = /^\d{4}-\d{2}-\d{2}$/;
+    const to = day.test(req.query.to) ? req.query.to : analytics.warsawDay();
+    const from = day.test(req.query.from) ? req.query.from : '2000-01-01';
+    try {
+        const report = await analytics.report(from, to);
+        res.json({ ...report, online: io.engine.clientsCount });
+    } catch (err) {
+        console.error('Analityka (raport):', err.message);
+        res.status(500).json({ error: 'Nie udało się pobrać danych' });
+    }
+});
 
 // Lekki adres do sprawdzania, czy serwer żyje (używa go też budzik poniżej)
 app.get('/health', (req, res) => {
@@ -77,6 +103,7 @@ const RATE_LIMITS = {
     account_import: { count: 2, ms: 60000 },
     account_merge: { count: 3, ms: 60000 },
     account_merge_preview: { count: 3, ms: 60000 },
+    track: { count: 5, ms: 60000 },
     get_profile: { count: 10, ms: 10000 },
     default: { count: 20, ms: 5000 }
 };
@@ -234,6 +261,14 @@ function finishGame(room) {
     const results = room.mode.finish(room);
     room.status = 'finished';
     const at = Date.now();
+    // kategoria wybrana w pokoju (np. "Losowa", a nie wylosowana); własnej nie zapisujemy z nazwy - wpisał ją host
+    const chosenCategory = (room.mode.categories || []).find(c => c.id === room.settings.category);
+    analytics.track('round', null, {
+        mode: room.mode.id,
+        category: room.settings.custom ? 'Własna kategoria' : chosenCategory ? chosenCategory.name : null,
+        players: room.players.length,
+        ms: room.roundStartedAt ? at - room.roundStartedAt : 0
+    });
 
     room.players.forEach(p => {
         p.away = true;
@@ -466,6 +501,17 @@ io.on('connection', (socket) => {
     };
 
     const auth = socket.handshake.auth || {};
+
+    // ANALITYKA: pierwsze połączenie strony = wejście do gry (skąd, jakie urządzenie, czy zainstalowana aplikacja)
+    if (auth.visit && typeof auth.visit === 'object' && isValidUserId(auth.userId)) {
+        const VISIT_SOURCES = ['zaproszenie', 'bezposrednio', 'wyszukiwarka', 'media spolecznosciowe', 'inna strona'];
+        const ua = socket.handshake.headers['user-agent'] || '';
+        analytics.visit(auth.userId, {
+            source: VISIT_SOURCES.includes(auth.visit.source) ? auth.visit.source : 'inne',
+            device: /iPad|Tablet/i.test(ua) ? 'tablet' : /Mobi|Android|iPhone/i.test(ua) ? 'telefon' : 'komputer',
+            installed: auth.visit.installed === true
+        });
+    }
     if (auth.modesVersion !== MODES_VERSION) socket.emit('mode_list', modeList, MODES_VERSION);
     // gracz ma otwartą starszą wersję gry (np. po wdrożeniu poprawki) - pasek "Dostępna nowa wersja"
     if (typeof auth.appVersion === 'string' && auth.appVersion && auth.appVersion !== assets.appVersion()) socket.emit('new_version');
@@ -487,6 +533,12 @@ io.on('connection', (socket) => {
     // Pełny profil (statystyki, historia) - przy otwarciu strony gracza
     handle('get_profile', withAccount(account => socket.emit('account_profile', account.profile)));
     handle('badges_seen', withAccount(account => accounts.markBadgesSeen(account)));
+    // Zgłoszenia do analityki z przeglądarki - tylko zalogowanie (Google / mailem)
+    handle('track', (type, data) => {
+        if (type !== 'login' || !data || !['google', 'email'].includes(data.provider)) return;
+        if (!isValidUserId(auth.userId)) return;
+        analytics.track('login', auth.userId, { provider: data.provider });
+    });
     // Zalogowanie na istniejące konto, a na tym urządzeniu jest konto gościa (token udowadnia, że jest jego):
     // najpierw podgląd jego postępu, potem decyzja gracza - dodać do konta albo pominąć
     handle('account_merge_preview', withAccount((account, anonToken) => {
@@ -525,6 +577,7 @@ io.on('connection', (socket) => {
         };
         rooms.set(room.code, room);
         applyRoomNames(room);
+        analytics.track('room', userId, { mode: room.settings.mode });
 
         attachSocket(socket, room, player);
         emitLobby(room);
@@ -875,6 +928,8 @@ server.listen(PORT, '0.0.0.0', () => {
     console.log(`Serwer działa na porcie ${PORT}`);
     if (process.env.RENDER) assets.warmUp();
     if (accounts.enabled) console.log('Konta: włączone (Supabase)');
+    if (analytics.enabled) console.log('Analityka: włączona');
+    analytics.startOnlineSampling(() => io.engine.clientsCount);
     startKeepAlive();
 });
 
@@ -901,6 +956,6 @@ function startKeepAlive() {
 
 // Render przy wdrożeniu nowej wersji wysyła SIGTERM - zapisujemy jeszcze niezapisany postęp kont
 process.on('SIGTERM', () => {
-    accounts.flushAll().finally(() => process.exit(0));
+    Promise.all([accounts.flushAll(), analytics.flush()]).finally(() => process.exit(0));
     setTimeout(() => process.exit(0), 5000).unref();
 });

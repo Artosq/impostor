@@ -4,5 +4,8 @@ Allow: /
 Disallow: /avatar/
 Disallow: /avatar-catalog
 Disallow: /health
+Disallow: /analityka
+Disallow: /analityka.html
+Disallow: /api/
 
 Sitemap: %SITE_URL%/sitemap.xml

@@ -465,6 +465,19 @@ function renderExpBar(animate) {
 
 const ACCOUNT_TOKEN_WAIT_MS = 3000;
 
+// ANALITYKA: skąd gracz przyszedł - liczone raz, przy wczytaniu strony (invite.js czyści potem adres z kodu)
+// zaproszenie = link /1234 albo kod QR (oba prowadzą na /?kod=1234)
+const VISIT_SOURCE = (() => {
+    if (/[?&]kod=\d{4}/.test(location.search)) return 'zaproszenie';
+    let host = '';
+    try { host = document.referrer ? new URL(document.referrer).hostname : ''; } catch (e) { /* bez adresu */ }
+    if (!host || host === location.hostname) return 'bezposrednio';
+    if (/(^|\.)(google|bing|duckduckgo|yahoo|ecosia|yandex|brave)\./.test(host)) return 'wyszukiwarka';
+    if (/(facebook|messenger|instagram|tiktok|twitter|x\.com|t\.co|reddit|discord|youtube|whatsapp|snapchat)/.test(host)) return 'media spolecznosciowe';
+    return 'inna strona';
+})();
+let visitReported = false;       // wejście zgłaszamy przy pierwszym połączeniu strony, nie przy każdym ponownym
+
 // Wersja tej strony (wpisuje ją serwer, zob. assets.js) - porównywana z wersją na serwerze przy każdym połączeniu
 const APP_VERSION = (document.querySelector('meta[name="app-version"]') || {}).content || '';
 
@@ -482,7 +495,8 @@ const socket = io({
             roomCode: localStorage.getItem('lastRoomCode') || '',
             modesVersion: availableModes.length ? (savedModes() || {}).version : undefined,
             appVersion: APP_VERSION,       // inna niż na serwerze = komunikat "Dostępna nowa wersja" (session.js)
-            accessToken: token || undefined
+            accessToken: token || undefined,
+            visit: visitReported ? undefined : (visitReported = true, { source: VISIT_SOURCE, installed: isInstalled() })
         }))
 });
 
@@ -506,7 +520,10 @@ socket.on('account', data => {
     // powrót z Google / linku z maila (przy pierwszym połączeniu z kontem po przeładowaniu strony)
     if (firstTime) {
         const redirect = Auth.takeRedirectResult();
-        if (redirect && redirect.ok && !Auth.isAnonymous()) showError(`Zalogowano: ${Auth.email() || 'konto Google'}`, true);
+        if (redirect && redirect.ok && !Auth.isAnonymous()) {
+            showError(`Zalogowano: ${Auth.email() || 'konto Google'}`, true);
+            socket.emit('track', 'login', { provider: Auth.provider() });      // analityka: Google czy mailem
+        }
         else if (redirect && !redirect.ok) showError(/expired|invalid/i.test(redirect.code + redirect.message) ? 'Link wygasł - wyślij nowy' : 'Logowanie nie powiodło się');
         // zalogowanie na konto inne niż tymczasowe: serwer pokaże, co jest na koncie gościa tego urządzenia
         Auth.takeMergeToken().then(token => {

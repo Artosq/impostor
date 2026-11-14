@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#161616">
+    <title>Analityka – Impostor</title>
+    <!-- Logowanie admina: ta sama sesja co w grze (auth.js) -->
+    <meta name="supabase-url" content="%SUPABASE_URL%">
+    <meta name="supabase-key" content="%SUPABASE_ANON_KEY%">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+    <link rel="stylesheet" href="css/fonts.css">
+    <link rel="stylesheet" href="css/analytics.css">
+</head>
+<body>
+    <header class="an-header">
+        <h1>— Analityka —</h1>
+        <div class="an-header-right">
+            <span id="an-online" class="an-online hidden"><span class="an-dot"></span><b id="an-online-count">0</b> online</span>
+            <a class="an-back" href="/">&lt;- Gra</a>
+        </div>
+    </header>
+
+    <!-- Brak dostępu: niezalogowany albo nie admin -->
+    <section id="an-gate" class="an-gate hidden">
+        <p id="an-gate-text"></p>
+        <a class="an-button" href="/">Przejdź do gry</a>
+    </section>
+
+    <main id="an-main" class="hidden">
+        <!-- Filtry: zakres i grupowanie w jednym rzędzie nad wykresami -->
+        <div class="an-filters">
+            <div class="an-segmented" id="an-range" role="group" aria-label="Zakres">
+                <button data-range="7">7 dni</button>
+                <button data-range="30">30 dni</button>
+                <button data-range="90">90 dni</button>
+                <button data-range="365">Rok</button>
+                <button data-range="all">Wszystko</button>
+                <button data-range="custom">Własny</button>
+            </div>
+            <div class="an-custom hidden" id="an-custom">
+                <label>od <input type="date" id="an-from"></label>
+                <label>do <input type="date" id="an-to"></label>
+            </div>
+            <div class="an-segmented" id="an-group" role="group" aria-label="Grupowanie">
+                <button data-group="day">Dzień</button>
+                <button data-group="week">Tydzień</button>
+                <button data-group="month">Miesiąc</button>
+            </div>
+            <button class="an-refresh" id="an-refresh" title="Odśwież dane" aria-label="Odśwież dane">⟳</button>
+        </div>
+        <p class="an-range-label" id="an-range-label"></p>
+        <p class="an-note">Dzisiejszy dzień jeszcze trwa - na wykresach liniowych jego odcinek jest przerywany.</p>
+
+        <section class="an-tiles" id="an-tiles"></section>
+
+        <section class="an-grid">
+            <article class="an-card an-wide"><h2>Gracze</h2><p class="an-sub">unikalni gracze dziennie: nowi i powracający</p><div class="an-chart"><canvas id="ch-players"></canvas></div></article>
+            <article class="an-card"><h2>Rundy i pokoje</h2><p class="an-sub">ile rozegrano rund i założono pokoi</p><div class="an-chart"><canvas id="ch-games"></canvas></div></article>
+            <article class="an-card"><h2>Szczyt online</h2><p class="an-sub">najwięcej graczy połączonych naraz</p><div class="an-chart"><canvas id="ch-online"></canvas></div></article>
+            <article class="an-card"><h2>Powroty</h2><p class="an-sub">% nowych graczy, którzy wrócili po 1 dniu i w ciągu 7 dni</p><div class="an-chart"><canvas id="ch-return"></canvas></div></article>
+            <article class="an-card"><h2>Logowania</h2><p class="an-sub">zalogowania przez Google i link z maila</p><div class="an-chart"><canvas id="ch-logins"></canvas></div></article>
+            <article class="an-card"><h2>Skąd przychodzą</h2><p class="an-sub">gracze według źródła wejścia</p><div class="an-chart an-chart-bars"><canvas id="ch-source"></canvas></div></article>
+            <article class="an-card"><h2>Urządzenia</h2><p class="an-sub">gracze według urządzenia</p><div class="an-chart an-chart-bars"><canvas id="ch-device"></canvas></div></article>
+            <article class="an-card"><h2>Tryby gry</h2><p class="an-sub">rozegrane rundy</p><div class="an-chart an-chart-bars"><canvas id="ch-mode"></canvas></div></article>
+            <article class="an-card"><h2>Wielkość grup</h2><p class="an-sub">rundy według liczby graczy w pokoju</p><div class="an-chart an-chart-bars"><canvas id="ch-size"></canvas></div></article>
+            <article class="an-card an-wide"><h2>Najpopularniejsze kategorie</h2><p class="an-sub">10 kategorii z największą liczbą rund</p><div class="an-chart an-chart-tall"><canvas id="ch-category"></canvas></div></article>
+        </section>
+
+        <details class="an-table-wrap">
+            <summary>Tabela - dane dzienne</summary>
+            <div class="an-table-scroll"><table id="an-table"></table></div>
+        </details>
+    </main>
+
+    <p id="an-loading" class="an-loading">Wczytywanie…</p>
+
+    <script src="vendor/chart.js" defer></script>
+    <script src="js/auth.js" defer></script>
+    <script src="js/analytics-page.js" defer></script>
+</body>
+</html>
