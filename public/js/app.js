@@ -3,7 +3,7 @@ const REVEAL_DELAY_MS = 2600;    // po tylu ms odkryty impostor zrzuca przebrani
 const HOST_CROWN_SVG = '<svg viewBox="0 0 26 20" fill="#f1c40f" stroke="black" stroke-width="2" stroke-linejoin="round">'
     + '<path d="M3 17L2 5l6 5 5-8 5 8 6-5-1 12z"/>'
     + '<circle cx="13" cy="13" r="1.6" fill="#e74c3c" stroke="none"/></svg>';
-const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results', 'screen-editor', 'screen-profile'];
+const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results', 'screen-editor', 'screen-profile', 'screen-shop', 'screen-shop-host'];
 const SCREENS_WITH_STATS = ['screen-login', 'screen-customize', 'screen-results'];
 
 // Kolejność części w adresie awatara - taka sama jak w avatars/*.js na serwerze
@@ -94,7 +94,7 @@ function showScreen(screenId, instant = false) {
     // bez animacji, wpychając się w środek przejścia (cała karta podskakiwała)
     const showStats = SCREENS_WITH_STATS.includes(screenId);
     const headers = [
-        [byId('logo'), !(showStats || screenId === 'screen-editor' || screenId === 'screen-profile')],   // edytor i profil potrzebują miejsca
+        [byId('logo'), !(showStats || screenId === 'screen-editor' || screenId === 'screen-profile' || screenId.startsWith('screen-shop'))],   // edytor, profil i sklep potrzebują miejsca
         [byId('player-stats'), showStats]
     ];
 
@@ -668,6 +668,7 @@ function updateCornerButtons() {
     resetLeaveConfirm();
     byId('btn-leave').classList.toggle('hidden', !ROOM_SCREENS.includes(currentScreen));
     byId('btn-rules').classList.toggle('hidden', currentScreen !== 'screen-login');
+    byId('btn-shop').classList.toggle('hidden', currentScreen !== 'screen-login');     // shop.js
     byId('btn-sound').classList.toggle('hidden', currentScreen === 'screen-results');   // na wynikach zasłaniałby napis
     if (typeof updateWakeLock === 'function') updateWakeLock();     // session.js
     byId('btn-download').classList.toggle('hidden', !(canInstall() && currentScreen === 'screen-login'));
@@ -1548,7 +1549,7 @@ function voteOn(selectedTile, maxVotes, playerId) {
 const roleCard = byId('role-card');
 
 function setRoleRevealed(revealed) {
-    roleCard.classList.toggle('revealed', revealed);
+    roleCard.classList.toggle('revealed', revealed || roleCardPinned);
 }
 
 roleCard.addEventListener('pointerdown', event => {
@@ -1565,6 +1566,55 @@ roleCard.addEventListener('keydown', event => {
     }
 });
 roleCard.addEventListener('keyup', () => setRoleRevealed(false));
+
+// ===== TYMCZASOWE: wybór wyglądu karty roli =====
+// Gracze widzą D (tajne akta). Pozostałe wyglądy zostają na razie do ewentualnej zmiany decyzji:
+// wejście z adresem ".../?karty" pokazuje pod kartą przełącznik (zapamiętany na tym urządzeniu, "?karty=0" go chowa).
+// Po ostatecznym wyborze: usunąć nieużywane rc-* w style.css, #rc-switch w index.html i ten blok.
+const ROLE_CARD_STYLES = ['A', 'B', 'C', 'D', 'E'];
+const ROLE_CARD_DEFAULT = 'D';
+let roleCardPinned = false;
+let lastGameData = null;
+
+const roleCardTester = (() => {
+    const param = new URLSearchParams(location.search).get('karty');
+    try {
+        if (param !== null) localStorage.setItem('roleCardTest', param === '0' ? '0' : '1');
+        return localStorage.getItem('roleCardTest') === '1';
+    } catch (e) {
+        return param !== null && param !== '0';
+    }
+})();
+
+function setRoleCardStyle(style) {
+    ROLE_CARD_STYLES.forEach(s => roleCard.classList.toggle(`rc-${s}`, s === style));
+    document.querySelectorAll('#rc-switch [data-rc]').forEach(b => b.classList.toggle('active', b.dataset.rc === style));
+    if (roleCardTester) try { localStorage.setItem('roleCardStyle', style); } catch (e) { /* bez pamięci */ }
+}
+
+function toggleRoleCardPin() {
+    roleCardPinned = !roleCardPinned;
+    byId('rc-pin').classList.toggle('active', roleCardPinned);
+    byId('rc-pin').textContent = roleCardPinned ? 'Zakryj' : 'Odkryj';
+    roleCard.classList.toggle('revealed', roleCardPinned);
+}
+
+// Tylko na tym telefonie: ta sama karta z inną rolą (serwer nic nie wie)
+function previewRole(role) {
+    if (!lastGameData || lastGameData.mode !== 'impostor') return;
+    const notes = { WSPOLNIK: 'Impostor: Ala', DETEKTYW: 'Ola na pewno nie jest impostorem' };
+    gameModes.impostor.showGame({ ...lastGameData, role, data: role === 'IMPOSTOR' ? 'Europa' : lastGameData.data, note: notes[role] });
+    if (roleCardPinned) roleCard.classList.add('revealed');
+}
+
+{
+    let style = ROLE_CARD_DEFAULT;
+    if (roleCardTester) {
+        try { style = localStorage.getItem('roleCardStyle') || ROLE_CARD_DEFAULT; } catch (e) { /* bez pamięci */ }
+        byId('rc-switch').classList.remove('hidden');
+    }
+    setRoleCardStyle(ROLE_CARD_STYLES.includes(style) ? style : ROLE_CARD_DEFAULT);
+}
 
 // ===== ODLICZANIE PRZED RUNDĄ =====
 // Tylko przy starcie rundy (serwer wysyła countdown), nie przy powrocie do trwającej gry
@@ -1944,6 +1994,7 @@ socket.on('is_host', isHost => {
 });
 
 socket.on('game_start', (data) => {
+    lastGameData = data;        // TYMCZASOWE: podgląd ról w przełączniku wyglądu karty
     // ekran gry już stoi (zapamiętany przy uruchomieniu) - serwer tylko go potwierdza, bez dźwięku startu
     const restored = restoredScreen === 'screen-game' || restoredScreen === 'screen-vote';
     const keepVote = restoredScreen === 'screen-vote';     // zaraz przyjdzie też głosowanie

@@ -118,8 +118,11 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4H6v16h8"/><path d="M10 12h11M17 8l4 4-4 4"/></svg>
             <span class="corner-label">Na pewno?</span>
         </button>
-        <!-- Prawy róg: dźwięk, zasady (tylko menu), instalacja (tylko menu) -->
+        <!-- Prawy róg: sklep (tylko menu, shop.js), dźwięk, zasady (tylko menu), instalacja (tylko menu) -->
         <div class="corner-group">
+            <button class="corner-btn corner-shop hidden" id="btn-shop" onclick="openShop()" title="Sklep" aria-label="Sklep">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></svg>
+            </button>
             <button class="corner-btn corner-help" id="btn-sound" onclick="toggleSound()" title="Wycisz" aria-label="Wycisz">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z"/><path class="sound-on" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="sound-off" d="M16 9l5 6M21 9l-5 6"/></svg>
             </button>
@@ -243,17 +246,50 @@
                 <h3>Kategoria: <span id="category-display" style="color: var(--danger); text-shadow: 0 0 20px rgb(252, 81, 81);"></span></h3>
                 <p id="starter-display" class="starter-display hidden"></p>
                 <p id="game-roles" class="room-roles hidden"></p>
-                <!-- Karta roli: przyciemniona, przytrzymanie (palcem albo myszą) ją rozjaśnia -->
-                <div id="role-card" class="role-card" tabindex="0" aria-label="Przytrzymaj, aby zobaczyć rolę">
+                <!-- Karta roli: zakryta, przytrzymanie (palcem albo myszą) ją odkrywa.
+                     Wygląd: klasa rc-A / rc-B / rc-C / rc-D na #role-card (style.css, "KARTA ROLI") -->
+                <div id="role-card" class="role-card rc-D" tabindex="0" aria-label="Przytrzymaj, aby zobaczyć rolę">
                     <div id="role-display">
-                        <div id="impostor-info" class="hidden">
-                            <p>Twoja rola:</p>
-                            <h2 id="role-name">---</h2>
-                            <hr>
+                        <span class="rc-tab">Akta</span>
+                        <div class="rc-sheet">
+                            <div id="impostor-info" class="rc-head hidden">
+                                <span id="role-icon" class="rc-icon"></span>
+                                <div class="rc-who">
+                                    <p class="rc-label rc-role-label">Twoja rola</p>
+                                    <h2 id="role-name">---</h2>
+                                </div>
+                            </div>
+                            <div class="rc-body">
+                                <p id="role-label" class="rc-label">Hasło</p>
+                                <h2 id="role-data">---</h2>
+                                <p id="role-note" class="role-note hidden"></p>
+                            </div>
                         </div>
-                        <p>Twoja informacja:</p>
-                        <h2 id="role-data" color="black">---</h2>
-                        <p id="role-note" class="role-note hidden"></p>
+                    </div>
+                    <div class="rc-cover" aria-hidden="true">
+                        <span class="rc-cover-icon" data-icon="secret"></span>
+                        <span class="rc-stamp">Ściśle tajne</span>
+                        <span class="rc-cover-text">Przytrzymaj, aby zobaczyć</span>
+                    </div>
+                </div>
+                <!-- TYMCZASOWE: wybór wyglądu karty roli - widoczny tylko po wejściu z ?karty (app.js) -->
+                <div id="rc-switch" class="rc-switch hidden">
+                    <div class="rc-switch-row">
+                        <span>Wygląd:</span>
+                        <button data-rc="A" onclick="setRoleCardStyle('A')">A</button>
+                        <button data-rc="B" onclick="setRoleCardStyle('B')">B</button>
+                        <button data-rc="C" onclick="setRoleCardStyle('C')">C</button>
+                        <button data-rc="D" onclick="setRoleCardStyle('D')">D</button>
+                        <button data-rc="E" onclick="setRoleCardStyle('E')">E</button>
+                        <button id="rc-pin" onclick="toggleRoleCardPin()">Odkryj</button>
+                    </div>
+                    <div class="rc-switch-row" id="rc-roles">
+                        <span>Rola:</span>
+                        <button onclick="previewRole('GRACZ')">Gracz</button>
+                        <button onclick="previewRole('IMPOSTOR')">Impostor</button>
+                        <button onclick="previewRole('BLAZEN')">Błazen</button>
+                        <button onclick="previewRole('WSPOLNIK')">Wspólnik</button>
+                        <button onclick="previewRole('DETEKTYW')">Detektyw</button>
                     </div>
                 </div>
                 <!-- Odliczanie przed rundą -->
@@ -355,6 +391,24 @@
                 <div id="profile-content" class="profile-content"></div>
                 <p id="profile-account" class="profile-account">Gość - postęp zapisany w tej przeglądarce.</p>
                 <button class="btn-join" onclick="closeProfile()">Powrót do menu -></button>
+            </div>
+
+            <!-- Sklep: Pakiet Hosta, wygląd, paczki kategorii (shop.js). Płatności jeszcze nie działają -->
+            <div id="screen-shop" class="screen hidden">
+                <h1 class="shop-title">Sklep</h1>
+                <div id="shop-tabs" class="profile-tabs shop-tabs"></div>
+                <div id="shop-content" class="shop-content"></div>
+                <button class="btn-join" onclick="closeShop()">Powrót do menu -></button>
+            </div>
+
+            <!-- Szczegóły Pakietu Hosta (shop.js) - osobny ekran, żeby działało przejście -->
+            <div id="screen-shop-host" class="screen hidden">
+                <h1 class="shop-title shop-title-gold">Pakiet Hosta</h1>
+                <p class="shop-sub">Kupujesz raz - korzysta cały pokój</p>
+                <div id="shop-host-content" class="shop-content shop-host-content"></div>
+                <div class="shop-price"><b>20 zł</b><span>na zawsze</span></div>
+                <button class="shop-buy shop-buy-gold shop-buy-wide" onclick="shopBuy()">Kup Pakiet Hosta</button>
+                <button class="btn-join" onclick="closeHostPack()">Powrót do sklepu -></button>
             </div>
 
             <!-- Ekran edytora własnej kategorii (otwierany z okna kategorii) -->
@@ -544,6 +598,7 @@
     <script src="js/auth.js" defer></script>
     <script src="js/app.js" defer></script>
     <script src="js/profile.js" defer></script>
+    <script src="js/shop.js" defer></script>
     <script src="js/login.js" defer></script>
     <script src="js/session.js" defer></script>
     <script src="js/invite.js" defer></script>

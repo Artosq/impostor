@@ -595,26 +595,16 @@ body::before{
     color: #f1c40f;
     text-shadow: 0 0 14px rgba(241, 196, 15, 0.5);
 }
-/* karty nowych ról i zdanie celu */
-.role-accomplice{
-    background: #8e44ad;
-}
-.role-jester{
-    background: #f1c40f;
-    color: #141414 !important;     /* na żółtym biały tekst byłby nieczytelny */
-}
-.role-jester hr{
-    border-color: #141414;
-}
-.role-detective{
-    background: var(--primary);
-}
+/* kolor roli na karcie (--role) - wygląd karty: "KARTA ROLI" niżej */
+.role-card .role-impostor{ --role: #e74c3c; --role-glow: rgba(231, 76, 60, 0.45); }
+.role-card .role-citizen{ --role: #2ecc71; --role-glow: rgba(46, 204, 113, 0.45); }
+.role-card .role-accomplice{ --role: #b16cf0; --role-glow: rgba(177, 108, 240, 0.45); }
+.role-card .role-jester{ --role: #f1c40f; --role-glow: rgba(241, 196, 15, 0.45); }
+.role-card .role-detective, .role-card .role-none{ --role: #3498db; --role-glow: rgba(52, 152, 219, 0.45); }
 .role-note{
     margin: 10px 0 0;
-    font-size: 0.75em;
-    line-height: 1.5;
-    color: #141414;
-    font-weight: 700;
+    font-size: 0.65em;
+    line-height: 1.6;
 }
 
 /* ZGADYWANIE HASŁA przez impostora */
@@ -1225,6 +1215,8 @@ body::before{
     left: 50%;
     transform: translateX(-50%);
     z-index:999;
+    pointer-events: none;      /* tylko informacja - niewidoczny (opacity 0) blokował kliknięcia przycisków w rogu i zaznaczał tekst */
+    user-select: none;
     padding: 10px;
     opacity: 1;
     border-radius: 5px;
@@ -1831,17 +1823,11 @@ button {
     outline: 5px solid white;
 }
 
-#role-display {
-    padding: 20px;
-    border-radius: 10px;
-    color: whitesmoke;
-    box-sizing: border-box;
-    width: 100%;
-    user-select: none;
-}
-
-/* KARTA ROLI: przyciemniona do zera, rozjaśnia się tylko w trakcie przytrzymania */
+/* KARTA ROLI: zakryta, odkrywa się tylko w trakcie przytrzymania (zasłona .rc-cover znika).
+   Szybko się zakrywa po puszczeniu - nikt obok nie zdąży podejrzeć.
+   TYMCZASOWO 4 wyglądy do wyboru: rc-A ciemna z pasem, rc-B kolorowa z okienkiem, rc-C obrys z poświatą, rc-D tajne akta, rc-E akta + kolor */
 .role-card{
+    position: relative;
     margin-bottom: 20px;
     cursor: pointer;
     user-select: none;
@@ -1850,13 +1836,255 @@ button {
     touch-action: none;
     outline: none;
 }
+.role-card{
+    --role: #2ecc71;
+    --role-glow: rgba(46, 204, 113, 0.45);
+}
+/* Odkrywanie: karta i zasłona płynnie się przenikają. Przytrzymanie - karta wyłania się z lekkiego
+   przybliżenia, zasłona blednie i lekko rośnie. Puszczenie - ten sam ruch wstecz, ale szybciej (nikt nie podejrzy). */
+.role-card{
+    --reveal-in: 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    --reveal-out: 0.16s ease-in;
+}
 .role-card #role-display{
-    filter: brightness(0%);
-    transition: 1s;
+    opacity: 0;
+    transform: scale(0.96);
+    transition: opacity var(--reveal-out), transform var(--reveal-out);
 }
 .role-card.revealed #role-display{
-    filter: brightness(100%);
+    opacity: 1;
+    transform: none;
+    transition: opacity var(--reveal-in), transform var(--reveal-in);
 }
+#role-display{
+    box-sizing: border-box;
+    width: 100%;
+    color: #fff;
+    user-select: none;
+}
+.rc-tab, .rc-stamp{ display: none; }
+.rc-head{ display: flex; align-items: center; justify-content: center; gap: 10px; }
+.rc-head.hidden{ display: none; }
+.rc-icon{ display: block; flex: none; width: 44px; height: 44px; }
+.rc-icon svg, .rc-cover-icon svg{ display: block; width: 100%; height: 100%; }
+.rc-label{ margin: 0; color: #888; font-size: 0.6em; letter-spacing: 1px; }
+#role-name{ margin: 0; font-size: 1.25em; letter-spacing: 2px; }
+#role-data{ margin: 8px 0 0; color: #fff; letter-spacing: 2px; overflow-wrap: anywhere; }
+.rc-role-label{ display: none; }
+
+.rc-cover{
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    box-sizing: border-box;
+    color: #888;
+    font-size: 0.6em;
+    letter-spacing: 1px;
+    transition: opacity var(--reveal-out), transform var(--reveal-out);
+}
+.role-card.revealed .rc-cover{
+    opacity: 0;
+    transform: scale(1.03);
+    transition: opacity var(--reveal-in), transform var(--reveal-in);
+}
+/* pieczątka "zdejmowana" z teczki: unosi się i blednie razem z zasłoną */
+.rc-stamp{
+    transition: transform var(--reveal-out);
+}
+.role-card.revealed .rc-stamp{
+    transform: rotate(-4deg) scale(1.25);
+    transition: transform var(--reveal-in);
+}
+@media (prefers-reduced-motion: reduce){
+    .role-card #role-display,
+    .role-card.revealed .rc-cover,
+    .role-card.revealed .rc-stamp{
+        transform: none;
+    }
+}
+.rc-cover-icon{ display: block; width: 54px; height: 54px; }
+
+/* --- A: ciemna karta, u góry pas w kolorze roli --- */
+.rc-A #role-display{
+    overflow: hidden;
+    border: 5px solid #111;
+    border-radius: 14px;
+    background: #262626;
+    box-shadow: 0 5px 0 #111;
+}
+.rc-A .rc-head{
+    padding: 12px;
+    border-bottom: 4px solid #111;
+    background: var(--role);
+    color: #111;
+}
+.rc-A .rc-icon{ width: 34px; height: 34px; }
+.rc-A .rc-body{ padding: 18px 14px 16px; }
+.rc-A .role-note{ color: #bbb; }
+.rc-A .rc-cover{
+    border: 5px solid #111;
+    border-radius: 14px;
+    background: repeating-linear-gradient(45deg, #262626 0 14px, #2c2c2c 14px 28px);
+}
+
+/* --- B: cała w kolorze roli, hasło w ciemnym okienku --- */
+.rc-B #role-display{
+    padding: 14px;
+    border: 5px solid #111;
+    border-radius: 16px;
+    background: var(--role);
+    color: #111;
+    box-shadow: 0 6px 0 #111;
+}
+.rc-B .rc-head{ justify-content: flex-start; text-align: left; }
+.rc-B .rc-icon{ padding: 5px; box-sizing: border-box; border: 3px solid #111; border-radius: 50%; background: #1f1f1f; }
+.rc-B .rc-role-label{ display: block; color: #111; opacity: 0.7; }
+.rc-B .rc-body{ margin-top: 12px; padding: 12px 8px; border: 4px solid #111; border-radius: 10px; background: #161616; }
+.rc-B .role-note{ color: #ccc; }
+.rc-B .rc-cover{
+    border: 5px solid #111;
+    border-radius: 16px;
+    background: #333;
+    color: #999;
+}
+
+/* --- C: bez wypełnienia, obrys i poświata w kolorze roli (jak przyciski gry) --- */
+.rc-C #role-display{
+    padding: 18px 14px;
+    border: 5px solid var(--role);
+    border-radius: 14px;
+    background: rgba(0, 0, 0, 0.18);
+    box-shadow: 0 0 20px var(--role-glow), inset 0 0 18px var(--role-glow);
+}
+.rc-C .rc-head{ flex-direction: column; gap: 6px; }
+.rc-C .rc-icon{ width: 52px; height: 52px; }
+.rc-C #role-name{ color: var(--role); font-size: 1.4em; letter-spacing: 3px; text-shadow: 0 0 14px var(--role); }
+.rc-C .rc-head:not(.hidden) + .rc-body{ margin-top: 14px; padding-top: 14px; border-top: 2px dashed #3a3a3a; }
+.rc-C .role-note{ color: #aaa; }
+.rc-C .rc-cover{
+    border: 5px dashed #555;
+    border-radius: 14px;
+    background: #1f1f1f;
+}
+
+/* --- D: tajne akta - teczka z zakładką, zakryta z pieczątką --- */
+.rc-D,
+.rc-E{ padding-top: 16px; }
+.rc-D .rc-tab,
+.rc-E .rc-tab{
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 14px;
+    height: 20px;
+    padding: 0 12px;
+    border: 4px solid #111;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: var(--role);
+    color: #111;
+    font-size: 0.55em;
+    line-height: 20px;
+}
+.rc-D .rc-sheet{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 16px 14px;
+    border: 5px solid #111;
+    border-radius: 4px 14px 14px 14px;
+    background: #2a2a2a;
+    box-shadow: 0 5px 0 #111;
+    text-align: left;
+}
+.rc-D .rc-head{ justify-content: flex-start; }
+.rc-D .rc-icon{ width: 56px; height: 56px; padding: 6px; box-sizing: border-box; border: 3px solid #111; border-radius: 10px; background: #1c1c1c; }
+.rc-D #role-name{ color: var(--role); }
+.rc-D .rc-role-label{ display: block; }
+.rc-D #role-data{ padding: 8px; border: 2px dashed #555; border-radius: 6px; text-align: center; }
+.rc-D .role-note{ color: #aaa; }
+.rc-D .rc-cover,
+.rc-E .rc-cover{
+    top: 16px;
+    border: 5px solid #111;
+    border-radius: 4px 14px 14px 14px;
+    background: #2a2a2a;
+}
+.rc-D .rc-cover-icon,
+.rc-E .rc-cover-icon{ display: none; }
+.rc-D .rc-cover::before,
+.rc-E .rc-cover::before{
+    content: "Akta";
+    position: absolute;
+    top: -21px;
+    left: 9px;
+    height: 20px;
+    padding: 0 12px;
+    border: 4px solid #111;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+    background: #555;
+    color: #111;
+    line-height: 20px;
+}
+.rc-D .rc-cover-text,
+.rc-E .rc-cover-text{ position: absolute; bottom: 12px; left: 0; right: 0; }
+.rc-D .rc-stamp,
+.rc-E .rc-stamp{
+    display: block;
+    padding: 6px 12px;
+    border: 4px solid var(--danger);
+    border-radius: 6px;
+    color: var(--danger);
+    font-size: 2em;
+    letter-spacing: 3px;
+    text-shadow: 0 0 10px rgba(231, 76, 60, 0.5);
+    transform: rotate(-10deg);
+}
+
+/* --- E: teczka z D (zakładka, pieczątka) + kolorowa karta z okienkiem z B --- */
+.rc-E .rc-sheet{
+    padding: 14px;
+    border: 5px solid #111;
+    border-radius: 4px 16px 16px 16px;
+    background: var(--role);
+    color: #111;
+    box-shadow: 0 6px 0 #111;
+}
+.rc-E .rc-tab{ background: #1f1f1f; color: var(--role); }
+.rc-E .rc-head{ justify-content: flex-start; text-align: left; }
+.rc-E .rc-icon{ padding: 5px; box-sizing: border-box; border: 3px solid #111; border-radius: 50%; background: #1f1f1f; }
+.rc-E .rc-role-label{ display: block; color: #111; opacity: 0.7; }
+.rc-E .rc-body{ margin-top: 12px; padding: 12px 8px; border: 4px solid #111; border-radius: 10px; background: #161616; }
+.rc-E .role-note{ color: #ccc; }
+
+/* TYMCZASOWE: przełącznik wyglądu karty (usunąć po wyborze) */
+.rc-switch{
+    margin: -6px 0 16px;
+    padding: 8px;
+    border: 2px dashed #555;
+    border-radius: 10px;
+    font-size: 0.55em;
+    color: #999;
+}
+.rc-switch-row{ display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
+.rc-switch-row + .rc-switch-row{ margin-top: 6px; }
+.rc-switch button{
+    width: auto;
+    margin: 0;
+    padding: 5px 8px;
+    border: 2px solid #444;
+    border-radius: 6px;
+    background: #262626;
+    color: #ccc;
+    font-size: 1em;
+}
+.rc-switch button.active{ border-color: var(--secondary); color: var(--secondary); }
 
 /* ODLICZANIE 3-2-1 przed rundą: zasłania kartę gry */
 .round-countdown{
@@ -1890,18 +2118,6 @@ button {
     30% { opacity: 1; transform: scale(1); }
     80% { opacity: 1; transform: scale(0.95); }
     100% { opacity: 0.2; transform: scale(0.8); }
-}
-#role-data{
-    color: var(--dark);
-}
-.role-impostor { 
-    background: var(--danger); 
-}
-.role-citizen { 
-    background: var(--secondary); 
-}
-.role-none { 
-    background: var(--primary); 
 }
 .player-tag, .player-avatar{ 
 animation: fadeIn 0.5s ease-in; 
@@ -3787,4 +4003,518 @@ img.skeleton-failed{
 @keyframes badgePop {
     from { opacity: 0; transform: scale(0.6); }
     to { opacity: 1; transform: scale(1); }
+}
+
+/* ===== SKLEP (shop.js) ===== */
+/* najmniejszy tekst ok. 11 px - czcionka pikselowa przy mniejszych rozmiarach jest nieczytelna */
+.corner-shop{
+    color: #f1c40f;
+}
+.corner-shop:hover{
+    border-color: #f1c40f;
+    background: #2a2410;
+    box-shadow: 0 0 14px rgba(241, 196, 15, 0.4), 0 3px 0 #111;
+}
+.shop-title{
+    margin: 4px 0 12px;
+    font-size: 24px;
+    letter-spacing: 2px;
+    color: var(--secondary);
+    text-shadow: 0 0 18px var(--secondary);
+}
+.shop-title.shop-title-gold{
+    margin: 4px 30px 4px;          /* długi tytuł nie wchodzi pod przycisk dźwięku */
+    font-size: 20px;
+    letter-spacing: 1px;
+    color: #f1c40f;
+    text-shadow: 0 0 18px #f1c40f;
+}
+.shop-sub{
+    margin: 0 0 6px;
+    font-size: 12px;
+    color: #ccc;
+}
+.shop-tabs .customize-categories-tile{
+    font-size: 11px;
+}
+.shop-content{
+    box-sizing: border-box;
+    max-height: 56vh;
+    min-height: 260px;
+    overflow-y: auto;
+    padding: 2px 4px 8px;
+    text-align: left;
+}
+.shop-host-content{
+    max-height: 44vh;
+    min-height: 200px;
+}
+.shop-fade{
+    animation: screenFadeIn .25s ease-out;
+}
+.shop-section, .shop-group{
+    margin: 16px 0 8px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: #999;
+}
+.shop-group{
+    color: #f1c40f;
+}
+.shop-hint{
+    margin: 12px 0 8px;
+    font-size: 11px;
+    line-height: 1.6;
+    color: #999;
+    text-align: center;
+}
+button.shop-hint-gold{
+    display: block;
+    width: 100%;
+    margin: 0 0 10px;
+    padding: 12px 10px;
+    border: 3px solid #f1c40f;
+    border-radius: 12px;
+    background: #2a2410;
+    color: #ddd;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.5;
+}
+.shop-hint-gold b{
+    color: #f1c40f;
+}
+.shop-card{
+    position: relative;
+    margin-bottom: 10px;
+    padding: 12px;
+    background: #1f1f1f;
+    border: 4px solid #111;
+    border-radius: 14px;
+    box-shadow: 0 4px 0 #111;
+}
+
+/* Pakiet Hosta - złota karta na górze */
+.shop-hero{
+    overflow: hidden;
+    border-color: #f1c40f;
+    box-shadow: 0 0 22px rgba(241, 196, 15, 0.3), 0 4px 0 #111;
+    cursor: pointer;
+}
+.shop-ribbon{
+    position: absolute;
+    top: 14px;
+    right: -36px;
+    padding: 3px 38px;
+    transform: rotate(35deg);
+    border: 2px solid #111;
+    background: var(--danger);
+    color: white;
+    font-size: 11px;
+}
+.shop-hero-title{
+    margin: 0;
+    font-size: 19px;
+    letter-spacing: 1px;
+    color: #f1c40f;
+}
+.shop-hero-sub{
+    margin: 4px 0 10px;
+    font-size: 11px;
+    color: #bbb;
+}
+.shop-perks{
+    margin: 0 0 10px;
+    padding: 0;
+    list-style: none;
+    font-size: 12px;
+    line-height: 1.9;
+}
+.shop-perks li::before{
+    content: "+ ";
+    color: var(--secondary);
+}
+.shop-more{
+    margin-top: 8px;
+    text-align: center;
+    color: #f1c40f;
+    font-size: 11px;
+}
+
+/* przyciski z ceną */
+button.shop-buy{
+    width: 100%;
+    margin: 6px 0 0;
+    padding: 7px 4px;
+    border: 3px solid #111;
+    border-radius: 9px;
+    background: var(--secondary);
+    color: #111;
+    font-size: 13px;
+    box-shadow: 0 3px 0 #111;
+    transition: transform .15s, box-shadow .15s, filter .2s;
+}
+button.shop-buy:hover{
+    filter: brightness(1.1);
+}
+button.shop-buy:active{
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #111;
+}
+button.shop-buy-gold{
+    background: #f1c40f;
+}
+button.shop-buy-wide{
+    padding: 12px 4px;
+    border-width: 4px;
+    font-size: 15px;
+    box-shadow: 0 4px 0 #111;
+}
+.shop-price{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 12px 0 4px;
+}
+.shop-price b{
+    font-size: 28px;
+    color: #f1c40f;
+    text-shadow: 0 0 14px rgba(241, 196, 15, .6);
+}
+.shop-price span{
+    padding: 3px 6px;
+    border: 3px solid var(--secondary);
+    border-radius: 8px;
+    color: var(--secondary);
+    font-size: 11px;
+}
+
+/* siatka wyglądu */
+.shop-grid{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+.shop-item{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    background: #1f1f1f;
+    border: 4px solid #111;
+    border-radius: 12px;
+    box-shadow: 0 3px 0 #111;
+    text-align: center;
+}
+.shop-anim{
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    z-index: 3;
+    padding: 1px 5px;
+    border: 2px solid #111;
+    border-radius: 6px;
+    background: #b16cf0;
+    color: #111;
+    font-size: 11px;
+}
+.shop-item-name{
+    flex: 1;
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+}
+.shop-item-name small, .shop-row-text small{
+    display: block;
+    margin-top: 2px;
+    color: #999;
+    font-size: 11px;
+}
+.shop-pic{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 86px;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #262626;
+}
+.shop-pic-avatar{
+    position: relative;
+    width: 64px;
+    height: 64px;
+}
+.shop-pic-avatar img{
+    display: block;
+    width: 100%;
+    border: 3px solid #111;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+.shop-overlay{
+    position: absolute;
+    pointer-events: none;
+}
+.shop-hat{
+    top: -20px;
+    left: -8px;
+    width: 80px;
+    animation: shopHatTip 2.4s ease-in-out infinite;
+}
+.shop-pic-mafia img{
+    filter: grayscale(.6) contrast(1.1);
+}
+.shop-pic-space{
+    background: radial-gradient(circle at 20% 30%, #fff 0 1px, transparent 2px), radial-gradient(circle at 80% 70%, #fff 0 1px, transparent 2px), radial-gradient(circle at 60% 15%, #fff 0 1px, transparent 2px), #141a2e;
+}
+.shop-helmet{
+    top: -12px;
+    left: -12px;
+    width: 88px;
+    height: 88px;
+}
+.shop-aura{
+    position: absolute;
+    inset: -5px;
+    border: 3px solid #b16cf0;
+    border-radius: 16px;
+    box-shadow: 0 0 14px #b16cf0;
+    animation: shopAura 1.6s ease-in-out infinite;
+}
+.shop-pic-fire .shop-aura{
+    border-color: #ff7a1a;
+    box-shadow: 0 0 14px #ff7a1a, 0 -6px 18px #e74c3c;
+    animation-duration: .7s;
+}
+.shop-nick-rainbow{
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 15px;
+    background: linear-gradient(90deg, #2ecc71, #3498db, #b16cf0, #e74c3c, #f1c40f, #2ecc71);
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shopRainbow 3s linear infinite;
+}
+.shop-mini-card{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 62px;
+    border: 3px dashed #555;
+    border-radius: 10px;
+    background: repeating-linear-gradient(45deg, #262626 0 8px, #2c2c2c 8px 16px);
+}
+.shop-mini-stamp{
+    padding: 2px 4px;
+    transform: rotate(-10deg);
+    border: 2px solid var(--danger);
+    border-radius: 4px;
+    color: var(--danger);
+    font-size: 11px;
+}
+.shop-pic-card-neon .shop-mini-card{
+    border: 3px solid var(--secondary);
+    background: #1a1a1a;
+    box-shadow: 0 0 14px rgba(46, 204, 113, .5), inset 0 0 10px rgba(46, 204, 113, .25);
+}
+.shop-pic-card-color .shop-mini-card{
+    border: 3px solid #111;
+    background: var(--secondary);
+}
+.shop-pic-card-color .shop-mini-stamp{
+    border-color: #111;
+    background: #161616;
+}
+
+/* wiersze: paczki kategorii, komplet */
+.shop-pack, .shop-bundle{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.shop-pack button.shop-buy, .shop-bundle button.shop-buy{
+    flex: none;
+    width: 76px;
+    margin: 0;
+}
+.shop-row-text{
+    flex: 1;
+    min-width: 0;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.shop-row-icon{
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border: 3px solid #111;
+    border-radius: 8px;
+    background: #262626;
+}
+.shop-row-icon svg{
+    width: 22px;
+    height: 22px;
+}
+.shop-bundle{
+    border-color: #b16cf0;
+    box-shadow: 0 0 16px rgba(177, 108, 240, .3), 0 4px 0 #111;
+}
+.shop-bundle b{
+    display: block;
+    margin-bottom: 3px;
+    color: #b16cf0;
+    font-size: 17px;
+}
+.shop-bundle s{
+    color: #999;
+}
+
+/* szczegóły Pakietu Hosta: awatar z koroną i plakietką */
+.shop-host-avatar{
+    position: relative;
+    width: 96px;
+    margin: 30px auto 18px;
+}
+.shop-host-avatar img{
+    display: block;
+    width: 96px;
+    border: 4px solid #f1c40f;
+    border-radius: 16px;
+    box-sizing: border-box;
+    box-shadow: 0 0 18px rgba(241, 196, 15, .45);
+}
+.shop-crown{
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    width: 52px;
+    transform-origin: 50% 100%;
+    filter: drop-shadow(0 0 6px rgba(241, 196, 15, .7));
+    animation: shopCrown 2.6s ease-in-out infinite;
+}
+.shop-host-tag{
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 3px 8px;
+    white-space: nowrap;
+    border: 3px solid #111;
+    border-radius: 8px;
+    background: #f1c40f;
+    color: #111;
+    font-size: 11px;
+}
+
+/* kafelki korzyści - dotknięcie pokazuje opis */
+.shop-tiles{
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+button.shop-tile{
+    --tile: #f1c40f;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: auto;
+    margin: 0;
+    padding: 10px 6px;
+    background: #262626;
+    border: 4px solid #111;
+    border-top-color: var(--tile);
+    border-radius: 12px;
+    box-shadow: 0 3px 0 #111;
+    color: #eee;
+    font-size: 12px;
+    font-weight: normal;
+    line-height: 1.35;
+    transition: background .2s, box-shadow .2s, transform .15s;
+}
+button.shop-tile:hover{
+    background: #2c2c2c;
+}
+button.shop-tile:active{
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #111;
+}
+button.shop-tile.open{
+    border-color: var(--tile);
+    box-shadow: 0 0 14px color-mix(in srgb, var(--tile) 45%, transparent), 0 3px 0 #111;
+}
+.shop-tile-wide{
+    grid-column: 1 / -1;
+}
+button.shop-tile-wide{
+    flex-direction: row;
+    gap: 10px;
+    padding-left: 12px;
+    text-align: left;
+}
+.shop-tile-icon{
+    display: flex;
+    width: 34px;
+    height: 34px;
+    flex: none;
+}
+.shop-tile-icon svg{
+    width: 100%;
+    height: 100%;
+}
+.shop-tiles .shop-tile-gold{ --tile: #f1c40f; }
+.shop-tiles .shop-tile-green{ --tile: #2ecc71; }
+.shop-tiles .shop-tile-violet{ --tile: #b16cf0; }
+.shop-tiles .shop-tile-blue{ --tile: #3498db; }
+.shop-tiles .shop-tile-red{ --tile: #e74c3c; }
+.shop-desc{
+    grid-column: 1 / -1;
+    padding: 10px 12px;
+    border: 3px solid var(--tile);
+    border-radius: 12px;
+    background: #1a1a1a;
+    animation: shopDesc .25s ease-out;
+}
+.shop-desc b{
+    display: block;
+    margin-bottom: 6px;
+    color: var(--tile);
+    font-size: 13px;
+}
+.shop-desc p{
+    margin: 0;
+    color: #ddd;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+@keyframes shopDesc{
+    from{ opacity: 0; transform: translateY(-6px); }
+    to{ opacity: 1; transform: none; }
+}
+@keyframes shopCrown{
+    0%, 100%{ transform: translateX(-50%) rotate(-8deg); }
+    50%{ transform: translateX(-50%) rotate(6deg) translateY(-2px); }
+}
+@keyframes shopHatTip{
+    0%, 70%, 100%{ transform: rotate(0); }
+    80%{ transform: rotate(-8deg) translateY(-3px); }
+}
+@keyframes shopAura{
+    0%, 100%{ opacity: .55; transform: scale(1); }
+    50%{ opacity: 1; transform: scale(1.06); }
+}
+@keyframes shopRainbow{
+    to{ background-position: 200% 0; }
+}
+@media (prefers-reduced-motion: reduce){
+    .shop-crown, .shop-hat, .shop-aura, .shop-nick-rainbow, .shop-desc, .shop-fade{ animation: none; }
 }

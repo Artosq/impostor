@@ -54,6 +54,7 @@ gameModes.pytania = {
         if (data.skipped) byId('input-answer').value = '';
         extra.classList.toggle('hidden', !extra.childElementCount);
 
+        byId('role-label').textContent = 'Pytanie';
         byId('role-data').style.fontSize = "120%";
         byId('role-data').innerText = data.question;
     },

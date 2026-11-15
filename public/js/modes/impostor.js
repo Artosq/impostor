@@ -5,12 +5,12 @@ let impostorRole = null;     // rola z początku rundy - przycisk zgadywania wid
 
 // Wygląd ról: nazwa na karcie, kolor karty i jedno zdanie celu
 const ROLE_INFO = {
-    IMPOSTOR: { label: 'IMPOSTOR', card: 'role-impostor', goal: 'Nie daj się złapać' },
-    GRACZ: { label: 'GRACZ', card: 'role-citizen', goal: '' },
-    WSPOLNIK: { label: 'WSPÓLNIK', card: 'role-accomplice', goal: 'Chroń impostora - wygrywasz razem z nim' },
-    BLAZEN: { label: 'BŁAZEN', card: 'role-jester', goal: 'Daj się wyrzucić - wtedy wygrywasz sam' },
-    DETEKTYW: { label: 'DETEKTYW', card: 'role-detective', goal: 'Pomóż złapać impostora' },
-    PODMIENIEC: { label: 'PODMIENIEC', card: 'role-citizen', goal: '' }
+    IMPOSTOR: { label: 'IMPOSTOR', card: 'role-impostor', icon: 'bluffer', goal: 'Nie daj się złapać' },
+    GRACZ: { label: 'GRACZ', card: 'role-citizen', icon: 'clean', goal: '' },
+    WSPOLNIK: { label: 'WSPÓLNIK', card: 'role-accomplice', icon: 'accomplice', goal: 'Chroń impostora - wygrywasz razem z nim' },
+    BLAZEN: { label: 'BŁAZEN', card: 'role-jester', icon: 'jester', goal: 'Daj się wyrzucić - wtedy wygrywasz sam' },
+    DETEKTYW: { label: 'DETEKTYW', card: 'role-detective', icon: 'detective', goal: 'Pomóż złapać impostora' },
+    PODMIENIEC: { label: 'PODMIENIEC', card: 'role-citizen', icon: 'clean', goal: '' }
 };
 const ROLE_NAMES = { WSPOLNIK: 'Wspólnik', BLAZEN: 'Błazen', DETEKTYW: 'Detektyw', PODMIENIEC: 'Podmieniec' };
 
@@ -63,6 +63,8 @@ gameModes.impostor = {
         byId('starter-display').textContent = data.starter.id === myPlayerId ? 'Zaczynasz Ty!' : `Zaczyna: ${data.starter.name}`;
 
         byId('role-name').innerText = info.label;
+        byId('role-icon').innerHTML = GameIcons.svg(info.icon);
+        byId('role-label').textContent = data.role === 'IMPOSTOR' ? 'Podpowiedź' : 'Hasło';
         byId('role-data').style.fontSize = "150%";
         byId('role-data').innerText = data.data;
     },
