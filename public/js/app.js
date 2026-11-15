@@ -75,44 +75,77 @@ document.addEventListener('animationend', event => {
     if (event.animationName === 'screenFadeOut' && event.target.classList.contains('screen-leaving')) finishLeaving(event.target);
 });
 
-function showScreen(screenId) {
+function startEntering(element) {
+    element.classList.remove('screen-entering');
+    void element.offsetWidth;            // ponowne dodanie klasy zaczyna animację od początku
+    element.classList.add('screen-entering');
+}
+
+function showScreen(screenId, instant = false) {
     const previous = currentScreen;
     currentScreen = screenId;
+    const changed = previous !== screenId;
 
-    // poprzednie przejście jeszcze trwa - kończymy je od razu
-    document.querySelectorAll('.screen-leaving').forEach(finishLeaving);
+    // poprzednie przejście jeszcze trwa - kończymy je od razu. Ten sam ekran drugi raz (np. poczekalnia pokazana
+    // od razu po kliknięciu, a po chwili odpowiedź serwera) nie przerywa wygaszania - stary ekran znikał skokiem
+    if (changed) document.querySelectorAll('.screen-leaving').forEach(finishLeaving);
+
+    // Logo leży nad ekranami - przechodzi razem z nimi. Wcześniej pojawiało się i znikało
+    // bez animacji, wpychając się w środek przejścia (cała karta podskakiwała)
+    const showStats = SCREENS_WITH_STATS.includes(screenId);
+    const headers = [
+        [byId('logo'), !(showStats || screenId === 'screen-editor' || screenId === 'screen-profile')],   // edytor i profil potrzebują miejsca
+        [byId('player-stats'), showStats]
+    ];
 
     // Przejście tylko przy faktycznej zmianie ekranu (np. odświeżenie poczekalni pokazuje ten sam ekran).
     // Stary ekran zostaje na chwilę widoczny w swoim miejscu i blednie, nowy od razu zajmuje swoje miejsce w karcie.
-    const old = previous && previous !== screenId ? byId(previous) : null;
-    const animate = old && !old.classList.contains('hidden');
+    const old = changed && previous ? byId(previous) : null;
+    const animate = !instant && old && !old.classList.contains('hidden');
     if (animate) {
-        old.style.top = `${old.offsetTop}px`;
-        old.style.left = `${old.offsetLeft}px`;
-        old.style.width = `${old.offsetWidth}px`;
-        old.classList.remove('screen-entering');     // w tej samej chwili zaczyna blednąć - nic nie rusza od nowa
-        old.classList.add('screen-leaving');
-        // zabezpieczenie, gdyby przeglądarka nie zgłosiła końca animacji (karta w tle, animacje wyłączone)
-        setTimeout(() => { if (old.classList.contains('screen-leaving')) finishLeaving(old); }, SCREEN_LEAVE_MAX_MS);
+        const leaving = [old, ...headers.filter(([el, visible]) => !visible && !el.classList.contains('hidden') && !el.closest('.screen')).map(([el]) => el)];
+        // Najpierw pomiar wszystkich (każde przypięcie zmienia układ pozostałych). Potem przypięcie w rogu
+        // i przesunięcie o różnicę - tak trafia dokładnie na swoje miejsce niezależnie od marginesów i rodzica
+        // Punkt odniesienia: pierwszy widoczny element w środku - jego margines u góry w zwykłym układzie wystaje
+        // poza ekran, a po przypięciu zostaje w środku (bez tego treść zjeżdżała o te kilka pikseli)
+        const anchors = leaving.map(el => [...el.children].find(child => child.getClientRects().length) || el);
+        const before = anchors.map(a => a.getBoundingClientRect());
+        const widths = leaving.map(el => el.getBoundingClientRect().width);
+        leaving.forEach((el, i) => {
+            el.style.top = el.style.left = '0px';
+            el.style.width = `${widths[i]}px`;
+            el.classList.remove('screen-entering');     // w tej samej chwili zaczyna blednąć - nic nie rusza od nowa
+            el.classList.add('screen-leaving');
+        });
+        const pinned = anchors.map(a => a.getBoundingClientRect());
+        leaving.forEach((el, i) => {
+            el.style.top = `${before[i].top - pinned[i].top}px`;
+            el.style.left = `${before[i].left - pinned[i].left}px`;
+            // zabezpieczenie, gdyby przeglądarka nie zgłosiła końca animacji (karta w tle, animacje wyłączone)
+            setTimeout(() => { if (el.classList.contains('screen-leaving')) finishLeaving(el); }, SCREEN_LEAVE_MAX_MS);
+        });
     }
 
     SCREENS.forEach(id => {
-        if (!(animate && id === previous)) byId(id).classList.add('hidden');
+        if (!byId(id).classList.contains('screen-leaving')) byId(id).classList.add('hidden');
     });
     const screen = byId(screenId);
     screen.classList.remove('hidden');
-    if (animate) {
-        screen.classList.remove('screen-entering');
-        void screen.offsetWidth;            // ponowne dodanie klasy zaczyna animację od początku
-        screen.classList.add('screen-entering');
-    }
+    if (animate) startEntering(screen);
+
+    // Pasek z awatarem leży w ekranie menu - wchodzi i blednie razem z nim (nie chowamy go w trakcie wygaszania)
+    headers.forEach(([el, visible]) => {
+        const parentScreen = el.closest('.screen');
+        if (visible && el.classList.contains('hidden')) {
+            el.classList.remove('hidden');
+            if (animate && !parentScreen) startEntering(el);
+        } else if (!visible && !el.classList.contains('screen-leaving') && !(parentScreen && parentScreen.classList.contains('screen-leaving'))) {
+            el.classList.add('hidden');
+        }
+    });
 
     // wejście do poczekalni (z menu, gry, wyników, edytora) - wszystkie kafelki graczy wchodzą od nowa
     if (screenId === 'screen-lobby' && previous !== 'screen-lobby') lobbyTilesRoom = null;
-
-    const showStats = SCREENS_WITH_STATS.includes(screenId);
-    byId('logo').classList.toggle('hidden', showStats || screenId === 'screen-editor' || screenId === 'screen-profile');   // edytor i profil potrzebują miejsca
-    byId('player-stats').classList.toggle('hidden', !showStats);
     if (screenId === 'screen-login' && typeof maybeShowLoginPrompt === 'function') maybeShowLoginPrompt();   // login.js
     updateCornerButtons();
 }
@@ -173,7 +206,8 @@ function avatarUrl(avatar, state) {
 
     const parts = AVATAR_ORDER[style].map(part => encodeURIComponent((avatar && avatar[part]) || '-')).join('/');
     const query = [];
-    if (avatarCatalog && avatarCatalog.version) query.push(`v=${avatarCatalog.version}`);
+    const version = avatarCatalog ? avatarCatalog.version : restoredAvatarVersion;
+    if (version) query.push(`v=${version}`);
     if (state) query.push(`state=${state}`);
     if (reducedMotion.matches) query.push('motion=off');
     return `/avatar/${style}/${parts}${query.length ? `?${query.join('&')}` : ''}`;
@@ -574,8 +608,44 @@ socket.on('account_profile', profile => {
     if (currentScreen === 'screen-profile' && typeof renderProfileTabs === 'function') renderProfileTabs();
 });
 
+// Poczekalnia pokazuje się od razu po kliknięciu (z naszym kafelkiem i domyślnymi ustawieniami),
+// a serwer po chwili dopisuje kod pokoju - bez tego przejście czekało na odpowiedź i wyglądało jak lag
+const PENDING_ID = 'pending';
+let pendingCreate = false;
+
+function defaultRoomSettings() {
+    const mode = availableModes[0];
+    if (!mode) return null;
+    const category = mode.categories.find(c => !c.random) || mode.categories[0];
+    const options = {};
+    (mode.options || []).forEach(o => { options[o.id] = Boolean(o.default); });
+    return { mode: mode.id, category: category ? category.id : null, impostorCount: 1, custom: null, options };
+}
+
 function createRoom() {
-    socket.emit('create_room', { ...nickToSend(), avatar: botConfig, level: playerLVL, userId: userId });
+    const nick = nickToSend();
+    socket.emit('create_room', { ...nick, avatar: botConfig, level: playerLVL, userId: userId });
+    if (currentRoomCode) return;           // przejście z innego pokoju - poczekalnię pokaże serwer
+
+    pendingCreate = true;
+    myPlayerId = PENDING_ID;
+    showScreen('screen-lobby');
+    renderLobby({
+        code: '----',
+        isPrivate: false,
+        settings: defaultRoomSettings(),
+        hostId: PENDING_ID,
+        players: [{ id: PENDING_ID, name: nick.playerName, avatar: botConfig, level: playerLVL }]
+    });
+    setHostControls(true);
+}
+
+// Serwer nie założył pokoju (np. za dużo pokoi) - wracamy do menu
+function cancelPendingCreate() {
+    if (!pendingCreate) return;
+    pendingCreate = false;
+    myPlayerId = null;
+    showScreen('screen-login');
 }
 
 // function gameModePanel(){
@@ -1200,7 +1270,7 @@ function renderLobby(room) {
     }
 
     const tiles = room.players.map(p => {
-        const key = JSON.stringify([p.name, avatarUrl(p.avatar), p.id === room.hostId, Boolean(p.away), p.id === myPlayerId, isHost]);
+        const key = JSON.stringify([p.id, p.name, avatarUrl(p.avatar), p.id === room.hostId, Boolean(p.away), p.id === myPlayerId, isHost]);
         const known = lobbyTiles.get(p.id);
         if (known && known.key === key) return known.element;      // nic się nie zmieniło - kafelek zostaje, bez animacji
 
@@ -1796,11 +1866,25 @@ socket.on("connect_error", (error) => {
 socket.on('joined', ({ roomCode, playerId }) => {
     currentRoomCode = roomCode;
     myPlayerId = playerId;
+    if (pendingCreate) {
+        // tymczasowy kafelek w poczekalni to już my w prawdziwym pokoju - zostaje bez ponownego wejścia
+        const tile = lobbyTiles.get(PENDING_ID);
+        lobbyTiles.delete(PENDING_ID);
+        if (tile) lobbyTiles.set(playerId, tile);
+        lobbyTilesRoom = roomCode;
+        if (shownNames.has(PENDING_ID)) shownNames.set(playerId, shownNames.get(PENDING_ID));
+        shownNames.delete(PENDING_ID);
+        shownNamesRoom = roomCode;
+    }
+    saveRoomSnapshot({});
 });
 
 socket.on('rejoin_failed', (failed) => {
     if (!failed) return;
 
+    roomAnswered = true;
+    restoredScreen = null;
+    clearRoomSnapshot();
     localStorage.removeItem('lastRoomCode');
     if (currentRoomCode) {
         // Pokój zniknął, gdy nas nie było (np. serwer był restartowany)
@@ -1816,7 +1900,11 @@ if (savedModes()) renderModes(savedModes().modes);    // zapamiętana lista - se
 socket.on('room_list', renderRoomList);
 
 socket.on('room_update', (room) => {
+    roomAnswered = true;
+    pendingCreate = false;
+    restoredScreen = null;
     currentRoomCode = room.code;
+    saveRoomSnapshot({ screen: 'lobby', room, game: null, vote: null });
     socket.emit('check_host', currentRoomCode);
     localStorage.setItem('lastRoomCode', room.code);
     byId('input-answer').value = "";
@@ -1844,40 +1932,127 @@ socket.on('left_room_success', () => {
     closeCategoryPicker();
     currentRoomCode = "";
     lobbySnapshot = null;
+    roomAnswered = true;
+    clearRoomSnapshot();
     localStorage.removeItem('lastRoomCode');
     showScreen('screen-login');
 });
 
-socket.on('is_host', setHostControls);
+socket.on('is_host', isHost => {
+    setHostControls(isHost);
+    if (currentRoomCode && roomSnapshot) saveRoomSnapshot({ isHost });
+});
 
 socket.on('game_start', (data) => {
-    showScreen('screen-game');
+    // ekran gry już stoi (zapamiętany przy uruchomieniu) - serwer tylko go potwierdza, bez dźwięku startu
+    const restored = restoredScreen === 'screen-game' || restoredScreen === 'screen-vote';
+    const keepVote = restoredScreen === 'screen-vote';     // zaraz przyjdzie też głosowanie
+    roomAnswered = true;
+    restoredScreen = null;
+    saveRoomSnapshot({ screen: 'game', game: data, vote: null });
+    if (!keepVote) showScreen('screen-game');
     showGame(data);
     noteRoundStart(data);       // profile.js - kategoria i czas rundy do statystyk
     updateSkipButton(data);
     if (data.countdown) startCountdown();
-    else sfx.play('roundStart');
+    else if (!restored) sfx.play('roundStart');
     if (data.skipped) showError(`Host wylosował nowe ${SKIP_CONTENT[data.mode] || 'zadanie'} - sprawdź kartę`, true);
     socket.emit('check_host', currentRoomCode);
 });
 
 socket.on('start_vote', (vote) => {
+    const restored = currentScreen === 'screen-vote';      // głosowanie już widać (z pamięci) - bez dźwięku
+    saveRoomSnapshot({ screen: 'vote', vote });
     showScreen('screen-vote');
-    sfx.play('voteStart');
+    if (!restored) sfx.play('voteStart');
     noteVote(vote);             // profile.js - odpowiedzi w "Kto z nas" do statystyk
     renderVoteTiles(vote);
 });
 
 socket.on('vote_status', renderVoteStatus);
 
-socket.on('game_over', showResults);
+socket.on('game_over', results => {
+    saveRoomSnapshot({ screen: 'lobby', game: null, vote: null });     // po odświeżeniu na wynikach serwer wraca do poczekalni
+    showResults(results);
+});
 
 socket.on('receive_fuck', (data) => {
     sfx.play('reaction');
     showFuck(data.playerId);
 });
 
-socket.on('error', showError);
+socket.on('error', message => {
+    cancelPendingCreate();
+    showError(message);
+});
+
+// ===== SZYBKI POWRÓT DO POKOJU =====
+// Po ponownym uruchomieniu gry (telefon zamknął kartę, odświeżenie) od razu pokazujemy ostatni ekran pokoju
+// z pamięci, a serwer po połączeniu tylko go odświeża. Wcześniej najpierw było menu i skok do gry po chwili.
+// Gdy pokoju już nie ma, serwer odpowiada "rejoin_failed" i wracamy do menu z komunikatem.
+const ROOM_SNAPSHOT_KEY = 'roomSnapshot';
+const ROOM_SNAPSHOT_MAX_AGE_MS = 3 * 60 * 60 * 1000;     // jak w skrypcie w <head> (index.html)
+let roomSnapshot = null;
+let roomAnswered = false;           // serwer już przysłał stan pokoju - zapamiętany widok jest zbędny
+let restoredScreen = null;          // ekran pokazany z pamięci, jeszcze niepotwierdzony przez serwer
+let restoredAvatarVersion = null;   // wersja obrazków awatarów, zanim wczyta się katalog
+
+function saveRoomSnapshot(changes) {
+    if (!currentRoomCode) return;
+    const base = roomSnapshot && roomSnapshot.code === currentRoomCode ? roomSnapshot : {};
+    roomSnapshot = {
+        ...base,
+        ...changes,
+        code: currentRoomCode,
+        playerId: myPlayerId,
+        avatarVersion: avatarCatalog ? avatarCatalog.version : base.avatarVersion,
+        at: Date.now()
+    };
+    if (!roomSnapshot.room) return;
+    try { localStorage.setItem(ROOM_SNAPSHOT_KEY, JSON.stringify(roomSnapshot)); } catch (e) { /* bez pamięci */ }
+}
+
+function clearRoomSnapshot() {
+    roomSnapshot = null;
+    try { localStorage.removeItem(ROOM_SNAPSHOT_KEY); } catch (e) { /* bez pamięci */ }
+}
+
+function restoreRoomSnapshot() {
+    let saved = null;
+    try { saved = JSON.parse(localStorage.getItem(ROOM_SNAPSHOT_KEY)); } catch (e) { /* uszkodzony zapis */ }
+    const fresh = saved && saved.room && saved.code === localStorage.getItem('lastRoomCode')
+        && Date.now() - saved.at < ROOM_SNAPSHOT_MAX_AGE_MS;
+
+    if (fresh && !roomAnswered) {
+        roomSnapshot = saved;
+        restoredAvatarVersion = saved.avatarVersion || null;
+        currentRoomCode = saved.code;
+        myPlayerId = saved.playerId;
+        try {
+            if (saved.screen === 'vote' && saved.game && saved.vote) {
+                showGame(saved.game);
+                showScreen('screen-vote', true);
+                renderVoteTiles(saved.vote);
+            } else if (saved.screen === 'game' && saved.game) {
+                showScreen('screen-game', true);
+                showGame(saved.game);
+                updateSkipButton(saved.game);
+            } else {
+                showScreen('screen-lobby', true);
+                renderLobby(saved.room);
+            }
+            const inLobby = currentScreen === 'screen-lobby';
+            setHostControls(inLobby ? saved.room.hostId === saved.playerId : Boolean(saved.isHost));
+            restoredScreen = currentScreen;
+        } catch (e) {
+            console.error('Nie udało się pokazać zapamiętanego pokoju', e);
+            restoredScreen = null;
+            showScreen('screen-login', true);
+        }
+    }
+    document.documentElement.classList.remove('restoring');
+}
+document.addEventListener('DOMContentLoaded', restoreRoomSnapshot);
 
 
 // ===== START =====

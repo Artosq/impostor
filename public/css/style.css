@@ -59,12 +59,15 @@ body::before{
    stary ekran blednie (0,1 s, nałożony na nowy), nowy pojawia się i rośnie z 92% do 100%.
    Tylko przezroczystość i skala (liczy je karta graficzna). Rosnący ekran nie odsłania miejsca, które zajmował,
    więc przeglądarka nie zostawia smug, a zwykła animacja CSS nie tworzy na siłę warstw (bez migania). */
-.screen.screen-leaving{
+.screen.screen-leaving,
+#logo.screen-leaving{
     position: absolute;         /* nad nowym ekranem, na swoim dawnym miejscu (top/left/width z app.js) */
     pointer-events: none;
     animation: screenFadeOut 0.1s ease-in forwards;
 }
-.screen.screen-entering{
+/* logo (nad ekranami) wchodzi i wychodzi razem z ekranem */
+.screen.screen-entering,
+#logo.screen-entering{
     animation: screenFadeThrough 0.25s cubic-bezier(0, 0, 0.2, 1) 0.05s both;
 }
 @keyframes screenFadeOut {
@@ -81,7 +84,8 @@ body::before{
 }
 /* "Ograniczanie ruchu" w systemie: samo przenikanie, bez skali */
 @media (prefers-reduced-motion: reduce){
-    .screen.screen-entering{
+    .screen.screen-entering,
+    #logo.screen-entering{
         animation-name: screenFadeIn;
     }
 }
@@ -1427,24 +1431,37 @@ button {
     box-shadow: 0 0 20px var(--danger); 
     transform: scale(1.05);
 }
-/* PRZYCISKI W ROGACH KARTY: wyjście z pokoju (lewy), instalacja aplikacji (prawy) */
+/* Wczytywanie strony z zapamiętanym pokojem: menu ukryte, zanim app.js pokaże ekran pokoju */
+.restoring #screen-login,
+.restoring #player-stats,
+.restoring .corner-btn{
+    visibility: hidden;
+}
+/* PRZYCISKI W ROGACH KARTY: wyjście z pokoju (lewy), dźwięk / zasady / instalacja (prawy).
+   Okrągłe "żetony": gruba czarna ramka, ciemne tło i twardy cień pod spodem jak przy przyciskach gry. */
 .corner-btn{
     position: absolute;
     top: 12px;
     z-index: 5;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    width: auto;
+    width: 40px;
     height: 40px;
     min-width: 40px;
     margin: 0;
-    padding: 0 8px;
-    background: transparent;
-    border: 3px solid #444;
-    border-radius: 8px;
-    color: #aaa;
-    transition: 0.3s;
+    padding: 0;
+    background: #262626;
+    border: 3px solid #111;
+    border-radius: 999px;
+    color: #bbb;
+    box-shadow: 0 3px 0 #111;
+    transition: color 0.3s, background 0.3s, border-color 0.3s, box-shadow 0.3s, transform 0.15s;
+}
+.corner-btn:active{
+    transform: translateY(2px);
+    box-shadow: 0 1px 0 #111;
 }
 .corner-btn.hidden{
     display: none;
@@ -1472,11 +1489,12 @@ button {
 .corner-install{
     border-color: var(--secondary);
     color: var(--secondary);
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.35), 0 3px 0 #111;
 }
 .corner-install:hover{
     background: var(--secondary);
     color: white;
-    box-shadow: 0 0 20px var(--secondary);
+    box-shadow: 0 0 20px var(--secondary), 0 3px 0 #111;
 }
 /* głośnik: fale gdy włączony, krzyżyk gdy wyciszony */
 #btn-sound .sound-off,
@@ -1490,30 +1508,30 @@ button {
     color: #666;
 }
 /* szare przyciski w rogu (dźwięk, zasady) */
-.corner-help{
-    border-color: #444;
-    color: #aaa;
-}
 .corner-help:hover{
-    background: transparent;
-    border-color: #777;
+    background: #303030;
     color: white;
-    box-shadow: 0 0 14px rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.12), 0 3px 0 #111;
+}
+#btn-leave{
+    color: var(--danger);
 }
 #btn-leave:hover{
     border-color: var(--danger);
-    color: var(--danger);
-    box-shadow: 0 0 12px var(--danger);
+    box-shadow: 0 0 12px var(--danger), 0 3px 0 #111;
 }
 .corner-label{
     display: none;
     font-size: 0.75em;
 }
+/* potwierdzenie wyjścia: żeton rozciąga się w czerwoną pigułkę z napisem */
 #btn-leave.confirm{
-    border-color: var(--danger);
+    width: auto;
+    padding: 0 12px;
+    border-color: #111;
     background: var(--danger);
     color: white;
-    box-shadow: 0 0 20px var(--danger);
+    box-shadow: 0 0 20px var(--danger), 0 3px 0 #111;
 }
 #btn-leave.confirm .corner-label{
     display: inline;
@@ -2771,9 +2789,11 @@ animation: fadeIn 0.5s ease-in;
     top: 8px;
     right: 8px;
     left: auto;
+    width: 30px;
     height: 30px;
     min-width: 30px;
-    padding: 0 5px;
+    padding: 0;
+    box-shadow: none;
 }
 .update-close svg{
     width: 14px;

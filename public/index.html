@@ -72,6 +72,10 @@
     <link rel="preload" href="fonts/silkscreen-700-pl.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- Serwer wkleja te style prosto do strony (assets.js) - bez osobnych żądań blokujących rysowanie -->
+    <!-- Powrót do pokoju po ponownym uruchomieniu: menu nie mignie, zanim gra pokaże zapamiętany ekran pokoju (app.js) -->
+    <script>try{var r=JSON.parse(localStorage.getItem('roomSnapshot'));if(r&&r.room&&r.code===localStorage.getItem('lastRoomCode')&&Date.now()-r.at<108e5){document.documentElement.classList.add('restoring');setTimeout(function(){document.documentElement.classList.remove('restoring')},3000)}}catch(e){}</script>
+    <!-- Powrót do pokoju po ponownym uruchomieniu: menu nie mignie, zanim gra pokaże zapamiętany ekran pokoju (app.js) -->
+    <script>try{var r=JSON.parse(localStorage.getItem('roomSnapshot'));if(r&&r.room&&r.code===localStorage.getItem('lastRoomCode')&&Date.now()-r.at<108e5){document.documentElement.classList.add('restoring');setTimeout(function(){document.documentElement.classList.remove('restoring')},3000)}}catch(e){}</script>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/scrollbar.css">
     <link rel="stylesheet" href="css/fonts.css">
