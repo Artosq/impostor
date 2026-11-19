@@ -105,7 +105,16 @@ async function send(req, res) {
 
 // Katalog dla klienta (panel personalizacji) w tym samym formacie co zestaw Agentów
 function catalog() {
-    const part = slot => id => ({ id, name: id, rarity: RARITY[slot][id] || 'common', ...(ANIMATED[slot].has(id) ? { animated: true } : {}) });
+    // Para "x" + "xAnim": kafelek ma tylko "x" (anim: id ruchomej wersji), "xAnim" (base: "x") włącza się znaczkiem ▶
+    const part = slot => id => {
+        const baseId = id.endsWith('Anim') && PARTS[slot].includes(id.slice(0, -4)) ? id.slice(0, -4) : null;
+        return {
+            id, name: id, rarity: RARITY[slot][id] || 'common',
+            ...(ANIMATED[slot].has(id) ? { animated: true } : {}),
+            ...(baseId ? { base: baseId } : {}),
+            ...(!baseId && PARTS[slot].includes(id + 'Anim') ? { anim: id + 'Anim' } : {})
+        };
+    };
     return {
         id: 'bottts',
         name: 'Roboty (klasyczne)',

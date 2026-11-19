@@ -256,7 +256,7 @@ function activeCatalog() {
 
 // Losowa część; nowy gracz i braki w zapisanym wyglądzie dostają zwykłe części
 function randomPart(slot, onlyCommon) {
-    const items = activeCatalog().parts[slot.id];
+    const items = activeCatalog().parts[slot.id].filter(item => !item.base);     // bez animowanych wersji (xAnim)
     const common = items.filter(item => item.rarity === 'common');
     return randomItem(onlyCommon && common.length ? common : items).id;
 }
@@ -331,16 +331,28 @@ function renderCustomizeTabs() {
 }
 
 // Kafelek części: kolory jako próbka, reszta jako cały awatar z tą częścią. Ramka pokazuje rzadkość.
-// Kafelek pokazuje samą tę część, bez reszty wyglądu. Animowane części ruszają się tylko na zaznaczonym kafelku
-// (i na dużym podglądzie) - kilkanaście ruchomych SVG naraz spowalniało panel na telefonach
-function customizeTileSrc(tile) {
-    const still = tile.dataset.animated === '1' && !tile.classList.contains('selected');
-    return avatarUrl({ style: botConfig.style, [tile.dataset.slot]: tile.dataset.part }, undefined, still);
+// Kafelek pokazuje samą tę część, bez reszty wyglądu. Część z animowaną wersją ("x" + "xAnim") ma JEDEN kafelek
+// i przycisk ▶ w rogu, który włącza/wyłącza ruch. W siatce kafelki stoją - rusza się tylko zaznaczony z włączonym
+// ruchem (i duży podgląd); kilkanaście ruchomych SVG naraz spowalniało panel na telefonach
+function tileShown(tile) {
+    const selected = tile.classList.contains('selected');
+    if (selected && tile.classList.contains('anim-on')) return { id: tile.dataset.anim, still: false };
+    // część animowana sama w sobie (bez nieruchomej pary, np. zestaw Agentów) - rusza się tylko po zaznaczeniu
+    return { id: tile.dataset.part, still: tile.dataset.animated === '1' && !selected };
 }
 
-// Po zmianie zaznaczenia: ruch włącza się na nowym kafelku i wyłącza na poprzednim
-function refreshTileMotion(tile) {
-    if (tile.tagName !== 'IMG' || tile.dataset.animated !== '1') return;
+function customizeTileSrc(tile) {
+    const { id, still } = tileShown(tile);
+    return avatarUrl({ style: botConfig.style, [tile.dataset.slot]: id }, undefined, still);
+}
+
+// Zaznaczenie i ruch kafelka według zapisanego wyglądu; obrazek zmienia się tylko, gdy trzeba
+function refreshTile(tile, value) {
+    const anim = tile.dataset.anim;
+    tile.classList.toggle('selected', value === tile.dataset.part || (anim && value === anim));
+    tile.classList.toggle('anim-on', Boolean(anim) && value === anim);
+    if (tile.wrap) tile.wrap.classList.toggle('anim-on', tile.classList.contains('anim-on'));
+    if (tile.tagName !== 'IMG' || !(anim || tile.dataset.animated === '1')) return;
     const src = customizeTileSrc(tile);
     if (!tile.src.endsWith(src)) tile.src = src;
 }
@@ -352,21 +364,38 @@ function createCustomizeTile(slot, item) {
     tile.title = item.name || '';
     tile.dataset.part = item.id;
     tile.dataset.slot = slot.id;
+    if (item.anim) tile.dataset.anim = item.anim;
     if (item.animated) tile.dataset.animated = '1';
-    tile.classList.toggle('selected', botConfig[slot.id] === item.id);
+    refreshTile(tile, botConfig[slot.id]);
 
     if (isSwatch) tile.style.background = item.css;
     else tile.src = customizeTileSrc(tile);
 
-    // animowana część: znaczek ▶ w rogu (na samym <img> nie da się go narysować, więc kafelek dostaje opakowanie)
-    if (item.animated) {
+    // znaczek ▶ w rogu (na samym <img> nie da się go narysować, więc kafelek dostaje opakowanie)
+    if (item.anim || item.animated) {
         tile.wrap = createElement('span', 'customize-tile-wrap');
-        tile.wrap.title = 'Animowane';
-        tile.wrap.append(tile);
+        const badge = createElement(item.anim ? 'button' : 'span', 'customize-anim-badge');
+        if (item.anim) {
+            const animItem = activeCatalog().parts[slot.id].find(part => part.id === item.anim);
+            badge.title = `Ruch${animItem ? ` (${RARITY_NAMES[animItem.rarity] || animItem.rarity})` : ''}`;
+            badge.setAttribute('aria-label', 'Włącz lub wyłącz ruch');
+            badge.classList.add(`rarity-${(animItem && animItem.rarity) || 'common'}`);
+            // ruch włączony -> nieruchoma wersja; inaczej -> animowana (także na niezaznaczonym kafelku)
+            badge.onclick = event => {
+                event.stopPropagation();
+                updatePart(slot.id, botConfig[slot.id] === item.anim ? item.id : item.anim);
+            };
+        } else {
+            badge.title = 'Animowane';
+        }
+        tile.wrap.append(tile, badge);
+        tile.wrap.classList.toggle('anim-on', tile.classList.contains('anim-on'));
     }
-    tile.onclick = () => updatePart(slot.id, item.id);
+    // dotknięcie zaznaczonego kafelka niczego nie zmienia (nie wyłącza włączonego ruchu)
+    tile.onclick = () => { if (!tile.classList.contains('selected')) updatePart(slot.id, item.id); };
     return tile;
 }
+const RARITY_NAMES = { common: 'zwykły', rare: 'rzadki', epic: 'epicki', legendary: 'legendarny' };
 
 // Rysujemy tylko aktywną zakładkę; każdy kafelek pokazuje jedną część, niezależnie od reszty wyglądu,
 // więc raz zrobione kafelki zakładki są zapamiętywane - przy powrocie zmienia się tylko zaznaczenie
@@ -383,18 +412,19 @@ function sortByRarity(items) {
 function renderCustomizeOptions(flyIn = false) {
     const slot = activeCatalog().slots.find(s => s.id === customizeSlot);
     const key = `${avatarStyle}:${slot.id}`;
-    if (!customizeTiles.has(key)) customizeTiles.set(key, sortByRarity(activeCatalog().parts[slot.id]).map(item => createCustomizeTile(slot, item)));
+    // animowane wersje (xAnim) nie mają własnych kafelków - włącza je ▶ na kafelku "x"
+    if (!customizeTiles.has(key)) customizeTiles.set(key, sortByRarity(activeCatalog().parts[slot.id].filter(item => !item.base)).map(item => createCustomizeTile(slot, item)));
 
     const tiles = customizeTiles.get(key);
     tiles.forEach(tile => {
-        tile.classList.toggle('selected', botConfig[slot.id] === tile.dataset.part);
         // obrazek nie przyszedł mimo ponowień (np. brak zasięgu) - przy kolejnym otwarciu zakładki próbujemy od nowa
         if (tile.classList.contains('skeleton-failed')) {
             tile.classList.replace('skeleton-failed', 'skeleton');
             delete tile.dataset.retry;
+            refreshTile(tile, botConfig[slot.id]);
             tile.src = customizeTileSrc(tile);
         } else {
-            refreshTileMotion(tile);    // np. wylosowany kostką wygląd zmienił zaznaczenie
+            refreshTile(tile, botConfig[slot.id]);    // np. wylosowany kostką wygląd zmienił zaznaczenie
         }
     });
     const list = byId('customize-list');
@@ -412,11 +442,8 @@ function updatePart(slotId, value) {
     botConfig[slotId] = value;
     saveAvatarConfig();
 
-    // Kafelki się nie zmieniają - przestawiamy tylko zaznaczenie
-    byId('customize-list').querySelectorAll('.customize-tile').forEach(tile => {
-        tile.classList.toggle('selected', tile.dataset.part === value);
-        refreshTileMotion(tile);
-    });
+    // Kafelki się nie zmieniają - przestawiamy tylko zaznaczenie (i ruch)
+    byId('customize-list').querySelectorAll('.customize-tile').forEach(tile => refreshTile(tile, value));
     updateCustomizePreview();
     changeNick();
 }
