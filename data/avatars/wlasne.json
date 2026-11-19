@@ -1,5 +1,5 @@
 {
-  "$comment": "Własne części awatarów w stylu Bottts Neutral. \"components\" ma format definicji DiceBear i jest doklejane do kopii data/avatars/bottts-neutral.json. \"backgrounds\" to specjalne tła rysowane przez avatars.js.",
+  "$comment": "Własne części awatarów w stylu Bottts Neutral. \"components\" ma format definicji DiceBear i jest doklejane do kopii data/avatars/bottts-neutral.json (część o tej samej nazwie zastępuje oryginał - tak działają ożywione części). \"removed\" - części, których nie pokazujemy. \"rarity\" - rzadkość każdej części (common/rare/epic/legendary). Ruch to CSS w elemencie <style> (DiceBear nie przepuszcza <animate>), z @media prefers-reduced-motion. \"backgrounds\" to specjalne tła rysowane przez avatars/backgrounds.js.",
   "components": {
     "eyes": {
       "variants": {
@@ -326,6 +326,16 @@
         "spiral": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bEsp{transform-origin:0 0;animation:bEsp 2.4s linear infinite}@keyframes bEsp{to{transform:rotate(360deg)}}}"
+                }
+              ]
+            },
+            {
               "name": "circle",
               "type": "element",
               "attributes": {
@@ -346,15 +356,80 @@
               }
             },
             {
-              "name": "path",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "d": "M29 24L29.13 24.27L29.18 24.6L29.13 24.97L28.97 25.33L28.69 25.67L28.31 25.95L27.83 26.13L27.29 26.19L26.71 26.1L26.14 25.86L25.62 25.46L25.19 24.91L24.9 24.24L24.77 23.49L24.82 22.68L25.09 21.88L25.56 21.14L26.22 20.5L27.05 20.03L28 19.75L29.03 19.71L30.08 19.92L31.08 20.4L31.96 21.12L32.68 22.06L33.16 23.18L33.37 24.42L33.28 25.72L32.87 26.98L32.15 28.15L31.15 29.15L29.92 29.9L28.5 30.34L26.98 30.44L25.44 30.18L23.97 29.54L22.67 28.55L21.61 27.26L20.87 25.71L20.5 24L20.55 22.21L21.03 20.45L21.93 18.81L23.21 17.41L24.82 16.32L26.67 15.63L28.68 15.39L30.72 15.63L32.68 16.36L34.45 17.55L35.92 19.15L36.99 21.08L37.58 23.25L37.65 25.53L37.18 27.8L36.17 29.94L34.66 31.8L32.73 33.29L30.47 34.29L28 34.75L25.45 34.61L22.97 33.87L20.7 32.55L18.78 30.7L17.32 28.42L16.42 25.83L16.15 23.07L16.54 20.28L17.59 17.62L19.25 15.25L21.45 13.31L24.08 11.92L26.99 11.18L30.04 11.14L33.05 11.82L35.85 13.2L38.27 15.22L40.18 17.79L41.46 20.77L42 24M77 24L77.13 24.27L77.18 24.6L77.13 24.97L76.97 25.33L76.69 25.67L76.31 25.95L75.83 26.13L75.29 26.19L74.71 26.1L74.14 25.86L73.62 25.46L73.19 24.91L72.9 24.24L72.77 23.49L72.82 22.68L73.09 21.88L73.56 21.14L74.22 20.5L75.05 20.03L76 19.75L77.03 19.71L78.08 19.92L79.08 20.4L79.96 21.12L80.68 22.06L81.16 23.18L81.37 24.42L81.28 25.72L80.87 26.98L80.15 28.15L79.15 29.15L77.92 29.9L76.5 30.34L74.98 30.44L73.44 30.18L71.97 29.54L70.67 28.55L69.61 27.26L68.87 25.71L68.5 24L68.55 22.21L69.03 20.45L69.93 18.81L71.21 17.41L72.82 16.32L74.67 15.63L76.68 15.39L78.72 15.63L80.68 16.36L82.45 17.55L83.92 19.15L84.99 21.08L85.58 23.25L85.65 25.53L85.18 27.8L84.17 29.94L82.66 31.8L80.73 33.29L78.47 34.29L76 34.75L73.45 34.61L70.97 33.87L68.7 32.55L66.78 30.7L65.32 28.42L64.42 25.83L64.15 23.07L64.54 20.28L65.59 17.62L67.25 15.25L69.45 13.31L72.08 11.92L74.99 11.18L78.04 11.14L81.05 11.82L83.85 13.2L86.27 15.22L88.18 17.79L89.46 20.77L90 24",
-                "stroke": "black",
-                "stroke-opacity": ".8",
-                "stroke-width": "2.5",
-                "stroke-linecap": "round"
-              }
+                "transform": "translate(28 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEsp"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-28 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M29 24L29.13 24.27L29.18 24.6L29.13 24.97L28.97 25.33L28.69 25.67L28.31 25.95L27.83 26.13L27.29 26.19L26.71 26.1L26.14 25.86L25.62 25.46L25.19 24.91L24.9 24.24L24.77 23.49L24.82 22.68L25.09 21.88L25.56 21.14L26.22 20.5L27.05 20.03L28 19.75L29.03 19.71L30.08 19.92L31.08 20.4L31.96 21.12L32.68 22.06L33.16 23.18L33.37 24.42L33.28 25.72L32.87 26.98L32.15 28.15L31.15 29.15L29.92 29.9L28.5 30.34L26.98 30.44L25.44 30.18L23.97 29.54L22.67 28.55L21.61 27.26L20.87 25.71L20.5 24L20.55 22.21L21.03 20.45L21.93 18.81L23.21 17.41L24.82 16.32L26.67 15.63L28.68 15.39L30.72 15.63L32.68 16.36L34.45 17.55L35.92 19.15L36.99 21.08L37.58 23.25L37.65 25.53L37.18 27.8L36.17 29.94L34.66 31.8L32.73 33.29L30.47 34.29L28 34.75L25.45 34.61L22.97 33.87L20.7 32.55L18.78 30.7L17.32 28.42L16.42 25.83L16.15 23.07L16.54 20.28L17.59 17.62L19.25 15.25L21.45 13.31L24.08 11.92L26.99 11.18L30.04 11.14L33.05 11.82L35.85 13.2L38.27 15.22L40.18 17.79L41.46 20.77L42 24",
+                            "stroke": "black",
+                            "stroke-opacity": ".8",
+                            "stroke-width": "2.5",
+                            "stroke-linecap": "round"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(76 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEsp"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-76 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M77 24L77.13 24.27L77.18 24.6L77.13 24.97L76.97 25.33L76.69 25.67L76.31 25.95L75.83 26.13L75.29 26.19L74.71 26.1L74.14 25.86L73.62 25.46L73.19 24.91L72.9 24.24L72.77 23.49L72.82 22.68L73.09 21.88L73.56 21.14L74.22 20.5L75.05 20.03L76 19.75L77.03 19.71L78.08 19.92L79.08 20.4L79.96 21.12L80.68 22.06L81.16 23.18L81.37 24.42L81.28 25.72L80.87 26.98L80.15 28.15L79.15 29.15L77.92 29.9L76.5 30.34L74.98 30.44L73.44 30.18L71.97 29.54L70.67 28.55L69.61 27.26L68.87 25.71L68.5 24L68.55 22.21L69.03 20.45L69.93 18.81L71.21 17.41L72.82 16.32L74.67 15.63L76.68 15.39L78.72 15.63L80.68 16.36L82.45 17.55L83.92 19.15L84.99 21.08L85.58 23.25L85.65 25.53L85.18 27.8L84.17 29.94L82.66 31.8L80.73 33.29L78.47 34.29L76 34.75L73.45 34.61L70.97 33.87L68.7 32.55L66.78 30.7L65.32 28.42L64.42 25.83L64.15 23.07L64.54 20.28L65.59 17.62L67.25 15.25L69.45 13.31L72.08 11.92L74.99 11.18L78.04 11.14L81.05 11.82L83.85 13.2L86.27 15.22L88.18 17.79L89.46 20.77L90 24",
+                            "stroke": "black",
+                            "stroke-opacity": ".8",
+                            "stroke-width": "2.5",
+                            "stroke-linecap": "round"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -1402,6 +1477,16 @@
         "hal": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bEhl{transform-origin:0 0;animation:bEhl 1.6s ease-in-out infinite}@keyframes bEhl{0%,100%{transform:scale(.85);opacity:.6}50%{transform:scale(1.3);opacity:1}}}"
+                }
+              ]
+            },
+            {
               "name": "circle",
               "type": "element",
               "attributes": {
@@ -1424,15 +1509,42 @@
               }
             },
             {
-              "name": "circle",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "cx": "52",
-                "cy": "24",
-                "r": "14",
-                "fill": "#FF3D3D",
-                "fill-opacity": ".35"
-              }
+                "transform": "translate(52 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEhl"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-52 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "52",
+                            "cy": "24",
+                            "r": "14",
+                            "fill": "#FF3D3D",
+                            "fill-opacity": ".35"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
               "name": "circle",
@@ -1470,6 +1582,16 @@
         "cylon": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bEcy{animation:bEcy 1.8s ease-in-out infinite alternate}@keyframes bEcy{from{transform:translateX(-52px)}to{transform:translateX(24px)}}}"
+                }
+              ]
+            },
+            {
               "name": "rect",
               "type": "element",
               "attributes": {
@@ -1482,48 +1604,44 @@
               }
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "28",
-                "y": "22",
-                "width": "34",
-                "height": "4",
-                "rx": "2",
-                "fill": "#FF3D3D",
-                "fill-opacity": ".3"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "66",
-                "cy": "24",
-                "r": "10",
-                "fill": "#FF3D3D",
-                "fill-opacity": ".25"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "66",
-                "cy": "24",
-                "r": "6",
-                "fill": "#FF3D3D"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "66",
-                "cy": "24",
-                "r": "2.5",
-                "fill": "#FFD0C8"
-              }
+                "class": "bEcy"
+              },
+              "children": [
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "66",
+                    "cy": "24",
+                    "r": "10",
+                    "fill": "#FF3D3D",
+                    "fill-opacity": ".25"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "66",
+                    "cy": "24",
+                    "r": "6",
+                    "fill": "#FF3D3D"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "66",
+                    "cy": "24",
+                    "r": "2.5",
+                    "fill": "#FFD0C8"
+                  }
+                }
+              ]
             }
           ]
         },
@@ -1858,6 +1976,1070 @@
                 "d": "M59 25A17 17 0 0 1 93 25Z",
                 "fill": "black",
                 "fill-opacity": ".85"
+              }
+            }
+          ]
+        },
+        "hearts": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bEht{transform-origin:0 0;animation:bEht 1.1s ease-in-out infinite}@keyframes bEht{0%,40%,100%{transform:scale(1)}15%{transform:scale(1.14)}28%{transform:scale(1.06)}}}"
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(52 22)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEht"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-52 -22)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M29.27 9.68c-2.55.13-4.96 2.24-6.25 4.15-1.48-1.76-4.1-3.6-6.65-3.47-5.48.28-8.85 3.8-8.63 8.1.3 5.72 4.88 8.89 9.7 12.24 1.7 1.15 5 4.15 5.42 4.82s2.14.6 2.58-.13a38 38 0 0 1 4.9-5.36c4.43-3.84 8.66-7.47 8.36-13.2-.23-4.3-3.95-7.44-9.43-7.15m58.36.68c-2.55-.14-5.17 1.7-6.65 3.47-1.3-1.9-3.7-4.02-6.25-4.15-5.48-.29-9.2 2.86-9.43 7.16-.3 5.72 3.93 9.35 8.36 13.2 1.6 1.31 4.55 4.63 4.9 5.35.35.7 2.06.82 2.58.13a37 37 0 0 1 5.42-4.82c4.8-3.35 9.4-6.52 9.7-12.24.22-4.3-3.15-7.82-8.63-8.1",
+                            "fill": "#FF5353",
+                            "fill-opacity": ".8"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "blink": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bEbl{transform-origin:0 0;animation:bEbl 4s infinite}@keyframes bEbl{0%,90%,100%{transform:scaleY(1)}94%{transform:scaleY(.08)}}}"
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(52 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEbl"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-52 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "28",
+                            "cy": "24",
+                            "r": "18",
+                            "fill": "black",
+                            "fill-opacity": ".2"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "76",
+                            "cy": "24",
+                            "r": "18",
+                            "fill": "black",
+                            "fill-opacity": ".2"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "28",
+                            "cy": "24",
+                            "r": "15",
+                            "fill": "#F1EEDA"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "76",
+                            "cy": "24",
+                            "r": "15",
+                            "fill": "#F1EEDA"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "30",
+                            "cy": "25",
+                            "r": "7",
+                            "fill": "black",
+                            "fill-opacity": ".85"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "78",
+                            "cy": "25",
+                            "r": "7",
+                            "fill": "black",
+                            "fill-opacity": ".85"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "32.5",
+                            "cy": "22",
+                            "r": "2.4",
+                            "fill": "white"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "80.5",
+                            "cy": "22",
+                            "r": "2.4",
+                            "fill": "white"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "look": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bElk{animation:bElk 5s ease-in-out infinite}@keyframes bElk{0%,12%,88%,100%{transform:translateX(0)}22%,42%{transform:translateX(-7px)}56%,76%{transform:translateX(7px)}}}"
+                }
+              ]
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "19",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "19",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "16",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "16",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "class": "bElk"
+              },
+              "children": [
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "28",
+                    "cy": "24",
+                    "r": "7.5",
+                    "fill": "black",
+                    "fill-opacity": ".85"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "76",
+                    "cy": "24",
+                    "r": "7.5",
+                    "fill": "black",
+                    "fill-opacity": ".85"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "30.5",
+                    "cy": "21",
+                    "r": "2.4",
+                    "fill": "white"
+                  }
+                },
+                {
+                  "name": "circle",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "78.5",
+                    "cy": "21",
+                    "r": "2.4",
+                    "fill": "white"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "loading": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bEld{transform-origin:0 0;animation:bEld 1s linear infinite}@keyframes bEld{to{transform:rotate(360deg)}}}"
+                }
+              ]
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "18",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "18",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "10",
+                "stroke": "#4EFAC9",
+                "stroke-opacity": ".2",
+                "stroke-width": "4"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "10",
+                "stroke": "#4EFAC9",
+                "stroke-opacity": ".2",
+                "stroke-width": "4"
+              }
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(28 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEld"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-28 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "28",
+                            "cy": "24",
+                            "r": "10",
+                            "stroke": "#4EFAC9",
+                            "stroke-width": "4",
+                            "stroke-linecap": "round",
+                            "stroke-dasharray": "18 45"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(76 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEld"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-76 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "76",
+                            "cy": "24",
+                            "r": "10",
+                            "stroke": "#4EFAC9",
+                            "stroke-width": "4",
+                            "stroke-linecap": "round",
+                            "stroke-dasharray": "18 45"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "laser": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bEls{transform-origin:0 0;animation:bEls 1.2s ease-in-out infinite}@keyframes bEls{0%,100%{transform:scale(.8);opacity:.25}50%{transform:scale(1.25);opacity:.6}}}"
+                }
+              ]
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "17",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "17",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(28 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEls"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-28 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "28",
+                            "cy": "24",
+                            "r": "13",
+                            "fill": "#FF3D3D"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(76 24)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bEls"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-76 -24)"
+                      },
+                      "children": [
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "76",
+                            "cy": "24",
+                            "r": "13",
+                            "fill": "#FF3D3D"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "7",
+                "fill": "#FF3D3D"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "7",
+                "fill": "#FF3D3D"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "3",
+                "fill": "#FFE0DA"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "3",
+                "fill": "#FFE0DA"
+              }
+            }
+          ]
+        },
+        "pixel": {
+          "elements": [
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "13",
+                "y": "9",
+                "width": "30",
+                "height": "30",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "61",
+                "y": "9",
+                "width": "30",
+                "height": "30",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "16",
+                "y": "12",
+                "width": "24",
+                "height": "24",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "64",
+                "y": "12",
+                "width": "24",
+                "height": "24",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "26",
+                "y": "20",
+                "width": "12",
+                "height": "12",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "74",
+                "y": "20",
+                "width": "12",
+                "height": "12",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "32",
+                "y": "20",
+                "width": "4",
+                "height": "4",
+                "fill": "white"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "80",
+                "y": "20",
+                "width": "4",
+                "height": "4",
+                "fill": "white"
+              }
+            }
+          ]
+        },
+        "aviators": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M44 17Q52 12 60 17",
+                "stroke": "#D4A13A",
+                "stroke-width": "3",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M8 13H45Q47 13 46.5 18Q44 38 27 38Q12 38 9 21Q8 15 8 13Z",
+                "fill": "#1D2B3A",
+                "stroke": "#D4A13A",
+                "stroke-width": "2.5",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M96 13H59Q57 13 57.5 18Q60 38 77 38Q92 38 95 21Q96 15 96 13Z",
+                "fill": "#1D2B3A",
+                "stroke": "#D4A13A",
+                "stroke-width": "2.5",
+                "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M14 17H22L13 31Q12 26 12 20ZM62 17H70L61 31Q60 26 60 20Z",
+                "fill": "white",
+                "fill-opacity": ".35"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M26 17H30L19 35H16ZM74 17H78L67 35H64Z",
+                "fill": "white",
+                "fill-opacity": ".18"
+              }
+            }
+          ]
+        },
+        "monocle": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "25",
+                "r": "12",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "25",
+                "r": "9.5",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M18 17Q28 12 38 17",
+                "stroke": "black",
+                "stroke-opacity": ".8",
+                "stroke-width": "3.5",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "29",
+                "cy": "26",
+                "r": "4",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "16",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "77",
+                "cy": "25",
+                "r": "6.5",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "79.5",
+                "cy": "22",
+                "r": "2.2",
+                "fill": "white"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "17.5",
+                "fill": "white",
+                "fill-opacity": ".15",
+                "stroke": "#D4A13A",
+                "stroke-width": "3.5"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M86 38Q92 46 98 44Q102 43 103 48",
+                "stroke": "#D4A13A",
+                "stroke-width": "2",
+                "stroke-linecap": "round",
+                "stroke-dasharray": "3 3"
+              }
+            }
+          ]
+        },
+        "anime": {
+          "elements": [
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "rx": "15",
+                "ry": "19",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "rx": "15",
+                "ry": "19",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "rx": "12.5",
+                "ry": "16.5",
+                "fill": "#1D2B3A"
+              }
+            },
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "rx": "12.5",
+                "ry": "16.5",
+                "fill": "#1D2B3A"
+              }
+            },
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "29",
+                "rx": "9",
+                "ry": "10",
+                "fill": "#4FB3FF"
+              }
+            },
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "29",
+                "rx": "9",
+                "ry": "10",
+                "fill": "#4FB3FF"
+              }
+            },
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "27",
+                "rx": "5",
+                "ry": "6",
+                "fill": "#0E1620"
+              }
+            },
+            {
+              "name": "ellipse",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "27",
+                "rx": "5",
+                "ry": "6",
+                "fill": "#0E1620"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "23",
+                "cy": "17",
+                "r": "4.5",
+                "fill": "white"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "71",
+                "cy": "17",
+                "r": "4.5",
+                "fill": "white"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "33",
+                "cy": "32",
+                "r": "2",
+                "fill": "white"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "81",
+                "cy": "32",
+                "r": "2",
+                "fill": "white"
+              }
+            }
+          ]
+        },
+        "tired": {
+          "elements": [
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "18",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "18",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "28",
+                "cy": "24",
+                "r": "15",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "76",
+                "cy": "24",
+                "r": "15",
+                "fill": "#F1EEDA"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "29",
+                "cy": "29",
+                "r": "6",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "77",
+                "cy": "29",
+                "r": "6",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M12.2 24.6A15.8 15.8 0 0 1 43.8 24.6Z",
+                "fill": "#6E6A5C"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M60.2 24.6A15.8 15.8 0 0 1 91.8 24.6Z",
+                "fill": "#6E6A5C"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M12.5 24.4H43.5M60.5 24.4H91.5",
+                "stroke": "black",
+                "stroke-opacity": ".8",
+                "stroke-width": "3",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M17 44Q28 48 39 44M65 44Q76 48 87 44",
+                "stroke": "black",
+                "stroke-opacity": ".25",
+                "stroke-width": "2.5",
+                "stroke-linecap": "round"
               }
             }
           ]
@@ -2271,6 +3453,16 @@
         "bubblegum": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bMbg{transform-origin:0 0;animation:bMbg 3s ease-in infinite}@keyframes bMbg{0%{transform:scale(.25);opacity:1}72%{transform:scale(1.15);opacity:1}76%{transform:scale(1.25);opacity:0}100%{transform:scale(.25);opacity:0}}}"
+                }
+              ]
+            },
+            {
               "name": "ellipse",
               "type": "element",
               "attributes": {
@@ -2283,25 +3475,52 @@
               }
             },
             {
-              "name": "circle",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "cx": "40",
-                "cy": "12",
-                "r": "11",
-                "fill": "#FF8FB8"
-              }
-            },
-            {
-              "name": "circle",
-              "type": "element",
-              "attributes": {
-                "cx": "36",
-                "cy": "7",
-                "r": "3",
-                "fill": "white",
-                "fill-opacity": ".5"
-              }
+                "transform": "translate(29 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMbg"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-29 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "40",
+                            "cy": "12",
+                            "r": "11",
+                            "fill": "#FF8FB8"
+                          }
+                        },
+                        {
+                          "name": "circle",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "36",
+                            "cy": "7",
+                            "r": "3",
+                            "fill": "white",
+                            "fill-opacity": ".5"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -2587,6 +3806,16 @@
         "equalizer": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bMeq{transform-origin:0 0;animation:bMeq .7s ease-in-out infinite alternate}.bMeq2{animation-duration:.5s}.bMeq3{animation-duration:.9s;animation-delay:-.3s}@keyframes bMeq{from{transform:scaleY(1)}to{transform:scaleY(.3)}}}"
+                }
+              ]
+            },
+            {
               "name": "rect",
               "type": "element",
               "attributes": {
@@ -2598,148 +3827,472 @@
               }
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "5",
-                "y": "9",
-                "width": "3",
-                "height": "6",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(6.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-6.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "5",
+                            "y": "9",
+                            "width": "3",
+                            "height": "6",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "10",
-                "y": "6",
-                "width": "3",
-                "height": "12",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(11.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq2"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-11.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "10",
+                            "y": "6",
+                            "width": "3",
+                            "height": "12",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "15",
-                "y": "3",
-                "width": "3",
-                "height": "18",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(16.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq3"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-16.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "15",
+                            "y": "3",
+                            "width": "3",
+                            "height": "18",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "20",
-                "y": "7",
-                "width": "3",
-                "height": "10",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(21.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-21.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "20",
+                            "y": "7",
+                            "width": "3",
+                            "height": "10",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "25",
-                "y": "4",
-                "width": "3",
-                "height": "16",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(26.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq2"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-26.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "25",
+                            "y": "4",
+                            "width": "3",
+                            "height": "16",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "30",
-                "y": "8",
-                "width": "3",
-                "height": "8",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(31.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq3"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-31.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "30",
+                            "y": "8",
+                            "width": "3",
+                            "height": "8",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "35",
-                "y": "5",
-                "width": "3",
-                "height": "14",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(36.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-36.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "35",
+                            "y": "5",
+                            "width": "3",
+                            "height": "14",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "40",
-                "y": "9",
-                "width": "3",
-                "height": "6",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(41.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq2"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-41.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "40",
+                            "y": "9",
+                            "width": "3",
+                            "height": "6",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "45",
-                "y": "6.5",
-                "width": "3",
-                "height": "11",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(46.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq3"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-46.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "45",
+                            "y": "6.5",
+                            "width": "3",
+                            "height": "11",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "50",
-                "y": "10",
-                "width": "3",
-                "height": "4",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(51.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-51.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "50",
+                            "y": "10",
+                            "width": "3",
+                            "height": "4",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "55",
-                "y": "6",
-                "width": "3",
-                "height": "12",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(56.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq2"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-56.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "55",
+                            "y": "6",
+                            "width": "3",
+                            "height": "12",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "60",
-                "y": "8",
-                "width": "3",
-                "height": "8",
-                "rx": "1.5",
-                "fill": "#4EFAC9"
-              }
+                "transform": "translate(61.5 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMeq bMeq3"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-61.5 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "60",
+                            "y": "8",
+                            "width": "3",
+                            "height": "8",
+                            "rx": "1.5",
+                            "fill": "#4EFAC9"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -2940,6 +4493,16 @@
         "loading": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bMld{transform-origin:0 0;animation:bMld 2.4s ease-in-out infinite}@keyframes bMld{0%{transform:scaleX(.08)}80%,100%{transform:scaleX(1)}}}"
+                }
+              ]
+            },
+            {
               "name": "rect",
               "type": "element",
               "attributes": {
@@ -2964,16 +4527,43 @@
               }
             },
             {
-              "name": "rect",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "x": "6",
-                "y": "8",
-                "width": "36",
-                "height": "8",
-                "rx": "4",
-                "fill": "#5EE38B"
-              }
+                "transform": "translate(6 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMld"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-6 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "rect",
+                          "type": "element",
+                          "attributes": {
+                            "x": "6",
+                            "y": "8",
+                            "width": "56",
+                            "height": "8",
+                            "rx": "4",
+                            "fill": "#5EE38B"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -3384,6 +4974,297 @@
               }
             }
           ]
+        },
+        "diagram": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bMdg{animation:bMdg 1.6s linear infinite}@keyframes bMdg{from{stroke-dashoffset:120}to{stroke-dashoffset:0}}}"
+                }
+              ]
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "width": "68",
+                "height": "24",
+                "rx": "5",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "4",
+                "y": "4",
+                "width": "60",
+                "height": "16",
+                "rx": "2",
+                "fill": "black",
+                "fill-opacity": ".8"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M5 13h11l2-4 3 7 4-8 2 9 3-11 3 10 3-3h15l3-4 2 7 3-3h4",
+                "stroke": "#4EFAC9",
+                "stroke-width": "2",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round",
+                "stroke-opacity": ".25"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M5 13h11l2-4 3 7 4-8 2 9 3-11 3 10 3-3h15l3-4 2 7 3-3h4",
+                "stroke": "#4EFAC9",
+                "stroke-width": "2",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round",
+                "class": "bMdg",
+                "stroke-dasharray": "36 84"
+              }
+            }
+          ]
+        },
+        "talk": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bMtk{transform-origin:0 0;animation:bMtk 1.3s ease-in-out infinite}@keyframes bMtk{0%,100%{transform:scaleY(.3)}18%{transform:scaleY(1)}36%{transform:scaleY(.45)}54%{transform:scaleY(.9)}72%{transform:scaleY(.3)}}}"
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(34 12)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bMtk"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-34 -12)"
+                      },
+                      "children": [
+                        {
+                          "name": "ellipse",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "34",
+                            "cy": "12",
+                            "rx": "15",
+                            "ry": "9",
+                            "fill": "black",
+                            "fill-opacity": ".85"
+                          }
+                        },
+                        {
+                          "name": "ellipse",
+                          "type": "element",
+                          "attributes": {
+                            "cx": "34",
+                            "cy": "17",
+                            "rx": "8",
+                            "ry": "3.5",
+                            "fill": "#FF8FB8"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "whistle": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bMwh{animation:bMwh 2s ease-out infinite}.bMwh2{animation-delay:1s}@keyframes bMwh{0%{transform:translate(0,0);opacity:0}15%{opacity:1}100%{transform:translate(12px,-18px);opacity:0}}}"
+                }
+              ]
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "22",
+                "cy": "13",
+                "r": "7",
+                "fill": "black",
+                "fill-opacity": ".2"
+              }
+            },
+            {
+              "name": "circle",
+              "type": "element",
+              "attributes": {
+                "cx": "22",
+                "cy": "13",
+                "r": "4.5",
+                "fill": "black",
+                "fill-opacity": ".85"
+              }
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "class": "bMwh"
+              },
+              "children": [
+                {
+                  "name": "ellipse",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "36",
+                    "cy": "16",
+                    "rx": "3",
+                    "ry": "2.4",
+                    "fill": "white"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M38.5 16V6L44 8",
+                    "stroke": "white",
+                    "stroke-width": "1.8",
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "class": "bMwh bMwh2"
+              },
+              "children": [
+                {
+                  "name": "ellipse",
+                  "type": "element",
+                  "attributes": {
+                    "cx": "36",
+                    "cy": "16",
+                    "rx": "3",
+                    "ry": "2.4",
+                    "fill": "white"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M38.5 16V6L44 8",
+                    "stroke": "white",
+                    "stroke-width": "1.8",
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "smirk": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M14 14Q30 19 46 13Q52 10 56 6",
+                "stroke": "black",
+                "stroke-opacity": ".8",
+                "stroke-width": "4",
+                "stroke-linecap": "round"
+              }
+            }
+          ]
+        },
+        "mask": {
+          "elements": [
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M3 3L-10 -6M65 3L78 -6M3 19L-8 26M65 19L76 26",
+                "stroke": "white",
+                "stroke-opacity": ".85",
+                "stroke-width": "2",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "1",
+                "y": "-4",
+                "width": "66",
+                "height": "29",
+                "rx": "11",
+                "fill": "#8FD3F4"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M9 4H59M7 11H61M9 18H59",
+                "stroke": "#5FB0D8",
+                "stroke-width": "2",
+                "stroke-linecap": "round"
+              }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "x": "1",
+                "y": "-4",
+                "width": "66",
+                "height": "29",
+                "rx": "11",
+                "stroke": "black",
+                "stroke-opacity": ".15",
+                "stroke-width": "2"
+              }
+            }
+          ]
         }
       }
     },
@@ -3418,12 +5299,23 @@
         "sparkles": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTsp{animation:bTsp 1.8s ease-in-out infinite}@keyframes bTsp{0%,100%{opacity:1}50%{opacity:.25}}}"
+                }
+              ]
+            },
+            {
               "name": "path",
               "type": "element",
               "attributes": {
                 "d": "M50.01 60.25L51.09 62.76L53.6 63.84L51.09 64.92L50.01 67.43L48.93 64.92L46.42 63.84L48.93 62.76ZM55.33 107.88L56.51 110.63L59.26 111.81L56.51 112.99L55.33 115.74L54.15 112.99L51.4 111.81L54.15 110.63ZM111.06 62.08L112.31 64.99L115.22 66.23L112.31 67.48L111.06 70.38L109.82 67.48L106.91 66.23L109.82 64.99ZM83.23 32.35L84.73 35.85L88.23 37.35L84.73 38.85L83.23 42.35L81.73 38.85L78.23 37.35L81.73 35.85ZM66.59 51.56L67.96 54.75L71.15 56.11L67.96 57.48L66.59 60.67L65.23 57.48L62.03 56.11L65.23 54.75ZM147.55 53.59L148.39 55.55L150.35 56.39L148.39 57.23L147.55 59.18L146.71 57.23L144.75 56.39L146.71 55.55ZM75.67 92.72L77.05 95.92L80.25 97.29L77.05 98.66L75.67 101.86L74.3 98.66L71.1 97.29L74.3 95.92ZM115.43 64.21L116.43 66.54L118.75 67.53L116.43 68.53L115.43 70.86L114.43 68.53L112.11 67.53L114.43 66.54ZM86.32 101.82L87.09 103.6L88.87 104.36L87.09 105.12L86.32 106.9L85.56 105.12L83.78 104.36L85.56 103.6ZM72.79 73.82L74.29 77.32L77.78 78.82L74.29 80.31L72.79 83.81L71.29 80.31L67.79 78.82L71.29 77.32ZM51.6 50.96L53.28 54.88L57.2 56.56L53.28 58.25L51.6 62.17L49.92 58.25L45.99 56.56L49.92 54.88ZM111.61 18.6L113 21.85L116.25 23.24L113 24.63L111.61 27.88L110.22 24.63L106.97 23.24L110.22 21.85ZM163.16 43.52L164.86 47.48L168.82 49.18L164.86 50.88L163.16 54.83L161.47 50.88L157.51 49.18L161.47 47.48ZM52.21 89.89L53.81 93.62L57.54 95.22L53.81 96.82L52.21 100.55L50.61 96.82L46.88 95.22L50.61 93.62ZM162.01 42.2L162.94 44.36L165.1 45.28L162.94 46.21L162.01 48.37L161.09 46.21L158.93 45.28L161.09 44.36ZM144.35 116.9L145.86 120.45L149.41 121.97L145.86 123.48L144.35 127.03L142.83 123.48L139.29 121.97L142.83 120.45ZM167.98 100.85L169.18 103.66L171.99 104.86L169.18 106.06L167.98 108.87L166.77 106.06L163.97 104.86L166.77 103.66ZM80.1 80.82L80.87 82.63L82.68 83.4L80.87 84.18L80.1 85.98L79.32 84.18L77.51 83.4L79.32 82.63ZM162.33 104.73L163.45 107.34L166.06 108.46L163.45 109.58L162.33 112.19L161.21 109.58L158.6 108.46L161.21 107.34ZM153.16 7.32L154.61 10.7L157.99 12.15L154.61 13.6L153.16 16.98L151.71 13.6L148.33 12.15L151.71 10.7ZM162.24 70.89L163.7 74.31L167.12 75.77L163.7 77.23L162.24 80.65L160.78 77.23L157.36 75.77L160.78 74.31ZM110.1 106.94L111.31 109.75L114.12 110.96L111.31 112.16L110.1 114.97L108.9 112.16L106.09 110.96L108.9 109.75ZM159.46 123.79L160.65 126.58L163.44 127.78L160.65 128.97L159.46 131.76L158.26 128.97L155.47 127.78L158.26 126.58ZM145.73 67.61L146.71 69.92L149.02 70.9L146.71 71.89L145.73 74.19L144.74 71.89L142.44 70.9L144.74 69.92ZM55.65 12.64L57.27 16.41L61.05 18.03L57.27 19.65L55.65 23.43L54.03 19.65L50.26 18.03L54.03 16.41ZM62.85 48.26L64.18 51.36L67.28 52.69L64.18 54.02L62.85 57.12L61.52 54.02L58.42 52.69L61.52 51.36Z",
                 "fill": "white",
-                "fill-opacity": ".5"
+                "fill-opacity": ".5",
+                "class": "bTsp"
               }
             }
           ]
@@ -3473,13 +5365,50 @@
         "bubbles": {
           "elements": [
             {
-              "name": "path",
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTbb{animation:bTbb 9s linear infinite}@keyframes bTbb{from{transform:translateY(0)}to{transform:translateY(-140px)}}}"
+                }
+              ]
+            },
+            {
+              "name": "g",
               "type": "element",
               "attributes": {
-                "d": "M91.81 66.78a2.64 2.64 0 1 0 5.27 0a2.64 2.64 0 1 0 -5.27 0M89.29 32.25a5.44 5.44 0 1 0 10.88 0a5.44 5.44 0 1 0 -10.88 0M112.39 119.3a2.59 2.59 0 1 0 5.18 0a2.59 2.59 0 1 0 -5.18 0M158.94 127.31a6.65 6.65 0 1 0 13.29 0a6.65 6.65 0 1 0 -13.29 0M109.52 54.87a7.17 7.17 0 1 0 14.33 0a7.17 7.17 0 1 0 -14.33 0M122.39 70.26a3.83 3.83 0 1 0 7.67 0a3.83 3.83 0 1 0 -7.67 0M105.11 41.77a7.77 7.77 0 1 0 15.55 0a7.77 7.77 0 1 0 -15.55 0M114.3 117.6a2.88 2.88 0 1 0 5.77 0a2.88 2.88 0 1 0 -5.77 0M62.66 123.55a6.15 6.15 0 1 0 12.29 0a6.15 6.15 0 1 0 -12.29 0M79.83 107.87a4.18 4.18 0 1 0 8.36 0a4.18 4.18 0 1 0 -8.36 0M148.66 68.06a5.05 5.05 0 1 0 10.11 0a5.05 5.05 0 1 0 -10.11 0M70.5 23.65a6.79 6.79 0 1 0 13.58 0a6.79 6.79 0 1 0 -13.58 0M146.51 42.44a6.54 6.54 0 1 0 13.09 0a6.54 6.54 0 1 0 -13.09 0M85.54 111.97a4.61 4.61 0 1 0 9.22 0a4.61 4.61 0 1 0 -9.22 0M47.91 14.37a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0 -4.4 0M108.9 46.29a6.85 6.85 0 1 0 13.7 0a6.85 6.85 0 1 0 -13.7 0M79.45 86.13a7.94 7.94 0 1 0 15.88 0a7.94 7.94 0 1 0 -15.88 0M105.13 99.8a3.04 3.04 0 1 0 6.07 0a3.04 3.04 0 1 0 -6.07 0M123.67 69.4a3.46 3.46 0 1 0 6.93 0a3.46 3.46 0 1 0 -6.93 0M75.53 69.67a5.74 5.74 0 1 0 11.47 0a5.74 5.74 0 1 0 -11.47 0M99.22 46.95a4.95 4.95 0 1 0 9.89 0a4.95 4.95 0 1 0 -9.89 0M104.34 25.64a5.78 5.78 0 1 0 11.56 0a5.78 5.78 0 1 0 -11.56 0",
-                "fill": "white",
-                "fill-opacity": ".2"
-              }
+                "class": "bTbb"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M91.81 66.78a2.64 2.64 0 1 0 5.27 0a2.64 2.64 0 1 0 -5.27 0M89.29 32.25a5.44 5.44 0 1 0 10.88 0a5.44 5.44 0 1 0 -10.88 0M112.39 119.3a2.59 2.59 0 1 0 5.18 0a2.59 2.59 0 1 0 -5.18 0M158.94 127.31a6.65 6.65 0 1 0 13.29 0a6.65 6.65 0 1 0 -13.29 0M109.52 54.87a7.17 7.17 0 1 0 14.33 0a7.17 7.17 0 1 0 -14.33 0M122.39 70.26a3.83 3.83 0 1 0 7.67 0a3.83 3.83 0 1 0 -7.67 0M105.11 41.77a7.77 7.77 0 1 0 15.55 0a7.77 7.77 0 1 0 -15.55 0M114.3 117.6a2.88 2.88 0 1 0 5.77 0a2.88 2.88 0 1 0 -5.77 0M62.66 123.55a6.15 6.15 0 1 0 12.29 0a6.15 6.15 0 1 0 -12.29 0M79.83 107.87a4.18 4.18 0 1 0 8.36 0a4.18 4.18 0 1 0 -8.36 0M148.66 68.06a5.05 5.05 0 1 0 10.11 0a5.05 5.05 0 1 0 -10.11 0M70.5 23.65a6.79 6.79 0 1 0 13.58 0a6.79 6.79 0 1 0 -13.58 0M146.51 42.44a6.54 6.54 0 1 0 13.09 0a6.54 6.54 0 1 0 -13.09 0M85.54 111.97a4.61 4.61 0 1 0 9.22 0a4.61 4.61 0 1 0 -9.22 0M47.91 14.37a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0 -4.4 0M108.9 46.29a6.85 6.85 0 1 0 13.7 0a6.85 6.85 0 1 0 -13.7 0M79.45 86.13a7.94 7.94 0 1 0 15.88 0a7.94 7.94 0 1 0 -15.88 0M105.13 99.8a3.04 3.04 0 1 0 6.07 0a3.04 3.04 0 1 0 -6.07 0M123.67 69.4a3.46 3.46 0 1 0 6.93 0a3.46 3.46 0 1 0 -6.93 0M75.53 69.67a5.74 5.74 0 1 0 11.47 0a5.74 5.74 0 1 0 -11.47 0M99.22 46.95a4.95 4.95 0 1 0 9.89 0a4.95 4.95 0 1 0 -9.89 0M104.34 25.64a5.78 5.78 0 1 0 11.56 0a5.78 5.78 0 1 0 -11.56 0",
+                    "fill": "white",
+                    "fill-opacity": ".2"
+                  }
+                },
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "transform": "translate(0 140)"
+                  },
+                  "children": [
+                    {
+                      "name": "path",
+                      "type": "element",
+                      "attributes": {
+                        "d": "M91.81 66.78a2.64 2.64 0 1 0 5.27 0a2.64 2.64 0 1 0 -5.27 0M89.29 32.25a5.44 5.44 0 1 0 10.88 0a5.44 5.44 0 1 0 -10.88 0M112.39 119.3a2.59 2.59 0 1 0 5.18 0a2.59 2.59 0 1 0 -5.18 0M158.94 127.31a6.65 6.65 0 1 0 13.29 0a6.65 6.65 0 1 0 -13.29 0M109.52 54.87a7.17 7.17 0 1 0 14.33 0a7.17 7.17 0 1 0 -14.33 0M122.39 70.26a3.83 3.83 0 1 0 7.67 0a3.83 3.83 0 1 0 -7.67 0M105.11 41.77a7.77 7.77 0 1 0 15.55 0a7.77 7.77 0 1 0 -15.55 0M114.3 117.6a2.88 2.88 0 1 0 5.77 0a2.88 2.88 0 1 0 -5.77 0M62.66 123.55a6.15 6.15 0 1 0 12.29 0a6.15 6.15 0 1 0 -12.29 0M79.83 107.87a4.18 4.18 0 1 0 8.36 0a4.18 4.18 0 1 0 -8.36 0M148.66 68.06a5.05 5.05 0 1 0 10.11 0a5.05 5.05 0 1 0 -10.11 0M70.5 23.65a6.79 6.79 0 1 0 13.58 0a6.79 6.79 0 1 0 -13.58 0M146.51 42.44a6.54 6.54 0 1 0 13.09 0a6.54 6.54 0 1 0 -13.09 0M85.54 111.97a4.61 4.61 0 1 0 9.22 0a4.61 4.61 0 1 0 -9.22 0M47.91 14.37a2.2 2.2 0 1 0 4.4 0a2.2 2.2 0 1 0 -4.4 0M108.9 46.29a6.85 6.85 0 1 0 13.7 0a6.85 6.85 0 1 0 -13.7 0M79.45 86.13a7.94 7.94 0 1 0 15.88 0a7.94 7.94 0 1 0 -15.88 0M105.13 99.8a3.04 3.04 0 1 0 6.07 0a3.04 3.04 0 1 0 -6.07 0M123.67 69.4a3.46 3.46 0 1 0 6.93 0a3.46 3.46 0 1 0 -6.93 0M75.53 69.67a5.74 5.74 0 1 0 11.47 0a5.74 5.74 0 1 0 -11.47 0M99.22 46.95a4.95 4.95 0 1 0 9.89 0a4.95 4.95 0 1 0 -9.89 0M104.34 25.64a5.78 5.78 0 1 0 11.56 0a5.78 5.78 0 1 0 -11.56 0",
+                        "fill": "white",
+                        "fill-opacity": ".2"
+                      }
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -3523,29 +5452,177 @@
         "gears": {
           "elements": [
             {
-              "name": "path",
+              "name": "style",
               "type": "element",
-              "attributes": {
-                "d": "M96 30L94.73 38.03L89.29 36.27L86.41 41.92L91.03 45.28L85.28 51.03L81.92 46.41L76.27 49.29L78.03 54.73L70 56L70 50.28L63.73 49.29L61.97 54.73L54.72 51.03L58.08 46.41L53.59 41.92L48.97 45.28L45.27 38.03L50.71 36.27L49.72 30L44 30L45.27 21.97L50.71 23.73L53.59 18.08L48.97 14.72L54.72 8.97L58.08 13.59L63.73 10.71L61.97 5.27L70 4L70 9.72L76.27 10.71L78.03 5.27L85.28 8.97L81.92 13.59L86.41 18.08L91.03 14.72L94.73 21.97L89.29 23.73L90.28 30ZM79.1 30A9.1 9.1 0 1 0 60.9 30A9.1 9.1 0 1 0 79.1 30ZM184 100L182.84 108.8L175.62 106.86L172.97 113.26L179.44 117L174.04 124.04L168.75 118.75L163.26 122.97L167 129.44L158.8 132.84L156.86 125.62L150 126.52L150 134L141.2 132.84L143.14 125.62L136.74 122.97L133 129.44L125.96 124.04L131.25 118.75L127.03 113.26L120.56 117L117.16 108.8L124.38 106.86L123.48 100L116 100L117.16 91.2L124.38 93.14L127.03 86.74L120.56 83L125.96 75.96L131.25 81.25L136.74 77.03L133 70.56L141.2 67.16L143.14 74.38L150 73.48L150 66L158.8 67.16L156.86 74.38L163.26 77.03L167 70.56L174.04 75.96L168.75 81.25L172.97 86.74L179.44 83L182.84 91.2L175.62 93.14L176.52 100ZM161.9 100A11.9 11.9 0 1 0 138.1 100A11.9 11.9 0 1 0 161.9 100ZM131 60L129.78 66.12L126.53 64.78L123.82 68.82L126.31 71.31L121.12 74.78L119.78 71.53L115 72.48L115 76L108.88 74.78L110.22 71.53L106.18 68.82L103.69 71.31L100.22 66.12L103.47 64.78L102.52 60L99 60L100.22 53.88L103.47 55.22L106.18 51.18L103.69 48.69L108.88 45.22L110.22 48.47L115 47.52L115 44L121.12 45.22L119.78 48.47L123.82 51.18L126.31 48.69L129.78 53.88L126.53 55.22L127.48 60ZM120.6 60A5.6 5.6 0 1 0 109.4 60A5.6 5.6 0 1 0 120.6 60Z",
-                "fill-rule": "evenodd",
-                "fill": "black",
-                "fill-opacity": ".1"
-              }
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTg1,.bTg2{transform-origin:0 0;}.bTg1{animation:bTg 9s linear infinite}.bTg2{animation:bTg 7s linear infinite reverse}@keyframes bTg{to{transform:rotate(360deg)}}}"
+                }
+              ]
             },
             {
-              "name": "path",
+              "name": "g",
               "type": "element",
               "attributes": {
-                "d": "M174 28L172.93 33.36L170.09 32.18L167.72 35.72L169.9 37.9L165.36 40.93L164.18 38.09L160 38.92L160 42L154.64 40.93L155.82 38.09L152.28 35.72L150.1 37.9L147.07 33.36L149.91 32.18L149.08 28L146 28L147.07 22.64L149.91 23.82L152.28 20.28L150.1 18.1L154.64 15.07L155.82 17.91L160 17.08L160 14L165.36 15.07L164.18 17.91L167.72 20.28L169.9 18.1L172.93 22.64L170.09 23.82L170.92 28ZM164.9 28A4.9 4.9 0 1 0 155.1 28A4.9 4.9 0 1 0 164.9 28Z",
-                "fill-rule": "evenodd",
-                "fill": "white",
-                "fill-opacity": ".15"
-              }
+                "transform": "translate(70 30)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bTg1"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-70 -30)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M96 30L94.73 38.03L89.29 36.27L86.41 41.92L91.03 45.28L85.28 51.03L81.92 46.41L76.27 49.29L78.03 54.73L70 56L70 50.28L63.73 49.29L61.97 54.73L54.72 51.03L58.08 46.41L53.59 41.92L48.97 45.28L45.27 38.03L50.71 36.27L49.72 30L44 30L45.27 21.97L50.71 23.73L53.59 18.08L48.97 14.72L54.72 8.97L58.08 13.59L63.73 10.71L61.97 5.27L70 4L70 9.72L76.27 10.71L78.03 5.27L85.28 8.97L81.92 13.59L86.41 18.08L91.03 14.72L94.73 21.97L89.29 23.73L90.28 30ZM79.1 30A9.1 9.1 0 1 0 60.9 30A9.1 9.1 0 1 0 79.1 30Z",
+                            "fill-rule": "evenodd",
+                            "fill": "black",
+                            "fill-opacity": ".1"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(150 100)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bTg2"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-150 -100)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M184 100L182.84 108.8L175.62 106.86L172.97 113.26L179.44 117L174.04 124.04L168.75 118.75L163.26 122.97L167 129.44L158.8 132.84L156.86 125.62L150 126.52L150 134L141.2 132.84L143.14 125.62L136.74 122.97L133 129.44L125.96 124.04L131.25 118.75L127.03 113.26L120.56 117L117.16 108.8L124.38 106.86L123.48 100L116 100L117.16 91.2L124.38 93.14L127.03 86.74L120.56 83L125.96 75.96L131.25 81.25L136.74 77.03L133 70.56L141.2 67.16L143.14 74.38L150 73.48L150 66L158.8 67.16L156.86 74.38L163.26 77.03L167 70.56L174.04 75.96L168.75 81.25L172.97 86.74L179.44 83L182.84 91.2L175.62 93.14L176.52 100ZM161.9 100A11.9 11.9 0 1 0 138.1 100A11.9 11.9 0 1 0 161.9 100Z",
+                            "fill-rule": "evenodd",
+                            "fill": "black",
+                            "fill-opacity": ".1"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(115 60)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bTg1"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-115 -60)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M131 60L129.78 66.12L126.53 64.78L123.82 68.82L126.31 71.31L121.12 74.78L119.78 71.53L115 72.48L115 76L108.88 74.78L110.22 71.53L106.18 68.82L103.69 71.31L100.22 66.12L103.47 64.78L102.52 60L99 60L100.22 53.88L103.47 55.22L106.18 51.18L103.69 48.69L108.88 45.22L110.22 48.47L115 47.52L115 44L121.12 45.22L119.78 48.47L123.82 51.18L126.31 48.69L129.78 53.88L126.53 55.22L127.48 60ZM120.6 60A5.6 5.6 0 1 0 109.4 60A5.6 5.6 0 1 0 120.6 60Z",
+                            "fill-rule": "evenodd",
+                            "fill": "black",
+                            "fill-opacity": ".1"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(160 28)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bTg2"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(-160 -28)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M174 28L172.93 33.36L170.09 32.18L167.72 35.72L169.9 37.9L165.36 40.93L164.18 38.09L160 38.92L160 42L154.64 40.93L155.82 38.09L152.28 35.72L150.1 37.9L147.07 33.36L149.91 32.18L149.08 28L146 28L147.07 22.64L149.91 23.82L152.28 20.28L150.1 18.1L154.64 15.07L155.82 17.91L160 17.08L160 14L165.36 15.07L164.18 17.91L167.72 20.28L169.9 18.1L172.93 22.64L170.09 23.82L170.92 28ZM164.9 28A4.9 4.9 0 1 0 155.1 28A4.9 4.9 0 1 0 164.9 28Z",
+                            "fill-rule": "evenodd",
+                            "fill": "white",
+                            "fill-opacity": ".15"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
         "scanlines": {
           "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTsl{animation:bTsl 3s linear infinite}@keyframes bTsl{from{transform:translateY(0)}to{transform:translateY(150px)}}}"
+                }
+              ]
+            },
             {
               "name": "path",
               "type": "element",
@@ -3554,11 +5631,34 @@
                 "fill": "black",
                 "fill-opacity": ".1"
               }
+            },
+            {
+              "name": "rect",
+              "type": "element",
+              "attributes": {
+                "class": "bTsl",
+                "x": "0",
+                "y": "-12",
+                "width": "217",
+                "height": "12",
+                "fill": "white",
+                "fill-opacity": ".14"
+              }
             }
           ]
         },
         "lightlines": {
           "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTll{animation:bTll 1.4s linear infinite}@keyframes bTll{from{stroke-dashoffset:0}to{stroke-dashoffset:-92}}}"
+                }
+              ]
+            },
             {
               "name": "path",
               "type": "element",
@@ -3581,6 +5681,21 @@
                 "stroke-opacity": ".65",
                 "stroke-width": "2.5",
                 "stroke-linejoin": "round"
+              }
+            },
+            {
+              "name": "path",
+              "type": "element",
+              "attributes": {
+                "d": "M48 34H96V62H170M58 132V96H118V140M128 8V44H170M48 84H78V112H100M140 76V120H170",
+                "fill": "none",
+                "stroke": "#C8FFF0",
+                "stroke-opacity": "1",
+                "stroke-width": "2.5",
+                "stroke-linejoin": "round",
+                "class": "bTll",
+                "stroke-dasharray": "8 38",
+                "stroke-linecap": "round"
               }
             },
             {
@@ -3783,6 +5898,16 @@
         "reactor": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTrc{transform-origin:0 0;animation:bTrc 1.4s ease-in-out infinite}@keyframes bTrc{0%,100%{transform:scale(.8);opacity:.5}50%{transform:scale(1.6);opacity:1}}}"
+                }
+              ]
+            },
+            {
               "name": "g",
               "type": "element",
               "attributes": {
@@ -3812,15 +5937,42 @@
                   }
                 },
                 {
-                  "name": "circle",
+                  "name": "g",
                   "type": "element",
                   "attributes": {
-                    "cx": "60",
-                    "cy": "10",
-                    "r": "8",
-                    "fill": "#4EFAC9",
-                    "fill-opacity": ".25"
-                  }
+                    "transform": "translate(60 10)"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "class": "bTrc"
+                      },
+                      "children": [
+                        {
+                          "name": "g",
+                          "type": "element",
+                          "attributes": {
+                            "transform": "translate(-60 -10)"
+                          },
+                          "children": [
+                            {
+                              "name": "circle",
+                              "type": "element",
+                              "attributes": {
+                                "cx": "60",
+                                "cy": "10",
+                                "r": "8",
+                                "fill": "#4EFAC9",
+                                "fill-opacity": ".35"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
                   "name": "circle",
@@ -3935,6 +6087,16 @@
         "matrix": {
           "elements": [
             {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTmx{animation:bTmx 7s linear infinite}@keyframes bTmx{from{transform:translateY(0)}to{transform:translateY(120px)}}}"
+                }
+              ]
+            },
+            {
               "name": "g",
               "type": "element",
               "attributes": {
@@ -3942,13 +6104,40 @@
               },
               "children": [
                 {
-                  "name": "path",
+                  "name": "g",
                   "type": "element",
                   "attributes": {
-                    "d": "M4 0h2.4v6.95h-2.4zM4 13.62h2.4v4.76h-2.4zM4 24.36h2.4v3.57h-2.4zM4 31.34h2.4v5.37h-2.4zM4 41.09h2.4v7.04h-2.4zM4 55.64h2.4v6.58h-2.4zM4 65.15h2.4v4.04h-2.4zM4 72.79h2.4v6.89h-2.4zM4 83.81h2.4v3.23h-2.4zM4 94.54h2.4v5.01h-2.4zM4 102.07h2.4v5.6h-2.4zM4 115.34h2.4v6.91h-2.4zM13 -12.69h2.4v5.76h-2.4zM13 -3.31h2.4v3.48h-2.4zM13 5.21h2.4v6.31h-2.4zM13 18.39h2.4v4.87h-2.4zM13 26.68h2.4v7.08h-2.4zM13 39.61h2.4v3.98h-2.4zM13 50.28h2.4v8.73h-2.4zM13 65.97h2.4v4.41h-2.4zM13 77.86h2.4v6.68h-2.4zM13 91.14h2.4v4.55h-2.4zM13 99.87h2.4v3.95h-2.4zM13 108.36h2.4v5.18h-2.4zM13 116.63h2.4v7.99h-2.4zM22 -3.78h2.4v5.25h-2.4zM22 8.25h2.4v8h-2.4zM22 20.85h2.4v5.93h-2.4zM22 32.06h2.4v4.82h-2.4zM22 42.02h2.4v6.14h-2.4zM22 53.65h2.4v6.57h-2.4zM22 67.82h2.4v5.82h-2.4zM22 77.62h2.4v5.72h-2.4zM22 89.77h2.4v5.21h-2.4zM22 100h2.4v8.52h-2.4zM22 112.83h2.4v6.41h-2.4zM31 -6.44h2.4v7.23h-2.4zM31 4.29h2.4v7.85h-2.4zM31 19.25h2.4v3.83h-2.4zM31 28.84h2.4v3.48h-2.4zM31 36.97h2.4v5.05h-2.4zM31 44.91h2.4v7.09h-2.4zM31 57.76h2.4v8.98h-2.4zM31 71.4h2.4v4h-2.4zM31 80.59h2.4v7.53h-2.4zM31 93.52h2.4v8.73h-2.4zM31 105.63h2.4v3.36h-2.4zM31 112.24h2.4v5.08h-2.4zM31 119.78h2.4v7.12h-2.4zM40 -8.72h2.4v8.35h-2.4zM40 6.24h2.4v8.15h-2.4zM40 16.46h2.4v3.99h-2.4zM40 26.48h2.4v5.95h-2.4zM40 39.09h2.4v7.45h-2.4zM40 53.18h2.4v5.72h-2.4zM40 61.65h2.4v4.26h-2.4zM40 72.7h2.4v3.38h-2.4zM40 81.52h2.4v6.91h-2.4zM40 93.16h2.4v5.24h-2.4zM40 100.49h2.4v3.43h-2.4zM40 106.73h2.4v6.29h-2.4zM40 119.16h2.4v4.2h-2.4zM49 -11.75h2.4v5.61h-2.4zM49 -2.58h2.4v7.51h-2.4zM49 9.37h2.4v8.57h-2.4zM49 25.57h2.4v5.99h-2.4zM49 37.99h2.4v8.62h-2.4zM49 49.98h2.4v8.7h-2.4zM49 65.34h2.4v7.68h-2.4zM49 79.46h2.4v8.5h-2.4zM49 90.22h2.4v7.25h-2.4zM49 104.42h2.4v4.56h-2.4zM49 113.64h2.4v4.92h-2.4zM58 -12.6h2.4v8.99h-2.4zM58 1.97h2.4v3.88h-2.4zM58 11.65h2.4v4.54h-2.4zM58 18.84h2.4v3.09h-2.4zM58 25.37h2.4v5.29h-2.4zM58 38.34h2.4v3.1h-2.4zM58 44.29h2.4v6.05h-2.4zM58 53.13h2.4v7.26h-2.4zM58 66.81h2.4v3.31h-2.4zM58 76.06h2.4v5.57h-2.4zM58 86.4h2.4v7.87h-2.4zM58 98.4h2.4v7.96h-2.4zM58 109.95h2.4v7.05h-2.4zM67 -5.53h2.4v7.49h-2.4zM67 5.53h2.4v3.27h-2.4zM67 14.75h2.4v4.55h-2.4zM67 21.76h2.4v5.39h-2.4zM67 32.42h2.4v4.5h-2.4zM67 40.75h2.4v5.14h-2.4zM67 51.07h2.4v3.01h-2.4zM67 56.61h2.4v7.68h-2.4zM67 68.16h2.4v7.54h-2.4zM67 78.68h2.4v4.18h-2.4zM67 85.6h2.4v5.67h-2.4zM67 96.34h2.4v8.61h-2.4zM67 111.58h2.4v4.54h-2.4zM76 -13.74h2.4v6.43h-2.4zM76 -2.21h2.4v3.42h-2.4zM76 8.51h2.4v5.3h-2.4zM76 17.01h2.4v6.89h-2.4zM76 27.98h2.4v6.47h-2.4zM76 36.47h2.4v6.2h-2.4zM76 48.92h2.4v3.57h-2.4zM76 57.07h2.4v6.75h-2.4zM76 67.72h2.4v4.96h-2.4zM76 78.08h2.4v5.67h-2.4zM76 87.78h2.4v5.46h-2.4zM76 101.23h2.4v6.5h-2.4zM76 111.71h2.4v5.7h-2.4zM85 -13.92h2.4v4.51h-2.4zM85 -1.73h2.4v3.47h-2.4zM85 5.12h2.4v6.47h-2.4zM85 17.03h2.4v5.45h-2.4zM85 25.67h2.4v5.03h-2.4zM85 32.9h2.4v7.95h-2.4zM85 43.2h2.4v8.97h-2.4zM85 58.78h2.4v3.91h-2.4zM85 65.18h2.4v3.02h-2.4zM85 70.23h2.4v8.2h-2.4zM85 84.25h2.4v6.58h-2.4zM85 93.36h2.4v5.47h-2.4zM85 103.25h2.4v3.16h-2.4zM85 109.5h2.4v6.27h-2.4zM85 118.63h2.4v5.84h-2.4zM94 -16.4h2.4v3.89h-2.4zM94 -10.09h2.4v3.41h-2.4zM94 -2.25h2.4v8.66h-2.4zM94 12.97h2.4v7.43h-2.4zM94 28.1h2.4v5.08h-2.4zM94 37.95h2.4v5.52h-2.4zM94 50.78h2.4v8.52h-2.4zM94 61.97h2.4v5.46h-2.4zM94 75.25h2.4v3.34h-2.4zM94 86.34h2.4v8.5h-2.4zM94 98.16h2.4v3.59h-2.4zM94 107.84h2.4v8.94h-2.4zM94 118.81h2.4v8.31h-2.4zM103 -15.77h2.4v8.64h-2.4zM103 -3.41h2.4v4.01h-2.4zM103 5.65h2.4v3.58h-2.4zM103 12.27h2.4v5.88h-2.4zM103 25.99h2.4v5.89h-2.4zM103 38.47h2.4v5.09h-2.4zM103 46.56h2.4v4.69h-2.4zM103 59.2h2.4v3.81h-2.4zM103 68.57h2.4v6h-2.4zM103 80.09h2.4v7.88h-2.4zM103 93.75h2.4v7.62h-2.4zM103 109.01h2.4v6.89h-2.4zM112 -14.3h2.4v7.85h-2.4zM112 -1.89h2.4v4.81h-2.4zM112 5.32h2.4v7.71h-2.4zM112 19.2h2.4v6.48h-2.4zM112 31.74h2.4v6.86h-2.4zM112 43.92h2.4v8.64h-2.4zM112 58.1h2.4v3.93h-2.4zM112 65.8h2.4v8.11h-2.4zM112 81.7h2.4v4.41h-2.4zM112 90.39h2.4v8.63h-2.4zM112 103.4h2.4v5.35h-2.4zM112 115.84h2.4v4.62h-2.4z",
-                    "fill": "#5EE38B",
-                    "fill-opacity": ".35"
-                  }
+                    "class": "bTmx"
+                  },
+                  "children": [
+                    {
+                      "name": "path",
+                      "type": "element",
+                      "attributes": {
+                        "d": "M4 0h2.4v6.95h-2.4zM4 13.62h2.4v4.76h-2.4zM4 24.36h2.4v3.57h-2.4zM4 31.34h2.4v5.37h-2.4zM4 41.09h2.4v7.04h-2.4zM4 55.64h2.4v6.58h-2.4zM4 65.15h2.4v4.04h-2.4zM4 72.79h2.4v6.89h-2.4zM4 83.81h2.4v3.23h-2.4zM4 94.54h2.4v5.01h-2.4zM4 102.07h2.4v5.6h-2.4zM4 115.34h2.4v6.91h-2.4zM13 -12.69h2.4v5.76h-2.4zM13 -3.31h2.4v3.48h-2.4zM13 5.21h2.4v6.31h-2.4zM13 18.39h2.4v4.87h-2.4zM13 26.68h2.4v7.08h-2.4zM13 39.61h2.4v3.98h-2.4zM13 50.28h2.4v8.73h-2.4zM13 65.97h2.4v4.41h-2.4zM13 77.86h2.4v6.68h-2.4zM13 91.14h2.4v4.55h-2.4zM13 99.87h2.4v3.95h-2.4zM13 108.36h2.4v5.18h-2.4zM13 116.63h2.4v7.99h-2.4zM22 -3.78h2.4v5.25h-2.4zM22 8.25h2.4v8h-2.4zM22 20.85h2.4v5.93h-2.4zM22 32.06h2.4v4.82h-2.4zM22 42.02h2.4v6.14h-2.4zM22 53.65h2.4v6.57h-2.4zM22 67.82h2.4v5.82h-2.4zM22 77.62h2.4v5.72h-2.4zM22 89.77h2.4v5.21h-2.4zM22 100h2.4v8.52h-2.4zM22 112.83h2.4v6.41h-2.4zM31 -6.44h2.4v7.23h-2.4zM31 4.29h2.4v7.85h-2.4zM31 19.25h2.4v3.83h-2.4zM31 28.84h2.4v3.48h-2.4zM31 36.97h2.4v5.05h-2.4zM31 44.91h2.4v7.09h-2.4zM31 57.76h2.4v8.98h-2.4zM31 71.4h2.4v4h-2.4zM31 80.59h2.4v7.53h-2.4zM31 93.52h2.4v8.73h-2.4zM31 105.63h2.4v3.36h-2.4zM31 112.24h2.4v5.08h-2.4zM31 119.78h2.4v7.12h-2.4zM40 -8.72h2.4v8.35h-2.4zM40 6.24h2.4v8.15h-2.4zM40 16.46h2.4v3.99h-2.4zM40 26.48h2.4v5.95h-2.4zM40 39.09h2.4v7.45h-2.4zM40 53.18h2.4v5.72h-2.4zM40 61.65h2.4v4.26h-2.4zM40 72.7h2.4v3.38h-2.4zM40 81.52h2.4v6.91h-2.4zM40 93.16h2.4v5.24h-2.4zM40 100.49h2.4v3.43h-2.4zM40 106.73h2.4v6.29h-2.4zM40 119.16h2.4v4.2h-2.4zM49 -11.75h2.4v5.61h-2.4zM49 -2.58h2.4v7.51h-2.4zM49 9.37h2.4v8.57h-2.4zM49 25.57h2.4v5.99h-2.4zM49 37.99h2.4v8.62h-2.4zM49 49.98h2.4v8.7h-2.4zM49 65.34h2.4v7.68h-2.4zM49 79.46h2.4v8.5h-2.4zM49 90.22h2.4v7.25h-2.4zM49 104.42h2.4v4.56h-2.4zM49 113.64h2.4v4.92h-2.4zM58 -12.6h2.4v8.99h-2.4zM58 1.97h2.4v3.88h-2.4zM58 11.65h2.4v4.54h-2.4zM58 18.84h2.4v3.09h-2.4zM58 25.37h2.4v5.29h-2.4zM58 38.34h2.4v3.1h-2.4zM58 44.29h2.4v6.05h-2.4zM58 53.13h2.4v7.26h-2.4zM58 66.81h2.4v3.31h-2.4zM58 76.06h2.4v5.57h-2.4zM58 86.4h2.4v7.87h-2.4zM58 98.4h2.4v7.96h-2.4zM58 109.95h2.4v7.05h-2.4zM67 -5.53h2.4v7.49h-2.4zM67 5.53h2.4v3.27h-2.4zM67 14.75h2.4v4.55h-2.4zM67 21.76h2.4v5.39h-2.4zM67 32.42h2.4v4.5h-2.4zM67 40.75h2.4v5.14h-2.4zM67 51.07h2.4v3.01h-2.4zM67 56.61h2.4v7.68h-2.4zM67 68.16h2.4v7.54h-2.4zM67 78.68h2.4v4.18h-2.4zM67 85.6h2.4v5.67h-2.4zM67 96.34h2.4v8.61h-2.4zM67 111.58h2.4v4.54h-2.4zM76 -13.74h2.4v6.43h-2.4zM76 -2.21h2.4v3.42h-2.4zM76 8.51h2.4v5.3h-2.4zM76 17.01h2.4v6.89h-2.4zM76 27.98h2.4v6.47h-2.4zM76 36.47h2.4v6.2h-2.4zM76 48.92h2.4v3.57h-2.4zM76 57.07h2.4v6.75h-2.4zM76 67.72h2.4v4.96h-2.4zM76 78.08h2.4v5.67h-2.4zM76 87.78h2.4v5.46h-2.4zM76 101.23h2.4v6.5h-2.4zM76 111.71h2.4v5.7h-2.4zM85 -13.92h2.4v4.51h-2.4zM85 -1.73h2.4v3.47h-2.4zM85 5.12h2.4v6.47h-2.4zM85 17.03h2.4v5.45h-2.4zM85 25.67h2.4v5.03h-2.4zM85 32.9h2.4v7.95h-2.4zM85 43.2h2.4v8.97h-2.4zM85 58.78h2.4v3.91h-2.4zM85 65.18h2.4v3.02h-2.4zM85 70.23h2.4v8.2h-2.4zM85 84.25h2.4v6.58h-2.4zM85 93.36h2.4v5.47h-2.4zM85 103.25h2.4v3.16h-2.4zM85 109.5h2.4v6.27h-2.4zM85 118.63h2.4v5.84h-2.4zM94 -16.4h2.4v3.89h-2.4zM94 -10.09h2.4v3.41h-2.4zM94 -2.25h2.4v8.66h-2.4zM94 12.97h2.4v7.43h-2.4zM94 28.1h2.4v5.08h-2.4zM94 37.95h2.4v5.52h-2.4zM94 50.78h2.4v8.52h-2.4zM94 61.97h2.4v5.46h-2.4zM94 75.25h2.4v3.34h-2.4zM94 86.34h2.4v8.5h-2.4zM94 98.16h2.4v3.59h-2.4zM94 107.84h2.4v8.94h-2.4zM94 118.81h2.4v8.31h-2.4zM103 -15.77h2.4v8.64h-2.4zM103 -3.41h2.4v4.01h-2.4zM103 5.65h2.4v3.58h-2.4zM103 12.27h2.4v5.88h-2.4zM103 25.99h2.4v5.89h-2.4zM103 38.47h2.4v5.09h-2.4zM103 46.56h2.4v4.69h-2.4zM103 59.2h2.4v3.81h-2.4zM103 68.57h2.4v6h-2.4zM103 80.09h2.4v7.88h-2.4zM103 93.75h2.4v7.62h-2.4zM103 109.01h2.4v6.89h-2.4zM112 -14.3h2.4v7.85h-2.4zM112 -1.89h2.4v4.81h-2.4zM112 5.32h2.4v7.71h-2.4zM112 19.2h2.4v6.48h-2.4zM112 31.74h2.4v6.86h-2.4zM112 43.92h2.4v8.64h-2.4zM112 58.1h2.4v3.93h-2.4zM112 65.8h2.4v8.11h-2.4zM112 81.7h2.4v4.41h-2.4zM112 90.39h2.4v8.63h-2.4zM112 103.4h2.4v5.35h-2.4zM112 115.84h2.4v4.62h-2.4z",
+                        "fill": "#5EE38B",
+                        "fill-opacity": ".35"
+                      }
+                    },
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "transform": "translate(0 -120)"
+                      },
+                      "children": [
+                        {
+                          "name": "path",
+                          "type": "element",
+                          "attributes": {
+                            "d": "M4 0h2.4v6.95h-2.4zM4 13.62h2.4v4.76h-2.4zM4 24.36h2.4v3.57h-2.4zM4 31.34h2.4v5.37h-2.4zM4 41.09h2.4v7.04h-2.4zM4 55.64h2.4v6.58h-2.4zM4 65.15h2.4v4.04h-2.4zM4 72.79h2.4v6.89h-2.4zM4 83.81h2.4v3.23h-2.4zM4 94.54h2.4v5.01h-2.4zM4 102.07h2.4v5.6h-2.4zM4 115.34h2.4v6.91h-2.4zM13 -12.69h2.4v5.76h-2.4zM13 -3.31h2.4v3.48h-2.4zM13 5.21h2.4v6.31h-2.4zM13 18.39h2.4v4.87h-2.4zM13 26.68h2.4v7.08h-2.4zM13 39.61h2.4v3.98h-2.4zM13 50.28h2.4v8.73h-2.4zM13 65.97h2.4v4.41h-2.4zM13 77.86h2.4v6.68h-2.4zM13 91.14h2.4v4.55h-2.4zM13 99.87h2.4v3.95h-2.4zM13 108.36h2.4v5.18h-2.4zM13 116.63h2.4v7.99h-2.4zM22 -3.78h2.4v5.25h-2.4zM22 8.25h2.4v8h-2.4zM22 20.85h2.4v5.93h-2.4zM22 32.06h2.4v4.82h-2.4zM22 42.02h2.4v6.14h-2.4zM22 53.65h2.4v6.57h-2.4zM22 67.82h2.4v5.82h-2.4zM22 77.62h2.4v5.72h-2.4zM22 89.77h2.4v5.21h-2.4zM22 100h2.4v8.52h-2.4zM22 112.83h2.4v6.41h-2.4zM31 -6.44h2.4v7.23h-2.4zM31 4.29h2.4v7.85h-2.4zM31 19.25h2.4v3.83h-2.4zM31 28.84h2.4v3.48h-2.4zM31 36.97h2.4v5.05h-2.4zM31 44.91h2.4v7.09h-2.4zM31 57.76h2.4v8.98h-2.4zM31 71.4h2.4v4h-2.4zM31 80.59h2.4v7.53h-2.4zM31 93.52h2.4v8.73h-2.4zM31 105.63h2.4v3.36h-2.4zM31 112.24h2.4v5.08h-2.4zM31 119.78h2.4v7.12h-2.4zM40 -8.72h2.4v8.35h-2.4zM40 6.24h2.4v8.15h-2.4zM40 16.46h2.4v3.99h-2.4zM40 26.48h2.4v5.95h-2.4zM40 39.09h2.4v7.45h-2.4zM40 53.18h2.4v5.72h-2.4zM40 61.65h2.4v4.26h-2.4zM40 72.7h2.4v3.38h-2.4zM40 81.52h2.4v6.91h-2.4zM40 93.16h2.4v5.24h-2.4zM40 100.49h2.4v3.43h-2.4zM40 106.73h2.4v6.29h-2.4zM40 119.16h2.4v4.2h-2.4zM49 -11.75h2.4v5.61h-2.4zM49 -2.58h2.4v7.51h-2.4zM49 9.37h2.4v8.57h-2.4zM49 25.57h2.4v5.99h-2.4zM49 37.99h2.4v8.62h-2.4zM49 49.98h2.4v8.7h-2.4zM49 65.34h2.4v7.68h-2.4zM49 79.46h2.4v8.5h-2.4zM49 90.22h2.4v7.25h-2.4zM49 104.42h2.4v4.56h-2.4zM49 113.64h2.4v4.92h-2.4zM58 -12.6h2.4v8.99h-2.4zM58 1.97h2.4v3.88h-2.4zM58 11.65h2.4v4.54h-2.4zM58 18.84h2.4v3.09h-2.4zM58 25.37h2.4v5.29h-2.4zM58 38.34h2.4v3.1h-2.4zM58 44.29h2.4v6.05h-2.4zM58 53.13h2.4v7.26h-2.4zM58 66.81h2.4v3.31h-2.4zM58 76.06h2.4v5.57h-2.4zM58 86.4h2.4v7.87h-2.4zM58 98.4h2.4v7.96h-2.4zM58 109.95h2.4v7.05h-2.4zM67 -5.53h2.4v7.49h-2.4zM67 5.53h2.4v3.27h-2.4zM67 14.75h2.4v4.55h-2.4zM67 21.76h2.4v5.39h-2.4zM67 32.42h2.4v4.5h-2.4zM67 40.75h2.4v5.14h-2.4zM67 51.07h2.4v3.01h-2.4zM67 56.61h2.4v7.68h-2.4zM67 68.16h2.4v7.54h-2.4zM67 78.68h2.4v4.18h-2.4zM67 85.6h2.4v5.67h-2.4zM67 96.34h2.4v8.61h-2.4zM67 111.58h2.4v4.54h-2.4zM76 -13.74h2.4v6.43h-2.4zM76 -2.21h2.4v3.42h-2.4zM76 8.51h2.4v5.3h-2.4zM76 17.01h2.4v6.89h-2.4zM76 27.98h2.4v6.47h-2.4zM76 36.47h2.4v6.2h-2.4zM76 48.92h2.4v3.57h-2.4zM76 57.07h2.4v6.75h-2.4zM76 67.72h2.4v4.96h-2.4zM76 78.08h2.4v5.67h-2.4zM76 87.78h2.4v5.46h-2.4zM76 101.23h2.4v6.5h-2.4zM76 111.71h2.4v5.7h-2.4zM85 -13.92h2.4v4.51h-2.4zM85 -1.73h2.4v3.47h-2.4zM85 5.12h2.4v6.47h-2.4zM85 17.03h2.4v5.45h-2.4zM85 25.67h2.4v5.03h-2.4zM85 32.9h2.4v7.95h-2.4zM85 43.2h2.4v8.97h-2.4zM85 58.78h2.4v3.91h-2.4zM85 65.18h2.4v3.02h-2.4zM85 70.23h2.4v8.2h-2.4zM85 84.25h2.4v6.58h-2.4zM85 93.36h2.4v5.47h-2.4zM85 103.25h2.4v3.16h-2.4zM85 109.5h2.4v6.27h-2.4zM85 118.63h2.4v5.84h-2.4zM94 -16.4h2.4v3.89h-2.4zM94 -10.09h2.4v3.41h-2.4zM94 -2.25h2.4v8.66h-2.4zM94 12.97h2.4v7.43h-2.4zM94 28.1h2.4v5.08h-2.4zM94 37.95h2.4v5.52h-2.4zM94 50.78h2.4v8.52h-2.4zM94 61.97h2.4v5.46h-2.4zM94 75.25h2.4v3.34h-2.4zM94 86.34h2.4v8.5h-2.4zM94 98.16h2.4v3.59h-2.4zM94 107.84h2.4v8.94h-2.4zM94 118.81h2.4v8.31h-2.4zM103 -15.77h2.4v8.64h-2.4zM103 -3.41h2.4v4.01h-2.4zM103 5.65h2.4v3.58h-2.4zM103 12.27h2.4v5.88h-2.4zM103 25.99h2.4v5.89h-2.4zM103 38.47h2.4v5.09h-2.4zM103 46.56h2.4v4.69h-2.4zM103 59.2h2.4v3.81h-2.4zM103 68.57h2.4v6h-2.4zM103 80.09h2.4v7.88h-2.4zM103 93.75h2.4v7.62h-2.4zM103 109.01h2.4v6.89h-2.4zM112 -14.3h2.4v7.85h-2.4zM112 -1.89h2.4v4.81h-2.4zM112 5.32h2.4v7.71h-2.4zM112 19.2h2.4v6.48h-2.4zM112 31.74h2.4v6.86h-2.4zM112 43.92h2.4v8.64h-2.4zM112 58.1h2.4v3.93h-2.4zM112 65.8h2.4v8.11h-2.4zM112 81.7h2.4v4.41h-2.4zM112 90.39h2.4v8.63h-2.4zM112 103.4h2.4v5.35h-2.4zM112 115.84h2.4v4.62h-2.4z",
+                            "fill": "#5EE38B",
+                            "fill-opacity": ".35"
+                          }
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             }
@@ -3979,6 +6168,856 @@
                     "fill": "black",
                     "fill-opacity": ".85"
                   }
+                }
+              ]
+            }
+          ]
+        },
+        "flames": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTf1,.bTf2{transform-origin:0 0;}.bTf1{animation:bTf .9s ease-in-out infinite alternate}.bTf2{animation:bTf .6s ease-in-out infinite alternate-reverse}@keyframes bTf{from{transform:scaleY(1)}to{transform:scaleY(.82)}}}"
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "transform": "translate(60 120)"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "class": "bTf1"
+                      },
+                      "children": [
+                        {
+                          "name": "g",
+                          "type": "element",
+                          "attributes": {
+                            "transform": "translate(-60 -120)"
+                          },
+                          "children": [
+                            {
+                              "name": "path",
+                              "type": "element",
+                              "attributes": {
+                                "d": "M0 120V92Q7 78 12 88Q16 64 28 84Q33 58 44 82Q50 68 58 86Q66 52 76 82Q82 70 90 88Q98 60 106 84Q112 74 120 90V120Z",
+                                "fill": "#FF7A1A",
+                                "fill-opacity": ".55"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "transform": "translate(60 120)"
+                  },
+                  "children": [
+                    {
+                      "name": "g",
+                      "type": "element",
+                      "attributes": {
+                        "class": "bTf2"
+                      },
+                      "children": [
+                        {
+                          "name": "g",
+                          "type": "element",
+                          "attributes": {
+                            "transform": "translate(-60 -120)"
+                          },
+                          "children": [
+                            {
+                              "name": "path",
+                              "type": "element",
+                              "attributes": {
+                                "d": "M0 120V104Q8 94 14 102Q20 86 30 100Q38 84 46 100Q54 90 62 102Q70 82 80 100Q88 92 96 104Q104 88 112 102L120 106V120Z",
+                                "fill": "#FFD43B",
+                                "fill-opacity": ".55"
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "tiger": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 14Q20 18 34 30Q18 28 0 24ZM0 52Q16 54 26 62Q14 64 0 62ZM0 92Q22 92 36 104Q18 104 0 100ZM120 20Q100 22 86 34Q102 34 120 30ZM120 60Q102 60 92 70Q104 72 120 70ZM120 98Q100 100 88 110Q104 110 120 106ZM42 0Q46 14 58 22Q50 10 52 0ZM70 0Q72 10 80 16Q76 6 80 0ZM40 120Q46 108 58 102Q52 112 52 120ZM74 120Q76 112 84 106Q80 114 82 120Z",
+                    "fill": "black",
+                    "fill-opacity": ".22"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "patches": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M-6 8C6 -2 26 2 28 14C30 26 14 34 4 30C-6 26 -14 16 -6 8ZM84 -8C98 -10 112 2 108 14C104 24 88 22 84 14C80 8 74 -6 84 -8ZM96 52C108 44 126 50 126 64C126 78 110 84 100 76C92 70 88 58 96 52ZM-8 72C4 66 20 72 18 86C16 98 0 100 -8 92ZM40 104C52 96 70 102 70 114C70 126 50 130 42 122C36 116 34 108 40 104Z",
+                    "fill": "black",
+                    "fill-opacity": ".2"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M10 12C16 8 22 12 20 18C18 22 12 22 10 18ZM98 60C104 56 112 60 110 66C108 70 100 70 98 66Z",
+                    "fill": "black",
+                    "fill-opacity": ".12"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "waves": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M-10 6Q0 0 10 6T30 6T50 6T70 6T90 6T110 6T130 6M-10 20Q0 14 10 20T30 20T50 20T70 20T90 20T110 20T130 20M-10 34Q0 28 10 34T30 34T50 34T70 34T90 34T110 34T130 34M-10 48Q0 42 10 48T30 48T50 48T70 48T90 48T110 48T130 48M-10 62Q0 56 10 62T30 62T50 62T70 62T90 62T110 62T130 62M-10 76Q0 70 10 76T30 76T50 76T70 76T90 76T110 76T130 76M-10 90Q0 84 10 90T30 90T50 90T70 90T90 90T110 90T130 90M-10 104Q0 98 10 104T30 104T50 104T70 104T90 104T110 104T130 104M-10 118Q0 112 10 118T30 118T50 118T70 118T90 118T110 118T130 118",
+                    "stroke": "white",
+                    "stroke-opacity": ".16",
+                    "stroke-width": "4",
+                    "stroke-linecap": "round"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "pixels": {
+          "elements": [
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M0 0h10v10h-10zM0 100h10v10h-10zM10 30h10v10h-10zM10 40h10v10h-10zM10 90h10v10h-10zM50 70h10v10h-10zM60 40h10v10h-10zM60 110h10v10h-10zM70 40h10v10h-10zM70 60h10v10h-10zM70 70h10v10h-10zM70 80h10v10h-10zM70 90h10v10h-10zM90 0h10v10h-10zM90 110h10v10h-10zM100 50h10v10h-10zM100 80h10v10h-10zM100 90h10v10h-10zM100 110h10v10h-10z",
+                    "fill": "black",
+                    "fill-opacity": ".14"
+                  }
+                },
+                {
+                  "name": "path",
+                  "type": "element",
+                  "attributes": {
+                    "d": "M10 30h10v10h-10zM40 20h10v10h-10zM40 50h10v10h-10zM50 30h10v10h-10zM60 60h10v10h-10zM70 50h10v10h-10zM90 30h10v10h-10zM90 40h10v10h-10zM90 110h10v10h-10zM100 60h10v10h-10zM100 70h10v10h-10z",
+                    "fill": "white",
+                    "fill-opacity": ".14"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "rain": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTrn{animation:bTrn .8s linear infinite}@keyframes bTrn{from{transform:translateY(0)}to{transform:translateY(120px)}}}"
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bTrn"
+                  },
+                  "children": [
+                    {
+                      "name": "path",
+                      "type": "element",
+                      "attributes": {
+                        "d": "M2 110v7M36 25v7M87 64v7M40 90v7M90 65v7M81 76v7M97 29v7M45 85v7M83 6v7M81 56v7M109 97v7M16 62v7M109 83v7M77 69v7M108 109v7M45 40v7M99 40v7M20 36v7M52 35v7M111 67v7M87 105v7M9 33v7M2 -10v7M36 -95v7M87 -56v7M40 -30v7M90 -55v7M81 -44v7M97 -91v7M45 -35v7M83 -114v7M81 -64v7M109 -23v7M16 -58v7M109 -37v7M77 -51v7M108 -11v7M45 -80v7M99 -80v7M20 -84v7M52 -85v7M111 -53v7M87 -15v7M9 -87v7",
+                        "stroke": "white",
+                        "stroke-opacity": ".4",
+                        "stroke-width": "2",
+                        "stroke-linecap": "round"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "snow": {
+          "elements": [
+            {
+              "name": "style",
+              "type": "element",
+              "children": [
+                {
+                  "type": "text",
+                  "value": "@media (prefers-reduced-motion: no-preference){.bTsn{animation:bTsn 7s linear infinite}@keyframes bTsn{from{transform:translateY(0)}to{transform:translateY(120px)}}}"
+                }
+              ]
+            },
+            {
+              "name": "g",
+              "type": "element",
+              "attributes": {
+                "transform": "translate(48.5 9.89)"
+              },
+              "children": [
+                {
+                  "name": "g",
+                  "type": "element",
+                  "attributes": {
+                    "class": "bTsn"
+                  },
+                  "children": [
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "67",
+                        "cy": "61",
+                        "r": "1.9",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "24",
+                        "cy": "109",
+                        "r": "1.3",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "44",
+                        "cy": "41",
+                        "r": "2.3",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "109",
+                        "cy": "62",
+                        "r": "1.5",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "49",
+                        "cy": "34",
+                        "r": "1.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "51",
+                        "cy": "40",
+                        "r": "2.1",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "73",
+                        "cy": "28",
+                        "r": "2.7",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "55",
+                        "cy": "104",
+                        "r": "2.2",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "76",
+                        "cy": "62",
+                        "r": "2.0",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "82",
+                        "cy": "113",
+                        "r": "1.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "84",
+                        "cy": "30",
+                        "r": "2.1",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "43",
+                        "cy": "40",
+                        "r": "1.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "94",
+                        "cy": "105",
+                        "r": "1.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "97",
+                        "cy": "9",
+                        "r": "1.9",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "20",
+                        "cy": "9",
+                        "r": "2.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "28",
+                        "cy": "76",
+                        "r": "1.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "55",
+                        "cy": "71",
+                        "r": "1.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "109",
+                        "cy": "106",
+                        "r": "2.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "105",
+                        "cy": "109",
+                        "r": "2.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "34",
+                        "cy": "1",
+                        "r": "1.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "11",
+                        "cy": "0",
+                        "r": "2.2",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "29",
+                        "cy": "89",
+                        "r": "2.0",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "82",
+                        "cy": "29",
+                        "r": "2.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "29",
+                        "cy": "45",
+                        "r": "2.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "16",
+                        "cy": "59",
+                        "r": "1.2",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "108",
+                        "cy": "76",
+                        "r": "2.7",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "67",
+                        "cy": "-59",
+                        "r": "1.9",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "24",
+                        "cy": "-11",
+                        "r": "1.3",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "44",
+                        "cy": "-79",
+                        "r": "2.3",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "109",
+                        "cy": "-58",
+                        "r": "1.5",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "49",
+                        "cy": "-86",
+                        "r": "1.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "51",
+                        "cy": "-80",
+                        "r": "2.1",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "73",
+                        "cy": "-92",
+                        "r": "2.7",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "55",
+                        "cy": "-16",
+                        "r": "2.2",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "76",
+                        "cy": "-58",
+                        "r": "2.0",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "82",
+                        "cy": "-7",
+                        "r": "1.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "84",
+                        "cy": "-90",
+                        "r": "2.1",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "43",
+                        "cy": "-80",
+                        "r": "1.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "94",
+                        "cy": "-15",
+                        "r": "1.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "97",
+                        "cy": "-111",
+                        "r": "1.9",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "20",
+                        "cy": "-111",
+                        "r": "2.8",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "28",
+                        "cy": "-44",
+                        "r": "1.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "55",
+                        "cy": "-49",
+                        "r": "1.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "109",
+                        "cy": "-14",
+                        "r": "2.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "105",
+                        "cy": "-11",
+                        "r": "2.4",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "34",
+                        "cy": "-119",
+                        "r": "1.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "11",
+                        "cy": "-120",
+                        "r": "2.2",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "29",
+                        "cy": "-31",
+                        "r": "2.0",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "82",
+                        "cy": "-91",
+                        "r": "2.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "29",
+                        "cy": "-75",
+                        "r": "2.6",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "16",
+                        "cy": "-61",
+                        "r": "1.2",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    },
+                    {
+                      "name": "circle",
+                      "type": "element",
+                      "attributes": {
+                        "cx": "108",
+                        "cy": "-44",
+                        "r": "2.7",
+                        "fill": "white",
+                        "fill-opacity": ".75"
+                      }
+                    }
+                  ]
                 }
               ]
             }
@@ -4220,15 +7259,213 @@
         "#2B2E33"
       ]
     },
-    "fireCap": {
-      "name": "Czerwony czubek",
+    "eyeBandRed": {
+      "name": "Czerwona opaska",
       "type": "paint",
-      "shape": "cap",
+      "shape": "eyeband",
       "rarity": "rare",
       "colors": [
-        "#8C9BAA",
+        "#2B2E33",
         "#D93A2B"
       ]
+    },
+    "eyeBandGold": {
+      "name": "Złota opaska",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#2C3E66",
+        "#D4A72C"
+      ]
+    },
+    "eyeBandNeon": {
+      "name": "Neonowa opaska",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#1E2126",
+        "#2ECC71"
+      ]
+    },
+    "eyeBandBlue": {
+      "name": "Biała opaska",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#1F5FBF",
+        "#F2F2F2"
+      ]
+    },
+    "eyeBandTeal": {
+      "name": "Morska opaska",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#E45E4D",
+        "#15A2A9"
+      ]
+    },
+    "eyeBandPurple": {
+      "name": "Fioletowa opaska",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#F1C40F",
+        "#6C3483"
+      ]
+    },
+    "eyeBandPink": {
+      "name": "Bordowa opaska",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#F2C6D9",
+        "#7B2D3A"
+      ]
+    },
+    "eyeBandOrange": {
+      "name": "Pomarańczowa opaska",
+      "type": "paint",
+      "shape": "eyeband",
+      "rarity": "rare",
+      "colors": [
+        "#263238",
+        "#FF9800"
+      ]
+    }
+  },
+  "removed": {
+    "eyes": [],
+    "mouth": [],
+    "texture": []
+  },
+  "rarity": {
+    "eyes": {
+      "bulging": "common",
+      "dizzy": "common",
+      "eva": "rare",
+      "frame1": "common",
+      "frame2": "common",
+      "glow": "rare",
+      "happy": "common",
+      "hearts": "epic",
+      "robocop": "rare",
+      "round": "common",
+      "sensor": "common",
+      "scanner": "rare",
+      "roundFrame01": "common",
+      "roundFrame02": "common",
+      "shade01": "rare",
+      "wink": "common",
+      "visor": "rare",
+      "cyclops": "common",
+      "stars": "rare",
+      "sleepy": "common",
+      "angry": "common",
+      "spiral": "epic",
+      "crying": "common",
+      "cat": "rare",
+      "nerd": "common",
+      "skull": "rare",
+      "camera": "rare",
+      "portholes": "rare",
+      "goggles": "rare",
+      "battery": "epic",
+      "screws": "common",
+      "binoculars": "rare",
+      "hal": "epic",
+      "cylon": "legendary",
+      "nightvision": "epic",
+      "baymax": "common",
+      "lcdtears": "epic",
+      "sus": "rare",
+      "blink": "rare",
+      "look": "epic",
+      "loading": "legendary",
+      "laser": "legendary",
+      "pixel": "common",
+      "aviators": "rare",
+      "monocle": "epic",
+      "anime": "rare",
+      "tired": "common"
+    },
+    "mouth": {
+      "bite": "common",
+      "grill01": "common",
+      "square01": "common",
+      "square02": "common",
+      "sad": "common",
+      "diagram": "epic",
+      "grill02": "common",
+      "grill03": "common",
+      "smile01": "common",
+      "smile02": "common",
+      "fangs": "rare",
+      "tongue": "common",
+      "zigzag": "common",
+      "mustache": "rare",
+      "speaker": "common",
+      "oh": "common",
+      "kiss": "rare",
+      "pixel": "common",
+      "grin": "common",
+      "bubblegum": "legendary",
+      "goldtooth": "epic",
+      "vent": "common",
+      "keypad": "rare",
+      "equalizer": "epic",
+      "barcode": "rare",
+      "loading": "rare",
+      "teethgrid": "common",
+      "respirator": "epic",
+      "cablestache": "rare",
+      "zipper": "rare",
+      "talk": "epic",
+      "whistle": "epic",
+      "smirk": "common",
+      "mask": "rare"
+    },
+    "texture": {
+      "camo01": "common",
+      "grunge01": "common",
+      "grunge02": "common",
+      "dots": "common",
+      "rust": "common",
+      "cracks": "common",
+      "camo02": "common",
+      "circuits": "common",
+      "dirty01": "common",
+      "dirty02": "common",
+      "stripes": "common",
+      "checker": "common",
+      "sparkles": "rare",
+      "hearts": "rare",
+      "rings": "common",
+      "chevrons": "common",
+      "bubbles": "epic",
+      "panels": "common",
+      "honeycomb": "rare",
+      "gears": "legendary",
+      "scanlines": "epic",
+      "lightlines": "epic",
+      "helmet": "epic",
+      "reactor": "epic",
+      "serial": "rare",
+      "matrix": "legendary",
+      "caution": "rare",
+      "flames": "legendary",
+      "tiger": "rare",
+      "patches": "rare",
+      "waves": "common",
+      "pixels": "common",
+      "rain": "epic",
+      "snow": "epic"
     }
   }
 }

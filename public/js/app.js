@@ -200,7 +200,8 @@ const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 // Awatary rysuje serwer gry. Adres: /avatar/<zestaw>/<części po kolei>?v=<wersja>[&state=kicked|revealed][&motion=off]
 // Wersja (z katalogu) zmienia się z każdą zmianą skórek - obrazki są w pamięci przeglądarki przez rok
-function avatarUrl(avatar, state) {
+// still: obrazek bez ruchu (np. kafelki w panelu wyglądu - kilkanaście animowanych SVG naraz mocno obciąża telefon)
+function avatarUrl(avatar, state, still = false) {
     const style = avatar && AVATAR_ORDER[avatar.style] ? avatar.style : avatarStyle;
     if (!style) return 'icons/icon-192.png';
 
@@ -209,7 +210,7 @@ function avatarUrl(avatar, state) {
     const version = avatarCatalog ? avatarCatalog.version : restoredAvatarVersion;
     if (version) query.push(`v=${version}`);
     if (state) query.push(`state=${state}`);
-    if (reducedMotion.matches) query.push('motion=off');
+    if (still || reducedMotion.matches) query.push('motion=off');
     return `/avatar/${style}/${parts}${query.length ? `?${query.join('&')}` : ''}`;
 }
 
@@ -330,16 +331,39 @@ function renderCustomizeTabs() {
 }
 
 // Kafelek części: kolory jako próbka, reszta jako cały awatar z tą częścią. Ramka pokazuje rzadkość.
+// Kafelek pokazuje samą tę część, bez reszty wyglądu. Animowane części ruszają się tylko na zaznaczonym kafelku
+// (i na dużym podglądzie) - kilkanaście ruchomych SVG naraz spowalniało panel na telefonach
+function customizeTileSrc(tile) {
+    const still = tile.dataset.animated === '1' && !tile.classList.contains('selected');
+    return avatarUrl({ style: botConfig.style, [tile.dataset.slot]: tile.dataset.part }, undefined, still);
+}
+
+// Po zmianie zaznaczenia: ruch włącza się na nowym kafelku i wyłącza na poprzednim
+function refreshTileMotion(tile) {
+    if (tile.tagName !== 'IMG' || tile.dataset.animated !== '1') return;
+    const src = customizeTileSrc(tile);
+    if (!tile.src.endsWith(src)) tile.src = src;
+}
+
 function createCustomizeTile(slot, item) {
     const isSwatch = slot.kind === 'swatch';
     const tile = createElement(isSwatch ? 'div' : 'img', `customize-tile rarity-${item.rarity || 'common'}${isSwatch ? '' : ' skeleton'}`);
 
-    if (isSwatch) tile.style.background = item.css;
-    else tile.src = avatarUrl({ style: botConfig.style, [slot.id]: item.id });   // sama ta część, bez reszty wyglądu
-
     tile.title = item.name || '';
     tile.dataset.part = item.id;
+    tile.dataset.slot = slot.id;
+    if (item.animated) tile.dataset.animated = '1';
     tile.classList.toggle('selected', botConfig[slot.id] === item.id);
+
+    if (isSwatch) tile.style.background = item.css;
+    else tile.src = customizeTileSrc(tile);
+
+    // animowana część: znaczek ▶ w rogu (na samym <img> nie da się go narysować, więc kafelek dostaje opakowanie)
+    if (item.animated) {
+        tile.wrap = createElement('span', 'customize-tile-wrap');
+        tile.wrap.title = 'Animowane';
+        tile.wrap.append(tile);
+    }
     tile.onclick = () => updatePart(slot.id, item.id);
     return tile;
 }
@@ -349,10 +373,17 @@ function createCustomizeTile(slot, item) {
 const customizeTiles = new Map();   // "zestaw:część" -> kafelki
 
 // flyIn: zmiana zakładki - kafelki "wlatują z góry" (przy otwarciu panelu robi to już animacja ekranu)
+// Kafelki od zwykłych do legendarnych; w obrębie rzadkości kolejność z katalogu (sort jest stabilny)
+const RARITY_ORDER = ['common', 'rare', 'epic', 'legendary'];
+function sortByRarity(items) {
+    const rank = item => { const i = RARITY_ORDER.indexOf(item.rarity || 'common'); return i < 0 ? 0 : i; };
+    return [...items].sort((a, b) => rank(a) - rank(b));
+}
+
 function renderCustomizeOptions(flyIn = false) {
     const slot = activeCatalog().slots.find(s => s.id === customizeSlot);
     const key = `${avatarStyle}:${slot.id}`;
-    if (!customizeTiles.has(key)) customizeTiles.set(key, activeCatalog().parts[slot.id].map(item => createCustomizeTile(slot, item)));
+    if (!customizeTiles.has(key)) customizeTiles.set(key, sortByRarity(activeCatalog().parts[slot.id]).map(item => createCustomizeTile(slot, item)));
 
     const tiles = customizeTiles.get(key);
     tiles.forEach(tile => {
@@ -361,11 +392,13 @@ function renderCustomizeOptions(flyIn = false) {
         if (tile.classList.contains('skeleton-failed')) {
             tile.classList.replace('skeleton-failed', 'skeleton');
             delete tile.dataset.retry;
-            tile.src = avatarUrl({ style: botConfig.style, [slot.id]: tile.dataset.part });
+            tile.src = customizeTileSrc(tile);
+        } else {
+            refreshTileMotion(tile);    // np. wylosowany kostką wygląd zmienił zaznaczenie
         }
     });
     const list = byId('customize-list');
-    list.replaceChildren(...tiles);
+    list.replaceChildren(...tiles.map(tile => tile.wrap || tile));
 
     // kafelki "wlatują z góry" przy zmianie zakładki (animacja fadeIn siatki zaczyna się od nowa)
     if (flyIn) {
@@ -382,6 +415,7 @@ function updatePart(slotId, value) {
     // Kafelki się nie zmieniają - przestawiamy tylko zaznaczenie
     byId('customize-list').querySelectorAll('.customize-tile').forEach(tile => {
         tile.classList.toggle('selected', tile.dataset.part === value);
+        refreshTileMotion(tile);
     });
     updateCustomizePreview();
     changeNick();

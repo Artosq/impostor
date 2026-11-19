@@ -51,10 +51,9 @@ function materialSvg(finish, [base, second]) {
 
 // Malowanie: drugi kolor w kształcie maski, pasa, opaski albo czubka (oczy ok. y 20-68, buzia y 72-96)
 const PAINT_SHAPES = {
-    faceplate: 'M16 16H104L98 102Q60 118 22 102Z',
+    faceplate: 'M8 18L30 8H90L112 18L110 70L84 110H36L10 70Z',     // po krawędziach hełmu ze wzoru "reactor"
     stripe: 'M48 0H72V120H48Z',
-    eyeband: 'M0 24H120V64H0Z',
-    cap: 'M0 0H120V30Q60 16 0 30Z'
+    eyeband: 'M0 24H120V64H0Z'
 };
 function paintSvg(shape, [base, accent]) {
     const d = PAINT_SHAPES[shape];

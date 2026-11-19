@@ -12,11 +12,27 @@ const own = require('../data/avatars/wlasne.json');
 const { BACKGROUND_COLORS, SPECIAL_BACKGROUNDS, specialBackgroundSvg, specialBackgroundCss } = require('./backgrounds');
 const { sendSvg } = require('./send');
 
-// Nasze warianty trafiają za oryginalnymi, więc kolejność części Bottts się nie zmienia
+// Nasze warianty trafiają za oryginalnymi, więc kolejność części Bottts się nie zmienia.
+// Wariant o nazwie oryginału zastępuje go (tak działają ożywione części, np. hearts, diagram)
 const definition = structuredClone(bottts);
 Object.entries(own.components).forEach(([component, { variants }]) => {
     Object.assign(definition.components[component].variants, variants);
 });
+// Słabsze części nie są pokazywane (kopia Bottts Neutral zostaje 1:1). Zapisany wygląd z taką częścią
+// wraca do domyślnej (clean), a klient losuje w jej miejsce zwykłą część (completeAvatarConfig)
+Object.entries(own.removed || {}).forEach(([component, ids]) => {
+    ids.forEach(id => delete definition.components[component].variants[id]);
+});
+const RARITY = { eyes: own.rarity.eyes, mouth: own.rarity.mouth, pattern: own.rarity.texture };
+// Ruch części to CSS w <style> (DiceBear nie przepuszcza <animate>)
+const ANIMATED = {
+    eyes: new Set(Object.keys(definition.components.eyes.variants).filter(id => isAnimated(definition.components.eyes.variants[id]))),
+    mouth: new Set(Object.keys(definition.components.mouth.variants).filter(id => isAnimated(definition.components.mouth.variants[id]))),
+    pattern: new Set(Object.keys(definition.components.texture.variants).filter(id => isAnimated(definition.components.texture.variants[id])))
+};
+function isAnimated(variant) {
+    return JSON.stringify(variant.elements).includes('"name":"style"');
+}
 
 const PARTS = {
     eyes: Object.keys(definition.components.eyes.variants),
@@ -77,15 +93,19 @@ async function send(req, res) {
         if (value !== NO_PART && !isValidPart(part, value)) return res.sendStatus(404);
         parts[part] = value === NO_PART ? null : value;
     }
-    if (req.query.state === 'kicked') parts.eyes = KICKED_EYES;
+    const kicked = req.query.state === 'kicked';
+    if (kicked) parts.eyes = KICKED_EYES;
+    // wyrzucony gracz i "ogranicz ruch" (motion=off od klienta) - bez ruchu
+    const still = kicked || req.query.motion === 'off';
 
     const render = await renderer;
-    sendSvg(req, res, `bottts|${ORDER.map(part => parts[part]).join('/')}`, 'public, max-age=31536000, immutable', () => render(parts));
+    sendSvg(req, res, `bottts|${ORDER.map(part => parts[part]).join('/')}${still ? '|still' : ''}`, 'public, max-age=31536000, immutable',
+        () => still ? render(parts).replace(/<style>[\s\S]*?<\/style>/g, '') : render(parts));
 }
 
 // Katalog dla klienta (panel personalizacji) w tym samym formacie co zestaw Agentów
 function catalog() {
-    const part = id => ({ id, name: id, rarity: 'common' });
+    const part = slot => id => ({ id, name: id, rarity: RARITY[slot][id] || 'common', ...(ANIMATED[slot].has(id) ? { animated: true } : {}) });
     return {
         id: 'bottts',
         name: 'Roboty (klasyczne)',
@@ -94,9 +114,9 @@ function catalog() {
             { id: 'pattern', name: 'Wzór', kind: 'avatar' }, { id: 'background', name: 'Tło', kind: 'swatch' }
         ],
         parts: {
-            eyes: PARTS.eyes.map(part),
-            mouth: PARTS.mouth.map(part),
-            pattern: PARTS.pattern.map(part),
+            eyes: PARTS.eyes.map(part('eyes')),
+            mouth: PARTS.mouth.map(part('mouth')),
+            pattern: PARTS.pattern.map(part('pattern')),
             background: [
                 ...BACKGROUND_COLORS.map(color => ({ id: color, name: '', rarity: 'common', css: '#' + color })),
                 ...Object.entries(SPECIAL_BACKGROUNDS).map(([id, background]) => ({ id, name: background.name, rarity: background.rarity || 'rare', css: specialBackgroundCss(background) }))
