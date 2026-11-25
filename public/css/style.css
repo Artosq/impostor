@@ -2362,8 +2362,7 @@ animation: fadeIn 0.5s ease-in;
     box-shadow: 0 0 20px var(--secondary);
     transform: scale(1.1);
 }
-/* Animowana wersja części (app.js: createCustomizeTile): przycisk ▶ w rogu kafelka włącza/wyłącza ruch.
-   Kolor trójkąta = rzadkość animowanej wersji; włączony ruch: wypełnione kółko z poświatą */
+/* Animowana część (app.js: createCustomizeTile): fioletowy znaczek ▶ w rogu - w siatce kafelki stoją, rusza się tylko zaznaczony */
 .customize-tile-wrap{
     position: relative;
     display: block;
@@ -2372,52 +2371,20 @@ animation: fadeIn 0.5s ease-in;
 .customize-tile-wrap .customize-tile{
     display: block;
 }
-.customize-anim-badge{
-    --badge: #b16cf0;
+.customize-tile-wrap::after{
+    content: "";
     position: absolute;
-    top: -6px;
-    left: -6px;
+    top: -4px;
+    left: -4px;
     z-index: 2;
-    width: 26px;
-    height: 26px;
-    margin: 0;
-    padding: 0;
+    width: 20px;
+    height: 20px;
     box-sizing: border-box;
     border: 3px solid #111;
     border-radius: 50%;
-    background: #262626;
-    box-shadow: 0 2px 0 #111;
-    cursor: pointer;
-    transition: background .2s, box-shadow .2s, transform .15s;
-}
-.customize-anim-badge::before{
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--badge);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3.6 2.4L7.8 5L3.6 7.6Z'/%3E%3C/svg%3E") center / 100% no-repeat;
-    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3.6 2.4L7.8 5L3.6 7.6Z'/%3E%3C/svg%3E") center / 100% no-repeat;
-}
-.customize-anim-badge.rarity-common{ --badge: #ddd; }
-.customize-anim-badge.rarity-rare{ --badge: #3498db; }
-.customize-anim-badge.rarity-epic{ --badge: #b16cf0; }
-.customize-anim-badge.rarity-legendary{ --badge: #f1c40f; }
-span.customize-anim-badge{
-    cursor: default;
+    background: #b16cf0 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3.5 2.2L8 5L3.5 7.8Z' fill='white'/%3E%3C/svg%3E") center / 100% no-repeat;
+    box-shadow: 0 0 8px rgba(177, 108, 240, 0.7);
     pointer-events: none;
-}
-button.customize-anim-badge:hover{
-    transform: scale(1.12);
-}
-button.customize-anim-badge:active{
-    transform: scale(.95);
-}
-.customize-tile-wrap.anim-on .customize-anim-badge{
-    background: var(--badge);
-    box-shadow: 0 0 12px var(--badge), 0 2px 0 #111;
-}
-.customize-tile-wrap.anim-on .customize-anim-badge::before{
-    background: #111;
 }
 #background-input{
     width: 100%;

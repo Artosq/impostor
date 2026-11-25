@@ -30,9 +30,12 @@ const ANIMATED = {
     mouth: new Set(Object.keys(definition.components.mouth.variants).filter(id => isAnimated(definition.components.mouth.variants[id]))),
     pattern: new Set(Object.keys(definition.components.texture.variants).filter(id => isAnimated(definition.components.texture.variants[id])))
 };
+// Mruganie zwykłych oczu (CSS oznaczony /*idle*/) to "oznaka życia", nie animowana część: bez znaczka ▶ i bez wyższej rzadkości
 function isAnimated(variant) {
-    return JSON.stringify(variant.elements).includes('"name":"style"');
+    const text = JSON.stringify(variant.elements);
+    return text.includes('"name":"style"') && !text.includes('/*idle*/');
 }
+const IDLE = new Set(Object.keys(definition.components.eyes.variants).filter(id => JSON.stringify(definition.components.eyes.variants[id].elements).includes('/*idle*/')));
 
 const PARTS = {
     eyes: Object.keys(definition.components.eyes.variants),
@@ -105,16 +108,11 @@ async function send(req, res) {
 
 // Katalog dla klienta (panel personalizacji) w tym samym formacie co zestaw Agentów
 function catalog() {
-    // Para "x" + "xAnim": kafelek ma tylko "x" (anim: id ruchomej wersji), "xAnim" (base: "x") włącza się znaczkiem ▶
-    const part = slot => id => {
-        const baseId = id.endsWith('Anim') && PARTS[slot].includes(id.slice(0, -4)) ? id.slice(0, -4) : null;
-        return {
-            id, name: id, rarity: RARITY[slot][id] || 'common',
-            ...(ANIMATED[slot].has(id) ? { animated: true } : {}),
-            ...(baseId ? { base: baseId } : {}),
-            ...(!baseId && PARTS[slot].includes(id + 'Anim') ? { anim: id + 'Anim' } : {})
-        };
-    };
+    const part = slot => id => ({
+        id, name: id, rarity: RARITY[slot][id] || 'common',
+        ...(ANIMATED[slot].has(id) ? { animated: true } : {}),
+        ...(slot === 'eyes' && IDLE.has(id) ? { idle: true } : {})      // mruga: kafelek w siatce stoi, bez znaczka
+    });
     return {
         id: 'bottts',
         name: 'Roboty (klasyczne)',
