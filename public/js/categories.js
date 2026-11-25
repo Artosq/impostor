@@ -37,6 +37,24 @@ const categoryArt = {
             <circle cx="48" cy="35" r="2" fill="currentColor"/>`)
     },
     // klaps filmowy
+    // telewizor - płatna paczka "Seriale"
+    Seriale: {
+        emoji: '\u{1F4FA}',
+        svg: categorySvg(`
+            <rect x="8" y="18" width="48" height="32" rx="4"/>
+            <path d="M24 8l8 10 8-10"/>
+            <path d="M28 28v12l10-6z"/>
+            <path d="M20 56h24"/>`)
+    },
+    // flaga na maszcie - płatna paczka "Polska"
+    Polska: {
+        emoji: '\u{1F1F5}\u{1F1F1}',
+        svg: categorySvg(`
+            <path d="M14 8v50"/>
+            <path d="M14 12h36v26H14"/>
+            <path d="M14 25h36"/>
+            <path d="M8 58h12"/>`)
+    },
     Filmy: {
         emoji: '\u{1F3AC}',
         svg: categorySvg(`

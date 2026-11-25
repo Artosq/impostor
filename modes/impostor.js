@@ -21,10 +21,15 @@ function isValidEntry(entry) {
         && Array.isArray(entry.hints) && entry.hints.length > 0 && entry.hints.every(isText);
 }
 
+// Płatne paczki haseł (data/paczki.json): kategoria -> rzecz ze sklepu, którą musi mieć gospodarz
+const PACKS = new Map();
+
 function loadCategories() {
     const categories = new Map();
+    const packs = Object.entries(loadData('paczki.json')).filter(([name]) => !name.startsWith('$'));
+    packs.forEach(([name, pack]) => PACKS.set(name, pack.item));
 
-    Object.entries(loadData('impostor.json')).forEach(([name, entries]) => {
+    [...Object.entries(loadData('impostor.json')), ...packs.map(([name, pack]) => [name, pack.words])].forEach(([name, entries]) => {
         const valid = Array.isArray(entries) ? entries.filter(isValidEntry) : [];
         const skipped = (Array.isArray(entries) ? entries.length : 0) - valid.length;
 
@@ -119,14 +124,14 @@ function cleanCustomCategory(input) {
     return { id: cleanText(input.id, 24), name, entries };
 }
 
-const totalWords = [...categories.values()].reduce((sum, words) => sum + words.length, 0);
+const totalWords = [...categories.entries()].filter(([name]) => !PACKS.has(name)).reduce((sum, [, words]) => sum + words.length, 0);
 
 module.exports = {
     id: 'impostor',
     name: 'Impostor',
     categories: [
         { id: RANDOM_CATEGORY, name: 'Losowa', count: totalWords, random: true },
-        ...[...categories.entries()].map(([id, words]) => ({ id, name: CATEGORY_NAMES[id] || id, count: words.length }))
+        ...[...categories.entries()].map(([id, words]) => ({ id, name: CATEGORY_NAMES[id] || id, count: words.length, ...(PACKS.has(id) ? { pack: PACKS.get(id) } : {}) }))
     ],
 
     customCategoryId: CUSTOM_CATEGORY,
@@ -135,7 +140,7 @@ module.exports = {
 
     options: OPTIONS.map(({ id, name, description, short, players, color }) => ({ id, name, description, short, default: OPTIONS.find(o => o.id === id).default, players: players || 0, color })),
 
-    start(room, { category: selectedCategory, impostorCount, customCategory, options = {} }) {
+    start(room, { category: selectedCategory, impostorCount, customCategory, options = {}, packs = new Set() }) {
         const error = shared.checkImpostorCount(room, impostorCount);
         if (error) return error;
 
@@ -153,8 +158,10 @@ module.exports = {
             entries = customCategory.entries;
         } else {
             // "Losowa" wybiera inną kategorię przy każdym starcie
-            category = selectedCategory === RANDOM_CATEGORY ? shared.pickFresh(room, 'category', [...categories.keys()]) : selectedCategory;
+            const usable = [...categories.keys()].filter(name => !PACKS.has(name) || packs.has(PACKS.get(name)));
+            category = selectedCategory === RANDOM_CATEGORY ? shared.pickFresh(room, 'category', usable) : selectedCategory;
             if (!categories.has(category)) return 'Nie znaleziono wybranej kategorii!';
+            if (PACKS.has(category) && !packs.has(PACKS.get(category))) return 'Ta paczka haseł jest w sklepie - gospodarz jej nie ma';
             entries = categories.get(category);
         }
 

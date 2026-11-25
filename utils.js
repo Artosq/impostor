@@ -23,8 +23,13 @@ function isText(value) {
 }
 
 // Dane gracza widoczne dla wszystkich (bez ról, haseł i userId)
+// look: efekt wyrzucenia (widzą wszyscy), perks: złoty nick / Pakiet Hosta (korona i złoty pasek) - zob. server.js
 function publicPlayer(player) {
-    return { id: player.publicId, name: player.name, avatar: player.avatar, level: player.level };
+    return {
+        id: player.publicId, name: player.name, avatar: player.avatar, level: player.level,
+        ...(player.look ? { look: player.look } : {}),
+        ...(player.perks ? { perks: player.perks } : {})
+    };
 }
 
 // Wczytuje plik z katalogu data/

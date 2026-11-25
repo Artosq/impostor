@@ -66,7 +66,9 @@ function sendCatalog(req, res) {
         render: () => JSON.stringify({
             active: ACTIVE_STYLE,
             version: AVATAR_VERSION,        // klient dopisuje ją do adresów obrazków (zob. version.js)
-            styles: Object.fromEntries(Object.entries(styles).map(([id, style]) => [id, style.catalog()]))
+            styles: Object.fromEntries(Object.entries(styles).map(([id, style]) => [id, style.catalog()])),
+            // ścieżka nagród i dostępność części (public/js/rewards.js liczy z tego to samo co serwer)
+            rewards: require('../data/sciezka.json')
         })
     });
 }

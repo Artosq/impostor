@@ -15,6 +15,8 @@
 const Core = require('./public/js/progress.js');
 const Badges = require('./public/js/badges.js');
 const { db } = require('./db');
+const payments = require('./payments');
+const crypto = require('crypto');
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || '').replace(/\/+$/, '');
 const DATABASE_URL = process.env.DATABASE_URL || '';
@@ -50,6 +52,7 @@ async function loadAccount(id) {
     const row = rows[0];
     return {
         id,
+        unlocks: await payments.loadUnlocks(id),      // kupione rzeczy (tabela unlocks)
         profile: Core.normalize({ ...row.data, level: row.level, exp: row.exp }),
         importedAt: row.imported_at,
         sockets: new Set(),
@@ -74,6 +77,7 @@ async function attach(socket, token) {
         loaded.set(identity.id, account);
     }
     account.isAnonymous = identity.isAnonymous;
+    account.email = identity.email;
     account.sockets.add(socket.id);
     socket.data.account = account;
     return account;
@@ -143,7 +147,7 @@ async function importGuest(account, localProfile) {
     if (rowCount === 0) return false;       // już przeniesione (np. w drugiej karcie)
 
     const seen = account.profile.unseenBadges;
-    const merged = Core.mergeProfiles(account.profile, Core.sanitize(localProfile));
+    const merged = Core.mergeProfiles(account.profile, guestPathOnly(Core.sanitize(localProfile)));
     Core.updateBadges(merged, Badges);
     merged.unseenBadges = seen;             // odznaki z przeglądarki gracz już widział
     account.profile = merged;
@@ -236,13 +240,55 @@ function recordFeat(account, id) {
     return earned;
 }
 
+// ===== ŚCIEŻKA NAGRÓD (public/js/rewards.js) =====
+let rewards = null;
+function setRewards(r) { rewards = r; }
+
+// Postęp gościa z przeglądarki: rzeczy ze sklepu i pakiety nie mogą przyjść z przeglądarki (tylko z zakupu)
+function guestPathOnly(profile) {
+    const allowed = item => item === 'none' || item === 'host-trial' || (rewards && rewards.rarityOf(item) && !rewards.isShopOnly(item));
+    Object.entries(profile.path.claimed).forEach(([level, item]) => { if (!allowed(item)) delete profile.path.claimed[level]; });
+    profile.path.extra = profile.path.extra.filter(allowed);
+    return profile;
+}
+
+// Odebranie nagrody poziomu - losuje serwer (gracz nie wybierze sobie wyniku)
+function claimReward(account, level) {
+    const result = rewards.claim(account.profile, level, account.unlocks, () => crypto.randomInt(0, 1e9) / 1e9);
+    if (!result.error) scheduleSave(account);
+    return result;
+}
+
+function startTrial(account) {
+    if (!rewards.startTrial(account.profile)) return false;
+    scheduleSave(account);
+    return true;
+}
+
+// Po zakupie (webhook Stripe): świeża lista rzeczy dla konta online; zwraca konto albo null (gracz offline)
+async function refreshUnlocks(userId) {
+    const account = loaded.get(userId);
+    if (!account) return null;
+    account.unlocks = await payments.loadUnlocks(userId);
+    if (account.dev) grantDev(account);
+    return account;
+}
+
+// DEWELOPER (konto z ADMIN_EMAILS albo DEV_UNLOCK_ALL=1): wszystkie rzeczy, Pakiet Hosta, Wspierający, paczki.
+// Tylko w pamięci serwera - nic nie trafia do tabeli zakupów.
+const DEV_ITEMS = ['dev:all', 'host', 'supporter', ...Object.values(payments.PRODUCTS).flatMap(p => p.items).filter(i => i.startsWith('cat:'))];
+function grantDev(account) {
+    account.dev = true;
+    DEV_ITEMS.forEach(item => account.unlocks.add(item));
+}
+
 // Co przeglądarka dostaje po połączeniu z kontem
 function welcome(account) {
-    return { isAnonymous: account.isAnonymous, needsImport: !account.importedAt, profile: account.profile };
+    return { isAnonymous: account.isAnonymous, needsImport: !account.importedAt, profile: account.profile, unlocks: [...(account.unlocks || [])] };
 }
 
 module.exports = {
-    enabled, attach, detach, recordRound, importGuest, previewAnonymous, mergeAnonymous, markBadgesSeen, recordFeat, welcome, flushAll,
+    enabled, attach, detach, recordRound, importGuest, previewAnonymous, mergeAnonymous, markBadgesSeen, recordFeat, welcome, flushAll, refreshUnlocks, grantDev, setRewards, claimReward, startTrial,
     // do testów
     verifyToken, loaded
 };

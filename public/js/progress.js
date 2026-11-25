@@ -40,7 +40,10 @@
             feats: {},          // jednorazowe wyczyny (np. "invisible": data) - do odznak bez poziomów
             badges: {},         // id odznaki -> { tier, at } (tier: 0 = brąz ... 3 = diament; jednorazowe: 0)
             unseenBadges: [],   // nowe odznaki, których gracz nie widział jeszcze w profilu
-            history: []         // ostatnie gry, najnowsza pierwsza
+            history: [],        // ostatnie gry, najnowsza pierwsza
+            // ścieżka nagród (rewards.js): poziom -> odebrana rzecz; extra - rzeczy z połączonego drugiego profilu;
+            // trialUntil - do kiedy trwa darmowy wieczór z Pakietem Hosta
+            path: { claimed: {}, extra: [], trialUntil: 0 }
         };
     }
 
@@ -51,6 +54,12 @@
         const merged = { ...base, ...profile, stats: { ...base.stats, ...(profile.stats || {}) } };
         ['feats', 'badges'].forEach(key => { merged[key] = { ...(profile[key] || {}) }; });
         ['unseenBadges', 'history'].forEach(key => { merged[key] = Array.isArray(profile[key]) ? profile[key] : []; });
+        const path = profile.path && typeof profile.path === 'object' ? profile.path : {};
+        merged.path = {
+            claimed: path.claimed && typeof path.claimed === 'object' ? { ...path.claimed } : {},
+            extra: Array.isArray(path.extra) ? path.extra : [],
+            trialUntil: Number(path.trialUntil) || 0
+        };
         merged.version = PROFILE_VERSION;
         return merged;
     }
@@ -199,6 +208,14 @@
             won: Boolean(g.won), kicked: Boolean(g.kicked), subject: text(g.subject, 200), players: int(g.players, 16),
             playerNames: Array.isArray(g.playerNames) ? g.playerNames.slice(0, 16).map(n => text(n, 12)).filter(Boolean) : []
         }));
+        // ścieżka gościa: tylko poziomy do jego poziomu i krótkie id rzeczy (rzeczy ze sklepu odrzuca serwer - accounts.js)
+        const item = value => typeof value === 'string' && /^[a-z]+(:[A-Za-z0-9-]+){0,3}$/.test(value) && value.length <= 80 ? value : null;
+        Object.entries(raw.path.claimed).slice(0, 2000).forEach(([level, value]) => {
+            const l = int(level, MAX_LEVEL);
+            if (l >= 2 && l <= clean.level && item(value)) clean.path.claimed[l] = value;
+        });
+        clean.path.extra = raw.path.extra.slice(0, 500).map(item).filter(Boolean);
+        clean.path.trialUntil = int(raw.path.trialUntil, 4102444800000);
         return clean;
     }
 
@@ -232,6 +249,15 @@
         merged.badges = { ...b.badges, ...a.badges };
         merged.unseenBadges = [...new Set([...a.unseenBadges, ...b.unseenBadges])];
         merged.history = [...a.history, ...b.history].sort((x, y) => (y.at || 0) - (x.at || 0)).slice(0, HISTORY_LIMIT);
+        // ścieżka: odebrane poziomy celu zostają, rzeczy z drugiego profilu (te same poziomy) trafiają do extra
+        merged.path.claimed = { ...a.path.claimed };
+        const extra = new Set([...a.path.extra, ...b.path.extra]);
+        Object.entries(b.path.claimed).forEach(([level, value]) => {
+            if (!Object.hasOwn(merged.path.claimed, level)) merged.path.claimed[level] = value;
+            else if (value !== 'none') extra.add(value);
+        });
+        merged.path.extra = [...extra];
+        merged.path.trialUntil = Math.max(a.path.trialUntil, b.path.trialUntil);
         return merged;
     }
 

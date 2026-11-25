@@ -3,7 +3,7 @@ const REVEAL_DELAY_MS = 2600;    // po tylu ms odkryty impostor zrzuca przebrani
 const HOST_CROWN_SVG = '<svg viewBox="0 0 26 20" fill="#f1c40f" stroke="black" stroke-width="2" stroke-linejoin="round">'
     + '<path d="M3 17L2 5l6 5 5-8 5 8 6-5-1 12z"/>'
     + '<circle cx="13" cy="13" r="1.6" fill="#e74c3c" stroke="none"/></svg>';
-const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results', 'screen-editor', 'screen-profile', 'screen-shop', 'screen-shop-host'];
+const SCREENS = ['screen-login', 'screen-lobby', 'screen-game', 'screen-vote', 'screen-load', 'screen-customize', 'screen-results', 'screen-editor', 'screen-profile', 'screen-shop', 'screen-shop-host', 'screen-path'];
 const SCREENS_WITH_STATS = ['screen-login', 'screen-customize', 'screen-results'];
 
 // Kolejność części w adresie awatara - taka sama jak w avatars/*.js na serwerze
@@ -94,7 +94,7 @@ function showScreen(screenId, instant = false) {
     // bez animacji, wpychając się w środek przejścia (cała karta podskakiwała)
     const showStats = SCREENS_WITH_STATS.includes(screenId);
     const headers = [
-        [byId('logo'), !(showStats || screenId === 'screen-editor' || screenId === 'screen-profile' || screenId.startsWith('screen-shop'))],   // edytor, profil i sklep potrzebują miejsca
+        [byId('logo'), !(showStats || screenId === 'screen-editor' || screenId === 'screen-profile' || screenId.startsWith('screen-shop') || screenId === 'screen-path')],   // edytor, profil i sklep potrzebują miejsca
         [byId('player-stats'), showStats]
     ];
 
@@ -256,19 +256,39 @@ function activeCatalog() {
 
 // Losowa część; nowy gracz i braki w zapisanym wyglądzie dostają zwykłe części
 function randomPart(slot, onlyCommon) {
-    const items = activeCatalog().parts[slot.id];
+    // tylko posiadane (ścieżka nagród / sklep - inventory.js)
+    const items = activeCatalog().parts[slot.id].filter(item => canWear(slot.id, item.id));
     const common = items.filter(item => item.rarity === 'common');
     return randomItem(onlyCommon && common.length ? common : items).id;
 }
 
-// Części spoza katalogu (np. usunięte albo z innego zestawu) zamieniamy na zwykłe
+// Czy gracz ma tę część (zestaw startowy, ścieżka, zakup) - inventory.js
+function canWear(slotId, id) {
+    return typeof Inventory === 'undefined' || Inventory.canUsePart(avatarStyle, slotId, id);
+}
+
+// Części spoza katalogu (np. usunięte albo z innego zestawu) i nieposiadane zamieniamy na zwykłe
+// Lista zakupów konta przychodzi z serwera chwilę po starcie - zdjęte wtedy części zapamiętujemy (strippedParts)
+// i zakładamy z powrotem, gdy okaże się, że gracz je ma (restoreStrippedParts)
+const strippedParts = {};
 function completeAvatarConfig() {
     activeCatalog().slots.forEach(slot => {
-        if (!activeCatalog().parts[slot.id].some(item => item.id === botConfig[slot.id])) {
+        const id = botConfig[slot.id];
+        const exists = activeCatalog().parts[slot.id].some(item => item.id === id);
+        if (!exists || !canWear(slot.id, id)) {
+            if (exists && !strippedParts[slot.id]) strippedParts[slot.id] = id;
             botConfig[slot.id] = randomPart(slot, true);
         }
     });
     saveAvatarConfig();
+}
+
+function restoreStrippedParts() {
+    let changed = false;
+    Object.entries(strippedParts).forEach(([slot, id]) => {
+        if (canWear(slot, id)) { botConfig[slot] = id; delete strippedParts[slot]; changed = true; }
+    });
+    if (changed) { saveAvatarConfig(); changeNick(); }
 }
 
 async function loadAvatarCatalog() {
@@ -276,6 +296,7 @@ async function loadAvatarCatalog() {
         avatarCatalog = await (await fetch('/avatar-catalog')).json();
         avatarStyle = avatarCatalog.active;
         botConfig = loadAvatarConfig(avatarStyle);
+        if (typeof Inventory !== 'undefined') Inventory.init();       // ścieżka nagród i posiadane rzeczy
         completeAvatarConfig();
         changeNick();
     } catch (e) {
@@ -307,15 +328,27 @@ function customizeAvatar() {
 }
 
 function updateCustomizePreview() {
-    byId('customize-player-avatar').src = avatarUrl(botConfig);
+    const img = byId('customize-player-avatar');
+    img.src = avatarUrl(botConfig);
+}
+
+// Zakładki panelu: części awatara z katalogu + dodatki (efekt wyrzucenia, skórka karty - inventory.js)
+const COSMETIC_TABS = [
+    { id: 'kick', name: 'Efekt', kind: 'cosmetic' },
+    { id: 'skin', name: 'Karta', kind: 'cosmetic' }
+];
+function customizeSlots() {
+    const { slots } = activeCatalog();
+    const withCosmetics = typeof Inventory !== 'undefined' && Inventory.ready();
+    return withCosmetics ? [...slots, ...COSMETIC_TABS] : slots;
 }
 
 function renderCustomizeTabs() {
-    const { slots } = activeCatalog();
+    const slots = customizeSlots();
     if (!slots.some(slot => slot.id === customizeSlot)) customizeSlot = slots[0].id;
 
     const panel = byId('customize-categories-panel');
-    panel.style.setProperty('--tabs', slots.length <= 5 ? slots.length : 3);
+    panel.style.setProperty('--tabs', slots.length <= 5 ? slots.length : Math.ceil(slots.length / 2));
     panel.replaceChildren(...slots.map(slot => {
         const tab = createElement('button', 'customize-categories-tile', slot.name);
         tab.dataset.slot = slot.id;
@@ -345,7 +378,49 @@ function refreshTileMotion(tile) {
     if (!tile.src.endsWith(src)) tile.src = src;
 }
 
+// ===== BLOKADY: rzecz ze ścieżki albo ze sklepu, której gracz jeszcze nie ma =====
+const PIX_LOCK_SVG = '<svg viewBox="0 0 7 8" shape-rendering="crispEdges"><path d="M2 0h3v1H2zM1 1h1v2H1zM5 1h1v2H5zM0 3h7v5H0z" fill="currentColor"/><path d="M3 5h1v2H3z" fill="#262626"/></svg>';
+const PIX_BAG_SVG = '<svg viewBox="0 0 9 9" shape-rendering="crispEdges"><path d="M3 0h3v1H3zM2 1h1v2H2zM6 1h1v2H6zM0 3h9v6H0z" fill="currentColor"/><path d="M2 4h1v1H2zM6 4h1v1H6z" fill="#2a2410"/></svg>';
+const PIX_QUESTION_SVG ='<svg viewBox="0 0 5 7" shape-rendering="crispEdges"><path d="M1 0h3v1H1zM0 1h1v1H0zM4 1h1v2H4zM3 3h1v1H3zM2 4h1v1H2zM2 6h1v1H2z" fill="currentColor"/></svg>';
+const RARITY_NAMES = { common: 'zwykła', rare: 'rzadka', epic: 'epicka', legendary: 'złota' };
+
+function tileItem(tile) {
+    if (typeof Inventory === 'undefined' || !Inventory.ready()) return null;
+    const slot = tile.dataset.slot;
+    if (['kick', 'skin'].includes(slot)) return tile.dataset.part ? `${slot}:${tile.dataset.part}` : null;
+    return avatarStyle === avatarCatalog.rewards.style ? Inventory.partItem(slot, tile.dataset.part) : null;
+}
+
+// Plakietka na zablokowanym kafelku i to, co pokazać po dotknięciu
+function refreshTileLock(tile) {
+    const wrap = tile.wrap;
+    const item = tileItem(tile);
+    const locked = Boolean(item) && !Inventory.has(item);
+    const shop = locked && Inventory.source(item).shop;
+    tile.dataset.locked = locked ? '1' : '';
+    // znaczek w rogu: ze ścieżki - kłódka (ciemne kółko), ze sklepu - torba zakupowa (złote kółko) i złota obwódka
+    wrap.classList.toggle('locked', locked && !shop);
+    wrap.classList.toggle('shop-locked', Boolean(shop));
+    wrap.querySelectorAll('.lock-badge').forEach(el => el.remove());
+    if (!locked) return;
+    const mark = createElement('span', shop ? 'lock-badge lock-badge-shop' : 'lock-badge');
+    mark.innerHTML = shop ? PIX_BAG_SVG : PIX_LOCK_SVG;
+    wrap.append(mark);
+}
+
+function showLockInfo(tile) {
+    const item = tileItem(tile);
+    const source = Inventory.source(item);
+    const name = Inventory.info(item).name;
+    if (source.shop) {
+        showError(`${name} - tylko w sklepie`, true);
+        setTimeout(() => { if (currentScreen === 'screen-customize') openShop('looks'); }, 900);
+    } else if (source.level) showError(`Do zdobycia na ścieżce - poziom ${source.level}`, true);
+    else showError(`Losowa ${RARITY_NAMES[source.random] || ''} nagroda ze ścieżki`.replace('  ', ' '), true);
+}
+
 function createCustomizeTile(slot, item) {
+    if (slot.kind === 'cosmetic') return createCosmeticTile(slot, item);
     const isSwatch = slot.kind === 'swatch';
     const tile = createElement(isSwatch ? 'div' : 'img', `customize-tile rarity-${item.rarity || 'common'}${isSwatch ? '' : ' skeleton'}`);
 
@@ -359,13 +434,56 @@ function createCustomizeTile(slot, item) {
     if (isSwatch) tile.style.background = item.css;
     else tile.src = customizeTileSrc(tile);
 
-    // animowana część: znaczek ▶ w rogu (na samym <img> nie da się go narysować, więc kafelek dostaje opakowanie)
-    if (item.animated) {
-        tile.wrap = createElement('span', 'customize-tile-wrap');
-        tile.wrap.title = 'Animowane';
-        tile.wrap.append(tile);
-    }
-    tile.onclick = () => updatePart(slot.id, item.id);
+    // opakowanie: znaczek ▶ animowanej części i plakietka blokady (na samym <img> nie da się ich narysować)
+    tile.wrap = createElement('span', item.animated ? 'customize-tile-wrap is-animated' : 'customize-tile-wrap');
+    if (item.animated) tile.wrap.title = 'Animowane';
+    tile.wrap.append(tile);
+    tile.onclick = () => {
+        if (tile.dataset.locked === '1') return showLockInfo(tile);
+        updatePart(slot.id, item.id);
+    };
+    return tile;
+}
+
+// ===== DODATKI: efekt wyrzucenia (dotknięcie pokazuje efekt na podglądzie) i skórka karty - miniatury z cosmetics.js =====
+
+function cosmeticItems(kind) {
+    const defs = kind === 'kick' ? Inventory.kicks() : Inventory.skins();
+    const none = { id: '', name: kind === 'skin' ? 'Klasyczna' : 'Bez', rarity: 'common' };
+    return [none, ...Object.entries(defs).map(([id, d]) => ({ id, name: d.name, rarity: d.rarity }))];
+}
+
+// Podgląd efektu wyrzucenia na dużym awatarze: postać naprawdę "wylatuje" - krzyżyki w oczach (jak na wynikach),
+// efekt, a po nim powrót do zwykłego wyglądu
+let kickPreviewTimer = null;
+function previewKick(id) {
+    const img = byId('customize-player-avatar');
+    const kicked = avatarUrl(botConfig, 'kicked');
+    new Image().src = kicked;
+    clearTimeout(kickPreviewTimer);
+    img.src = kicked;
+    Cosmetics.playKick(img.parentElement, id);
+    kickPreviewTimer = setTimeout(() => { if (currentScreen === 'screen-customize') img.src = avatarUrl(botConfig); }, 2300);
+}
+
+function createCosmeticTile(slot, item) {
+    const tile = createElement('div', `customize-tile cosmetic-tile rarity-${item.rarity || 'common'}`);
+    tile.dataset.slot = slot.id;
+    tile.dataset.part = item.id;
+    tile.title = item.name;
+    if (slot.id === 'kick') tile.append(Cosmetics.kickThumb(item.id));
+    else tile.append(Cosmetics.skinThumb(item.id));
+    tile.append(createElement('span', 'cos-name', item.name));
+    tile.wrap = createElement('span', 'customize-tile-wrap');
+    tile.wrap.append(tile);
+    tile.onclick = () => {
+        if (tile.dataset.locked === '1') return showLockInfo(tile);
+        Inventory.setLook(slot.id, item.id);
+        refreshCustomizeSelection();
+        updateCustomizePreview();
+        // podgląd efektu wyrzucenia na dużym awatarze
+        if (slot.id === 'kick' && item.id) previewKick(item.id);
+    };
     return tile;
 }
 
@@ -381,14 +499,31 @@ function sortByRarity(items) {
     return [...items].sort((a, b) => rank(a) - rank(b));
 }
 
+function isTileSelected(tile) {
+    const slot = tile.dataset.slot;
+    if (['kick', 'skin'].includes(slot)) return (Inventory.getLook()[slot] || '') === tile.dataset.part;
+    return botConfig[slot] === tile.dataset.part;
+}
+
+function refreshCustomizeSelection() {
+    byId('customize-list').querySelectorAll('.customize-tile').forEach(tile => {
+        tile.classList.toggle('selected', isTileSelected(tile));
+        refreshTileMotion(tile);
+    });
+}
+
 function renderCustomizeOptions(flyIn = false) {
-    const slot = activeCatalog().slots.find(s => s.id === customizeSlot);
+    const slot = customizeSlots().find(s => s.id === customizeSlot);
     const key = `${avatarStyle}:${slot.id}`;
-    if (!customizeTiles.has(key)) customizeTiles.set(key, sortByRarity(activeCatalog().parts[slot.id]).map(item => createCustomizeTile(slot, item)));
+    if (!customizeTiles.has(key)) {
+        const items = slot.kind === 'cosmetic' ? cosmeticItems(slot.id) : sortByRarity(activeCatalog().parts[slot.id]);
+        customizeTiles.set(key, items.map(item => createCustomizeTile(slot, item)));
+    }
 
     const tiles = customizeTiles.get(key);
     tiles.forEach(tile => {
-        tile.classList.toggle('selected', botConfig[slot.id] === tile.dataset.part);
+        tile.classList.toggle('selected', isTileSelected(tile));
+        refreshTileLock(tile);
         // obrazek nie przyszedł mimo ponowień (np. brak zasięgu) - przy kolejnym otwarciu zakładki próbujemy od nowa
         if (tile.classList.contains('skeleton-failed')) {
             tile.classList.replace('skeleton-failed', 'skeleton');
@@ -398,8 +533,14 @@ function renderCustomizeOptions(flyIn = false) {
             refreshTileMotion(tile);    // np. wylosowany kostką wygląd zmienił zaznaczenie
         }
     });
+    // kolejność: najpierw to, co masz, potem reszta; w obu grupach od zwykłych do złotych (sort jest stabilny)
+    const rank = tile => {
+        const rarity = (tile.className.match(/rarity-(\w+)/) || [])[1] || 'common';
+        return (tile.dataset.locked === '1' ? 10 : 0) + Math.max(0, RARITY_ORDER.indexOf(rarity));
+    };
+    const ordered = [...tiles].sort((a, b) => rank(a) - rank(b));
     const list = byId('customize-list');
-    list.replaceChildren(...tiles.map(tile => tile.wrap || tile));
+    list.replaceChildren(...ordered.map(tile => tile.wrap || tile));
 
     // kafelki "wlatują z góry" przy zmianie zakładki (animacja fadeIn siatki zaczyna się od nowa)
     if (flyIn) {
@@ -414,10 +555,7 @@ function updatePart(slotId, value) {
     saveAvatarConfig();
 
     // Kafelki się nie zmieniają - przestawiamy tylko zaznaczenie
-    byId('customize-list').querySelectorAll('.customize-tile').forEach(tile => {
-        tile.classList.toggle('selected', tile.dataset.part === value);
-        refreshTileMotion(tile);
-    });
+    refreshCustomizeSelection();
     updateCustomizePreview();
     changeNick();
 }
@@ -457,6 +595,11 @@ function randomNick() {
 }
 
 // Nick do wysłania na serwer; pusty pole = losowy
+// Efekt wyrzucenia - widzą go wszyscy w pokoju (inventory.js)
+function lookToSend() {
+    return typeof Inventory !== 'undefined' ? Inventory.lookToSend() : {};
+}
+
 function nickToSend() {
     const typed = byId('input-name').value.trim();
     return { playerName: typed || randomNick(), randomName: !typed || nickIsRandom };
@@ -500,6 +643,11 @@ function updateExp(exp) {
     playerExp = exp;
     ProfileStore.setProgress(playerLVL, exp);
     renderExpBar(true);
+}
+
+// czerwona kropka na pasku poziomu (path.js)
+function refreshPathDot() {
+    if (typeof updatePathDot === 'function') updatePathDot();
 }
 
 function renderExpBar(animate) {
@@ -579,6 +727,10 @@ socket.on('account', data => {
     if (!data || !data.profile) return;
     const firstTime = !ProfileStore.isAccount();
     ProfileStore.useAccount({ send: (event, payload) => socket.emit(event, payload) }, data.profile);
+    if (typeof Inventory !== 'undefined') {
+        Inventory.setUnlocks(data.unlocks);         // zakupy konta
+        if (avatarCatalog) { restoreStrippedParts(); completeAvatarConfig(); changeNick(); }
+    }
     playerLVL = ProfileStore.get().level;
     playerExp = ProfileStore.get().exp;
     renderExpBar(false);
@@ -659,7 +811,7 @@ function defaultRoomSettings() {
 
 function createRoom() {
     const nick = nickToSend();
-    socket.emit('create_room', { ...nick, avatar: botConfig, level: playerLVL, userId: userId });
+    socket.emit('create_room', { ...nick, avatar: botConfig, look: lookToSend(), level: playerLVL, userId: userId });
     if (currentRoomCode) return;           // przejście z innego pokoju - poczekalnię pokaże serwer
 
     pendingCreate = true;
@@ -689,7 +841,7 @@ function cancelPendingCreate() {
 
 function joinRoom(listCode) {
     let code = listCode || byId('input-code').value.trim().toUpperCase();
-    socket.emit('join_room', { ...nickToSend(), roomCode: code, avatar: botConfig, level: playerLVL, userId: userId });
+    socket.emit('join_room', { ...nickToSend(), roomCode: code, avatar: botConfig, look: lookToSend(), level: playerLVL, userId: userId });
 }
 
 // ===== PRZYCISKI W ROGACH KARTY =====
@@ -1087,6 +1239,12 @@ function isCustomCategorySelected(customId) {
     return Boolean(roomCustom) && roomCustom.id === customId;
 }
 
+// Paczka haseł: kupiona, w Pakiecie Hosta albo w trakcie darmowego wieczoru ze ścieżki (inventory.js)
+function hasCategoryPack(pack) {
+    if (typeof Inventory === 'undefined') return false;
+    return Inventory.hasPack(pack) || Boolean(Inventory.trial().activeUntil);
+}
+
 function renderCategoryPicker() {
     const mode = findMode(gameMode);
     const query = normalizeText(byId('picker-search').value);
@@ -1094,9 +1252,24 @@ function renderCategoryPicker() {
     const list = byId('picker-list');
 
     const tiles = mode.categories.filter(matches).map(c => {
-        const description = c.random ? 'Inna przy każdej grze' : `${c.count} ${c.unit || 'haseł'}`;
-        const tile = createCategoryTile(c, description, () => selectCategory(c.id));
+        // płatna paczka haseł: bez niej (albo Pakietu Hosta / darmowego wieczoru) - kłódka i przejście do sklepu
+        const locked = c.pack && !hasCategoryPack(c.pack);
+        const packPrice = c.pack && typeof shopCatalog !== 'undefined' && shopCatalog
+            ? Object.values(shopCatalog.products).find(p => p.items.length === 1 && p.items[0] === c.pack) : null;
+        const lockedText = packPrice ? `${(packPrice.price / 100).toFixed(2).replace('.', ',')} zł · w sklepie` : 'w sklepie';
+        const description = c.random ? 'Inna przy każdej grze' : `${c.count} ${c.unit || 'haseł'}${c.pack ? (locked ? ` · ${lockedText}` : ' · paczka') : ''}`;
+        const tile = createCategoryTile(c, description, () => {
+            if (locked) return showError(`Paczka „${c.name}” jest w sklepie (menu -> sklep) albo w Pakiecie Hosta`, true);
+            selectCategory(c.id);
+        });
         tile.classList.toggle('selected', c.id === category);
+        if (c.pack) tile.classList.add('category-pack');
+        if (locked) {
+            tile.classList.add('category-locked');
+            const badge = createElement('span', 'lock-badge lock-badge-shop');     // koszyk w rogu - jak w panelu wyglądu
+            badge.innerHTML = PIX_BAG_SVG;
+            tile.append(badge);
+        }
         return tile;
     });
 
@@ -1107,11 +1280,15 @@ function renderCategoryPicker() {
         });
     }
 
-    list.replaceChildren(...tiles);
+    // najpierw dostępne (darmowe, Twoje paczki, własne), na końcu paczki ze sklepu
+    const available = tiles.filter(t => !t.classList.contains('category-locked'));
+    const locked = tiles.filter(t => t.classList.contains('category-locked'));
+    list.replaceChildren(...available);
     if (tiles.length === 0) {
         list.append(createElement('p', 'picker-empty', 'Brak takiej kategorii'));
     }
     if (mode.custom) list.append(createNewCategoryTile());
+    list.append(...locked);
 }
 
 const PICKER_CLOSE_MS = 250;    // długość animacji wyjścia w style.css
@@ -1297,6 +1474,7 @@ function renderLobby(room) {
     byId('room-privacy-label').textContent = room.isPrivate ? '\u{1F512} Pokój prywatny' : 'Pokój publiczny';
 
     applySettings(room.settings);
+    renderHostPackBar(room);
 
     // Nowy pokój (albo powrót do niego) - wszystkie kafelki wchodzą od nowa
     if (lobbyTilesRoom !== room.code) {
@@ -1306,7 +1484,7 @@ function renderLobby(room) {
     }
 
     const tiles = room.players.map(p => {
-        const key = JSON.stringify([p.id, p.name, avatarUrl(p.avatar), p.id === room.hostId, Boolean(p.away), p.id === myPlayerId, isHost]);
+        const key = JSON.stringify([p.id, p.name, avatarUrl(p.avatar), p.id === room.hostId, Boolean(p.away), p.id === myPlayerId, isHost, p.look || null, p.perks || null]);
         const known = lobbyTiles.get(p.id);
         if (known && known.key === key) return known.element;      // nic się nie zmieniło - kafelek zostaje, bez animacji
 
@@ -1329,6 +1507,40 @@ function renderLobby(room) {
         if (current !== element) list.insertBefore(element, current || null);
     });
     fitPlayerTags(list);
+}
+
+// Skórka karty roli (dodatek ze ścieżki / sklepu - widzi ją tylko właściciel karty)
+function applyCardSkin() {
+    const skin = typeof Inventory !== 'undefined' ? Inventory.getLook().skin : null;
+    const card = byId('role-card');
+    if (skin) card.dataset.skin = skin;
+    else delete card.dataset.skin;
+}
+
+// Złoty pasek: gospodarz ma Pakiet Hosta (albo darmowy wieczór ze ścieżki - pasek przerywany z licznikiem)
+const PIX_CROWN_SVG = '<svg viewBox="0 0 9 7" shape-rendering="crispEdges"><path d="M0 1h1v1H0zM4 0h1v1H4zM8 1h1v1H8zM0 2h1v2h1V3h1v1h1V2h1v2h1V3h1v1h1V2h1v5H0z" fill="#f1c40f"/><path d="M4 4h1v1H4z" fill="#e74c3c"/></svg>';
+const PIX_HEART_SVG = '<svg class="nick-heart" viewBox="0 0 7 6" shape-rendering="crispEdges"><path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" fill="#e74c3c"/></svg>';
+
+function renderHostPackBar(room) {
+    const bar = byId('host-pack-bar');
+    const host = room.players.find(p => p.id === room.hostId);
+    const perks = host && host.perks;
+    bar.classList.toggle('hidden', !(perks && perks.hostPack));
+    if (!perks || !perks.hostPack) return;
+    bar.classList.toggle('trial', Boolean(perks.trialUntil));
+    const text = perks.trialUntil
+        ? ['Darmowy wieczór z Pakietem Hosta', `Nagroda ze ścieżki · zostało ${formatLeft(perks.trialUntil - Date.now())}`]
+        : ['Pokój z Pakietem Hosta', `Wszystkie paczki haseł dzięki: ${host.name}`];
+    bar.innerHTML = PIX_CROWN_SVG;
+    const box = createElement('div');
+    box.append(createElement('b', '', text[0]), createElement('small', '', text[1]));
+    bar.append(box);
+}
+
+function formatLeft(ms) {
+    const minutes = Math.max(0, Math.round(ms / 60000));
+    const hours = Math.floor(minutes / 60);
+    return hours ? `${hours} h ${minutes % 60} min` : `${minutes} min`;
 }
 
 // Kafelki poczekalni wg id gracza: odświeżane tylko wtedy, gdy coś się w nich zmieniło
@@ -1358,6 +1570,7 @@ function createPlayerTile(p, room, isHost, previous) {
     // Znaczniki trzymają się rogów samego awatara, a nie szerszej plakietki z nickiem
     const frame = createElement('div', 'avatar-frame');
     frame.append(avatar);
+    if (p.id === room.hostId && p.perks && p.perks.hostPack) frame.classList.add('host-pack');
 
     if (p.id === room.hostId) {
         const crown = createElement('span', 'host-crown');
@@ -1367,6 +1580,8 @@ function createPlayerTile(p, room, isHost, previous) {
     }
 
     const tag = createElement('span', p.id === myPlayerId ? 'player-tag this-player' : 'player-tag', p.name);
+    if (p.perks && p.perks.gold) tag.classList.add('gold-nick');
+    if (p.perks && p.perks.heart) tag.insertAdjacentHTML('afterbegin', PIX_HEART_SVG);
     container.append(frame, tag);
 
     if (isHost && p.id !== myPlayerId) {
@@ -1763,14 +1978,25 @@ function setHostControls(isHost) {
 // ===== WYNIKI =====
 
 // Wyrzucony gracz ma na ekranie wyników wersję "po wpadce", a odkryty impostor zrzuca przebranie
+// Wyrzucenie ma pierwszeństwo: złapany impostor też dostaje krzyżyki i efekt wyrzucenia
 function resultAvatarState(player, results) {
-    if (results.impostors.some(i => i.id === player.id)) return 'revealed';
-    return results.kickedPlayers.some(k => k.id === player.id) ? 'kicked' : undefined;
+    if (results.kickedPlayers.some(k => k.id === player.id)) return 'kicked';
+    return results.impostors.some(i => i.id === player.id) ? 'revealed' : undefined;
+}
+
+// Efekt wyrzucenia rysuje się wokół samego awatara - bez tego środkiem efektu był cały wiersz głosów
+function kickAnchor(img) {
+    if (img.parentElement && img.parentElement.classList.contains('kx-anchor')) return img.parentElement;
+    const anchor = createElement('span', 'kx-anchor');
+    img.replaceWith(anchor);
+    anchor.append(img);
+    return anchor;
 }
 
 const KICK_HIT_MS = RESULTS_SUSPENSE_MS - 500;    // chwila "trafienia" wyrzuconego (błysk i dźwięk)
 
-function setResultAvatar(img, player, results) {
+// withEffect: efekt wyrzucenia gra tylko w wierszu głosów - kafelek impostora u góry jest wtedy jeszcze ukryty (werdykt)
+function setResultAvatar(img, player, results, withEffect = false) {
     const state = resultAvatarState(player, results);
     img.src = avatarUrl(player.avatar);
 
@@ -1778,7 +2004,11 @@ function setResultAvatar(img, player, results) {
         // Krzyżyki w oczach dopiero przy trafieniu - wcześniej zdradzałyby wynik liczenia
         const kicked = avatarUrl(player.avatar, state);
         new Image().src = kicked;
-        resultsTimers.push(setTimeout(() => { img.src = kicked; }, KICK_HIT_MS));
+        resultsTimers.push(setTimeout(() => {
+            img.src = kicked;
+            // efekt wyrzucenia wybrany przez wyrzuconego (dodatek ze ścieżki / sklepu) - widzą go wszyscy
+            if (withEffect && player.look && player.look.kick && img.parentElement && typeof Cosmetics !== 'undefined') Cosmetics.playKick(kickAnchor(img), player.look.kick);
+        }, KICK_HIT_MS));
     }
 
     if (state === 'revealed') {
@@ -1840,7 +2070,7 @@ function renderResultVotes(results) {
         resultsTimers.push(setTimeout(() => sfx.play('voteIn'), rowDelay));
 
         const avatar = createElement('img');
-        setResultAvatar(avatar, p, results);
+        setResultAvatar(avatar, p, results, true);
 
         const who = createElement('div', 'res-vote-who');
         who.append(createElement('div', 'res-vote-name', p.name));
@@ -2029,6 +2259,7 @@ socket.on('is_host', isHost => {
 });
 
 socket.on('game_start', (data) => {
+    applyCardSkin();
     lastGameData = data;        // TYMCZASOWE: podgląd ról w przełączniku wyglądu karty
     // ekran gry już stoi (zapamiętany przy uruchomieniu) - serwer tylko go potwierdza, bez dźwięku startu
     const restored = restoredScreen === 'screen-game' || restoredScreen === 'screen-vote';

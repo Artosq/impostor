@@ -167,7 +167,7 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg>
                         </span>
                     </div>
-                    <div id="player-stats-rest" onclick="openProfile()" title="Twój profil">
+                    <div id="player-stats-rest" onclick="openPath()" title="Ścieżka nagród">
                         <div class="main-level-row">
                             <span id="main-level" class="main-level">Poziom 1</span>
                             <span id="main-exp-text" class="main-exp-text"></span>
@@ -211,6 +211,8 @@
                     <span class="privacy-switch"><span class="privacy-knob"></span></span>
                 </div>
 
+                <!-- Pakiet Hosta gospodarza (albo jego darmowy wieczór ze ścieżki) - renderLobby -->
+                <div id="host-pack-bar" class="host-pack-bar hidden"></div>
                 <div id="players-list"></div>
 
                 <div id="host-controls" class="hidden">
@@ -393,7 +395,17 @@
                 <button class="btn-join" onclick="closeProfile()">Powrót do menu -></button>
             </div>
 
-            <!-- Sklep: Pakiet Hosta, wygląd, paczki kategorii (shop.js). Płatności jeszcze nie działają -->
+            <!-- Ścieżka nagród (path.js): każdy poziom = nagroda -->
+            <div id="screen-path" class="screen hidden">
+                <h1 class="shop-title">Ścieżka</h1>
+                <p class="shop-sub">Każdy poziom = nagroda</p>
+                <div class="path-bar"><span id="path-level">Poz. 1</span><span class="path-progress"><i id="path-fill"></i></span><span id="path-exp"></span></div>
+                <div id="path-list" class="path-list"></div>
+                <p id="path-next" class="shop-sub path-next"></p>
+                <button class="btn-join" onclick="closePath()">Powrót do menu -></button>
+            </div>
+
+            <!-- Sklep: Pakiet Hosta, Wspierający, zestawy wyglądu, paczki haseł (shop.js, płatności: payments.js) -->
             <div id="screen-shop" class="screen hidden">
                 <h1 class="shop-title">Sklep</h1>
                 <div id="shop-tabs" class="profile-tabs shop-tabs"></div>
@@ -403,11 +415,11 @@
 
             <!-- Szczegóły Pakietu Hosta (shop.js) - osobny ekran, żeby działało przejście -->
             <div id="screen-shop-host" class="screen hidden">
-                <h1 class="shop-title shop-title-gold">Pakiet Hosta</h1>
-                <p class="shop-sub">Kupujesz raz - korzysta cały pokój</p>
+                <h1 id="shop-detail-title" class="shop-title shop-title-gold">Pakiet Hosta</h1>
+                <p id="shop-detail-sub" class="shop-sub">Kupujesz raz - korzysta cały pokój</p>
                 <div id="shop-host-content" class="shop-content shop-host-content"></div>
-                <div class="shop-price"><b>20 zł</b><span>na zawsze</span></div>
-                <button class="shop-buy shop-buy-gold shop-buy-wide" onclick="shopBuy()">Kup Pakiet Hosta</button>
+                <div class="shop-price"><b id="shop-host-price">19,99 zł</b><span>na zawsze</span></div>
+                <button id="shop-host-buy" class="shop-buy shop-buy-gold shop-buy-wide" onclick="shopBuy('host')">Kup Pakiet Hosta</button>
                 <button class="btn-join" onclick="closeHostPack()">Powrót do sklepu -></button>
             </div>
 
@@ -594,9 +606,13 @@
     <script src="js/icons.js" defer></script>
     <script src="js/badges.js" defer></script>
     <script src="js/progress.js" defer></script>
+    <script src="js/rewards.js" defer></script>
     <script src="js/profileStore.js" defer></script>
     <script src="js/auth.js" defer></script>
     <script src="js/app.js" defer></script>
+    <script src="js/inventory.js" defer></script>
+    <script src="js/cosmetics.js" defer></script>
+    <script src="js/path.js" defer></script>
     <script src="js/profile.js" defer></script>
     <script src="js/shop.js" defer></script>
     <script src="js/login.js" defer></script>

@@ -11,6 +11,13 @@ const nicks = require('./public/js/nicks');
 const { maskNick } = require('./nickFilter');
 const accounts = require('./accounts');
 const analytics = require('./analytics');
+const payments = require('./payments');
+const Rewards = require('./public/js/rewards.js');
+
+// Ścieżka nagród i posiadane rzeczy (data/sciezka.json) - te same zasady liczy przeglądarka gościa
+const PATH_DEF = require('./data/sciezka.json');
+const rewards = Rewards.create(PATH_DEF, avatars.styles[PATH_DEF.style].catalog().parts);
+accounts.setRewards(rewards);
 
 // USTAWIENIA
 const PORT = process.env.PORT || 10000;
@@ -38,6 +45,14 @@ const server = http.createServer(app);
 // Strona i jej pliki: skompresowane z góry i z długim cache (zob. assets.js)
 app.use(assets.serve);
 avatars.register(app);
+
+// SKLEP: płatności Stripe i przyznawanie kupionych rzeczy (payments.js). Po zakupie gracz online dostaje nową listę
+payments.register(app, express, {
+    verifyToken: accounts.verifyToken,
+    onGrant: userId => accounts.refreshUnlocks(userId)
+        .then(account => { if (account) account.sockets.forEach(id => { io.to(id).emit('shop_owned', [...account.unlocks]); refreshLook(id); }); })
+        .catch(err => console.error('Sklep (lista rzeczy):', err.message))
+});
 
 // Link zaproszenia: /1234 otwiera menu z wpisanym kodem pokoju
 app.get(/^\/(\d{4})$/, (req, res) => res.redirect(302, `/?kod=${req.params[0]}`));
@@ -181,18 +196,101 @@ function cleanLevel(level) {
     return Number.isInteger(level) && level >= 1 && level <= MAX_LEVEL ? level : 1;
 }
 
-function createPlayer(socket, { userId, playerName, avatar, level }) {
+// WYGLĄD GRACZA W POKOJU: części awatara i efekt wyrzucenia (look) oraz wyróżnienia (perks).
+// Konto: tylko to, co naprawdę ma (zestaw startowy + ścieżka + zakupy - rewards.owned). Gość: postęp ma w przeglądarce,
+// więc ufamy mu poza rzeczami ze sklepu (tych gość mieć nie może). Konto jeszcze się wczytuje (accountPending) -
+// zostawiamy, co przysłał, i sprawdzamy po wczytaniu (refreshLook).
+const LOOK_SLOTS = ['kick'];
+// DEV_UNLOCK_ALL=1 - TYLKO do testów lokalnych: każdy gracz (także gość) ma wszystko. Nigdy na Renderze.
+const DEV_UNLOCK_ALL = process.env.DEV_UNLOCK_ALL === '1';
+if (DEV_UNLOCK_ALL) console.warn('UWAGA: DEV_UNLOCK_ALL=1 - wszyscy mają wszystko (tylko do testów lokalnych)');
+const DEV_GUEST = { unlocks: new Set(['dev:all', 'host', 'supporter', 'cat:movies', 'cat:poland']) };
+
+function cleanLook(look) {
+    const out = {};
+    LOOK_SLOTS.forEach(kind => {
+        const id = look && typeof look[kind] === 'string' ? look[kind] : '';
+        if (id && rewards.rarityOf(`${kind}:${id}`)) out[kind] = id;
+    });
+    return out;
+}
+
+function applyLook(socket, player) {
+    const account = socket.data.account;
+    const wanted = player.wanted;
+    if (socket.data.accountPending) {
+        player.avatar = wanted.avatar;
+        player.look = wanted.look;
+        return;
+    }
+    const have = account ? rewards.owned(account.profile, account.unlocks) : null;
+    const allowed = item => DEV_UNLOCK_ALL || (account ? have.has(item) : !rewards.isShopOnly(item));
+
+    const avatar = { ...wanted.avatar };
+    const style = avatars.styles[avatar.style];
+    if (style && avatar.style === rewards.style) {
+        Object.keys(style.DEFAULT_AVATAR).forEach(slot => {
+            const item = rewards.partItem(slot, avatar[slot]);
+            if (avatar[slot] && rewards.rarityOf(item) && !allowed(item)) avatar[slot] = style.DEFAULT_AVATAR[slot];
+        });
+    }
+    const look = {};
+    LOOK_SLOTS.forEach(kind => { if (wanted.look[kind] && allowed(`${kind}:${wanted.look[kind]}`)) look[kind] = wanted.look[kind]; });
+
+    // złoty nick: Wspierający albo Pakiet Hosta; hostPack: korona i złoty pasek, gdy jest gospodarzem (też darmowy wieczór)
+    const perks = {};
+    if (DEV_UNLOCK_ALL && !account) { perks.gold = true; perks.hostPack = true; }
+    if (account) {
+        const trial = rewards.trialState(account.profile).activeUntil;
+        if (account.unlocks.has('supporter') || account.unlocks.has('host')) perks.gold = true;
+        if (account.unlocks.has('supporter')) perks.heart = true;          // Wspierający: serduszko przy nicku
+        if (account.unlocks.has('host') || trial) perks.hostPack = true;
+        if (trial && !account.unlocks.has('host')) perks.trialUntil = trial;
+    }
+    player.avatar = avatar;
+    player.look = Object.keys(look).length ? look : undefined;
+    player.perks = Object.keys(perks).length ? perks : undefined;
+}
+
+// Paczki haseł gospodarza: kupione osobno, w Pakiecie Hosta albo w trakcie darmowego wieczoru ze ścieżki
+function hostPacks(room) {
+    const host = room.players.find(p => p.userId === room.host);
+    const socket = host && io.sockets.sockets.get(host.socketId);
+    const account = socket && socket.data.account;
+    if (!account && DEV_UNLOCK_ALL) return new Set(DEV_GUEST.unlocks);
+    if (!account) return new Set();
+    const all = account.unlocks.has('host') || rewards.trialState(account.profile).activeUntil;
+    const packs = new Set([...account.unlocks].filter(item => item.startsWith('cat:')));
+    if (all) Object.values(payments.PRODUCTS).flatMap(p => p.items).filter(item => item.startsWith('cat:')).forEach(item => packs.add(item));
+    return packs;
+}
+
+// Konto się wczytało / coś kupił / włączył darmowy wieczór - wygląd w pokoju liczymy od nowa
+function refreshLook(socketId) {
+    const socket = io.sockets.sockets.get(socketId);
+    if (!socket) return;
+    const room = rooms.get(socket.data.roomCode);
+    const player = room && room.players.find(p => p.socketId === socket.id);
+    if (!player) return;
+    const before = JSON.stringify([player.avatar, player.look, player.perks]);
+    applyLook(socket, player);
+    if (JSON.stringify([player.avatar, player.look, player.perks]) !== before && room.status === 'waiting') emitLobby(room);
+}
+
+function createPlayer(socket, { userId, playerName, avatar, level, look }) {
     const name = cleanText(playerName, MAX_NAME_LENGTH) || 'Gracz';
-    return {
+    const player = {
         userId: userId,                     // sekret gracza - nigdy nie trafia do innych klientów
         publicId: crypto.randomBytes(6).toString('base64url'),  // identyfikator widoczny dla wszystkich (krótki - powtarza się w wielu wiadomościach)
         socketId: socket.id,
         connected: true,
         rawName: name,                      // pełny nick (zostaje na serwerze)
         name: name,                         // nick pokazywany innym - w pokoju publicznym z gwiazdkami (applyRoomNames)
-        avatar: avatars.cleanAvatar(avatar),
+        wanted: { avatar: avatars.cleanAvatar(avatar), look: cleanLook(look) },     // co gracz chce założyć (applyLook)
         level: cleanLevel(level)
     };
+    applyLook(socket, player);
+    return player;
 }
 
 // Pokój publiczny widzą obcy: wulgaryzmy i obelgi w nickach zamieniają się na gwiazdki (nickFilter.js).
@@ -513,14 +611,21 @@ io.on('connection', (socket) => {
         });
     }
     if (auth.modesVersion !== MODES_VERSION) socket.emit('mode_list', modeList, MODES_VERSION);
+    if (DEV_UNLOCK_ALL) socket.emit('shop_owned', [...DEV_GUEST.unlocks]);
     // gracz ma otwartą starszą wersję gry (np. po wdrożeniu poprawki) - pasek "Dostępna nowa wersja"
     if (typeof auth.appVersion === 'string' && auth.appVersion && auth.appVersion !== assets.appVersion()) socket.emit('new_version');
 
     // KONTO (Supabase): przeglądarka przysłała token - wczytujemy postęp z bazy (accounts.js)
     if (accounts.enabled && typeof auth.accessToken === 'string' && auth.accessToken.length < 4096) {
+        socket.data.accountPending = true;
         accounts.attach(socket, auth.accessToken)
-            .then(account => { if (account) socket.emit('account', accounts.welcome(account)); })
-            .catch(err => console.error('Konto:', err.message));
+            .then(account => {
+                if (!account) return;
+                if (DEV_UNLOCK_ALL || analytics.isAdmin(account)) accounts.grantDev(account);     // deweloper: wszystko
+                socket.emit('account', accounts.welcome(account));
+            })
+            .catch(err => console.error('Konto:', err.message))
+            .finally(() => { socket.data.accountPending = false; refreshLook(socket.id); });
     }
     const withAccount = fn => (...args) => { if (socket.data.account) fn(socket.data.account, ...args); };
 
@@ -557,14 +662,24 @@ io.on('connection', (socket) => {
     }));
     handle('account_feat', withAccount((account, id) => accounts.recordFeat(account, id)));
 
+    // ŚCIEŻKA NAGRÓD (konto): odebranie nagrody poziomu (losuje serwer) i włączenie darmowego wieczoru z Pakietem Hosta
+    handle('path_claim', withAccount((account, level) => {
+        const result = accounts.claimReward(account, level);
+        socket.emit('path_claimed', { level: Number(level), ...result, path: account.profile.path });
+    }));
+    handle('path_trial', withAccount(account => {
+        if (!accounts.startTrial(account)) return socket.emit('error', 'Darmowy wieczór jest już wykorzystany');
+        account.sockets.forEach(id => { io.to(id).emit('path_trial_started', account.profile.path); refreshLook(id); });
+    }));
+
     // Tworzenie pokoju
-    handle('create_room', ({ playerName, randomName, avatar, level, userId } = {}) => {
+    handle('create_room', ({ playerName, randomName, avatar, look, level, userId } = {}) => {
         if (!isValidUserId(userId)) return socket.emit('error', 'Nieprawidłowy identyfikator gracza!');
         if (rooms.size >= MAX_ROOMS) return socket.emit('error', 'Zbyt wiele pokoi, spróbuj później!');
 
         leaveCurrentRoom(socket);
 
-        const player = createPlayer(socket, { userId, playerName: roomNickname(null, playerName, randomName), avatar, level });
+        const player = createPlayer(socket, { userId, playerName: roomNickname(null, playerName, randomName), avatar, look, level });
         const room = {
             code: generateRoomCode(),
             host: userId,
@@ -585,7 +700,7 @@ io.on('connection', (socket) => {
     });
 
     // Dołączanie do pokoju
-    handle('join_room', ({ playerName, randomName, roomCode, avatar, level, userId } = {}) => {
+    handle('join_room', ({ playerName, randomName, roomCode, avatar, look, level, userId } = {}) => {
         if (!isValidUserId(userId)) return socket.emit('error', 'Nieprawidłowy identyfikator gracza!');
 
         const ip = clientIp(socket);
@@ -611,7 +726,7 @@ io.on('connection', (socket) => {
         if (socket.data.roomCode !== room.code) leaveCurrentRoom(socket);
 
         if (!player) {
-            player = createPlayer(socket, { userId, playerName: roomNickname(room, playerName, randomName), avatar, level });
+            player = createPlayer(socket, { userId, playerName: roomNickname(room, playerName, randomName), avatar, look, level });
             room.players.push(player);
             applyRoomNames(room);
         }
@@ -700,7 +815,11 @@ io.on('connection', (socket) => {
 
         let selectedCategory = defaultCategory(mode);
         if (customCategory) selectedCategory = mode.customCategoryId;
-        else if (mode.categories.some(c => c.id === category)) selectedCategory = category;
+        else if (mode.categories.some(c => c.id === category)) {
+            const chosen = mode.categories.find(c => c.id === category);
+            if (chosen.pack && !hostPacks(room).has(chosen.pack)) socket.emit('error', 'Ta paczka haseł jest w sklepie');
+            else selectedCategory = category;
+        }
 
         room.settings = {
             mode: mode.id,
@@ -727,7 +846,7 @@ io.on('connection', (socket) => {
         // Kto nie wrócił z ekranu wyników, nie gra w rewanżu
         ejectAwayPlayers(room);
 
-        const error = mode.start(room, { ...room.settings, customCategory: room.customCategory });
+        const error = mode.start(room, { ...room.settings, customCategory: room.customCategory, packs: hostPacks(room) });
         if (error) return socket.emit('error', error);
 
         room.mode = mode;

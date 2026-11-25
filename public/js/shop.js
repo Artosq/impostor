@@ -1,7 +1,7 @@
-// SKLEP: Pakiet Hosta (20 zł, na zawsze), wygląd (animowane SVG), paczki kategorii, komplet.
-// Na razie tylko wystawa - płatności i zapisywanie zakupów (Supabase) dojdą później, "Kup" pokazuje informację.
+// SKLEP: Pakiet Hosta, Wspierający, zestawy wyglądu, paczki haseł, Komplet. Ceny i zawartość podaje serwer
+// (/api/shop/catalog, payments.js). Płatność: Stripe (BLIK / Przelewy24 / karta) - tylko po zalogowaniu.
 // Dwa ekrany: screen-shop (zakładki) i screen-shop-host (szczegóły pakietu) - przejścia robi showScreen.
-// Ładowany po app.js (korzysta z byId, createElement, showScreen, showError, avatarUrl, botConfig, GameIcons).
+// Ładowany po app.js (korzysta z byId, createElement, showScreen, showError, avatarUrl, botConfig, GameIcons, Auth, Inventory).
 
 const SHOP_TABS = [
     { id: 'featured', name: 'Polecane' },
@@ -9,70 +9,46 @@ const SHOP_TABS = [
     { id: 'packs', name: 'Kategorie' }
 ];
 
-// color: kolor paska kafelka, wide: kafelek na całą szerokość
+// Pakiet Hosta: soon - funkcja w przygotowaniu (kupujący dostaną ją za darmo, gdy będzie gotowa)
 const HOST_PACK = {
-    name: 'Pakiet Hosta', price: 20,
     room: [
         { icon: 'secret', color: 'gold', name: 'Wszystkie paczki haseł', desc: 'Każda płatna paczka haseł - obecne i wszystkie nowe. Wybierasz je w poczekalni, a grają nimi wszyscy w pokoju.' },
-        { icon: 'veteran', color: 'green', name: 'Turniej z podium', desc: 'Gracie kilka rund, punkty się sumują, a na koniec podium dla najlepszych graczy wieczoru.' },
-        { icon: 'jester', color: 'violet', name: 'Własne role', desc: 'Ustawiasz zestaw ról: np. dwóch impostorów albo błazen i detektyw naraz. Do tego własne timery i więcej miejsc w pokoju.' },
-        { icon: 'ui_players', color: 'blue', name: 'Stały pokój ekipy', desc: 'Własny kod pokoju, np. ZIOMKI. Ekipa zawsze wchodzi pod ten sam kod i link.' },
-        { icon: 'detective', color: 'blue', name: 'Historia wieczoru', desc: 'Po grze widać wszystkie hasła, kto był impostorem w każdej rundzie i statystyki całej ekipy.' },
-        { icon: 'streak', color: 'red', name: 'Zadania dla przegranych', desc: 'Po rundzie osoby, które przegrały, losują zabawne wyzwanie. Idealne na imprezę.' },
-        { icon: 'ui_fast', color: 'green', name: 'Motyw pokoju i nowe tryby wcześniej', wide: true, desc: 'Własne kolory i tło poczekalni, a nowe tryby gry dostajesz przed wszystkimi.' }
+        { icon: 'host', color: 'gold', name: 'Złoty pasek w poczekalni', desc: 'Wszyscy w pokoju widzą „Pokój z Pakietem Hosta” i komu zawdzięczają paczki.' },
+        { icon: 'veteran', color: 'green', name: 'Turniej z podium', soon: true, desc: 'Gracie kilka rund, punkty się sumują, a na koniec podium dla najlepszych graczy wieczoru.' },
+        { icon: 'jester', color: 'violet', name: 'Własne role', soon: true, desc: 'Ustawiasz zestaw ról: np. dwóch impostorów albo błazen i detektyw naraz. Do tego własne timery i więcej miejsc w pokoju.' },
+        { icon: 'ui_players', color: 'blue', name: 'Stały pokój ekipy', soon: true, desc: 'Własny kod pokoju, np. ZIOMKI. Ekipa zawsze wchodzi pod ten sam kod i link.' },
+        { icon: 'detective', color: 'blue', name: 'Historia wieczoru', soon: true, desc: 'Po grze widać wszystkie hasła, kto był impostorem w każdej rundzie i statystyki całej ekipy.' }
     ],
     me: [
-        { icon: 'host', color: 'gold', name: 'Korona, złoty nick i odznaka', wide: true, desc: 'Animowana korona przy awatarze, złoty nick i odznaka „Gospodarz” - widzą je wszyscy w pokoju.' }
+        { icon: 'host', color: 'gold', name: 'Złota korona i złoty nick', wide: true, desc: 'Gdy jesteś gospodarzem: świecąca złota korona i złota obwódka awatara. Złoty nick w każdym pokoju.' }
     ]
 };
 
-const HOST_HERO_PERKS = ['Wszystkie paczki haseł', 'Turniej z podium', 'Własne role', 'Stały pokój ekipy', 'Korona hosta'];
-
-// preview: jak narysować miniaturkę (renderShopPreview)
-const SHOP_LOOKS = [
-    { id: 'pack-mafia', name: 'Pakiet Mafia', note: '5 rzeczy', price: 6, animated: true, preview: 'mafia' },
-    { id: 'pack-space', name: 'Pakiet Kosmos', note: '5 rzeczy', price: 6, animated: true, preview: 'space' },
-    { id: 'aura-violet', name: 'Aura fioletowa', price: 3, animated: true, preview: 'aura' },
-    { id: 'aura-fire', name: 'Aura płomieni', price: 3, animated: true, preview: 'fire' },
-    { id: 'nick-rainbow', name: 'Tęczowy nick', price: 3, animated: true, preview: 'nick' },
-    { id: 'card-neon', name: 'Karta „Neon”', price: 3, preview: 'card-neon' },
-    { id: 'card-color', name: 'Karta „Kolor”', price: 3, preview: 'card-color' }
-];
-
-const SHOP_PACKS = [
-    { id: 'cat-movies', name: 'Filmy i seriale', note: '150 haseł', price: 5 },
-    { id: 'cat-poland', name: 'Polska', note: '150 haseł', price: 5 },
-    { id: 'cat-memes', name: 'Memy i internet', note: '150 haseł', price: 5 },
-    { id: 'cat-sport', name: 'Sport', note: '150 haseł', price: 5 }
-];
-
-const SHOP_BUNDLE_PRICE = 35;
-
-// Korona hosta: kołysze się (CSS), gwiazdka mruga (SMIL) - animacja w samym SVG, jak GIF, ale ostra
 const SHOP_CROWN = `<svg class="shop-crown" viewBox="0 0 60 40" aria-hidden="true">
 <path d="M6 34L2 10L18 22L30 4L42 22L58 10L54 34Z" fill="#f1c40f" stroke="#111" stroke-width="4" stroke-linejoin="round"/>
 <circle cx="30" cy="24" r="4" fill="#e74c3c" stroke="#111" stroke-width="2"/>
 <path d="M48 8l2 -6l2 6l6 2l-6 2l-2 6l-2 -6l-6 -2z" fill="#fff"><animate attributeName="opacity" values="1;0.1;1" dur="1.6s" repeatCount="indefinite"/></path>
 </svg>`;
 
-const SHOP_HAT = `<svg class="shop-overlay shop-hat" viewBox="0 0 80 40" aria-hidden="true">
-<path d="M6 32C20 26 60 26 74 32C64 38 16 38 6 32Z" fill="#1b1b1b" stroke="#111" stroke-width="3"/>
-<path d="M20 30L24 8C30 4 50 4 56 8L60 30Z" fill="#2b2b2b" stroke="#111" stroke-width="3"/>
-<path d="M22 24H58V29H21Z" fill="#e74c3c"/>
-<circle cx="66" cy="12" r="4" fill="#bbb" opacity=".6"><animate attributeName="cy" values="14;2" dur="2s" repeatCount="indefinite"/><animate attributeName="opacity" values=".7;0" dur="2s" repeatCount="indefinite"/></circle>
-</svg>`;
-
-const SHOP_HELMET = `<svg class="shop-overlay shop-helmet" viewBox="0 0 100 100" aria-hidden="true">
-<circle cx="50" cy="50" r="44" fill="rgba(140,200,255,.18)" stroke="#d8e6f0" stroke-width="6"/>
-<path d="M24 30A34 34 0 0 1 46 16" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
-<circle cx="50" cy="4" r="4" fill="#e74c3c"><animate attributeName="opacity" values="1;.2;1" dur="1s" repeatCount="indefinite"/></circle>
-</svg>`;
-
 let shopTab = 'featured';
+let shopCatalog = null;         // { enabled, test, products: { id: { name, price, items } } }
+
+const price = grosze => `${(grosze / 100).toFixed(2).replace('.', ',')} zł`;
+
+async function loadShopCatalog() {
+    try {
+        shopCatalog = await (await fetch('/api/shop/catalog')).json();
+    } catch (e) {
+        shopCatalog = null;
+    }
+    return shopCatalog;
+}
 
 // ===== OTWIERANIE =====
 
-function openShop() {
+async function openShop(tab) {
+    if (tab && SHOP_TABS.some(t => t.id === tab)) shopTab = tab;
+    if (!shopCatalog) await loadShopCatalog();
     renderShopTabs();
     showScreen('screen-shop');
 }
@@ -81,18 +57,61 @@ function closeShop() {
     showScreen('screen-login');
 }
 
-function openHostPack() {
-    renderHostDetails();
-    showScreen('screen-shop-host');
+// ===== KUPOWANIE =====
+
+// Czy gracz ma już wszystko z produktu
+function ownsProduct(id) {
+    const product = shopCatalog && shopCatalog.products[id];
+    if (!product || typeof Inventory === 'undefined') return false;
+    const have = Inventory.owned();
+    const unlocks = Inventory.unlocks();
+    return product.items.every(item => have.has(item) || unlocks.has(item) || (item.startsWith('cat:') && unlocks.has('host')));
 }
 
-function closeHostPack() {
-    showScreen('screen-shop');
+// Płatność: po zalogowaniu (Google / e-mail) serwer otwiera stronę Stripe; w trybie próbnym przyznaje od razu
+async function shopBuy(productId = 'host') {
+    if (!shopCatalog) await loadShopCatalog();
+    if (!shopCatalog || !shopCatalog.enabled || typeof Auth === 'undefined' || !Auth.enabled) {
+        return showError('Płatności ruszą wkrótce', true);
+    }
+    if (ownsProduct(productId)) return showError('Masz to już na koncie', true);
+    if (Auth.isAnonymous()) {
+        return openLogin('— Zaloguj się, aby kupić —');      // zakupy tylko na koncie - wtedy nie przepadną
+    }
+    const token = await Auth.getToken();
+    if (!token) return showError('Brak połączenia z kontem - spróbuj za chwilę');
+    showError('Otwieram płatność…', true);
+    try {
+        const res = await fetch('/api/shop/checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ product: productId })
+        });
+        const data = await res.json();
+        if (data.url) { location.href = data.url; return; }
+        if (data.granted) { showError('Gotowe - zakup jest na Twoim koncie', true); return; }
+        if (data.error === 'login') return openLogin('— Zaloguj się, aby kupić —');
+        showError(data.message || data.error || 'Nie udało się rozpocząć płatności');
+    } catch (e) {
+        showError('Brak połączenia - spróbuj za chwilę');
+    }
 }
 
-function shopBuy() {
-    showError('Płatności ruszą wkrótce - sklep jest w przygotowaniu', true);
-}
+// Powrót ze strony płatności (?zakup=ok / ?zakup=anulowano)
+(function handlePaymentReturn() {
+    const params = new URLSearchParams(location.search);
+    const state = params.get('zakup');
+    if (!state) return;
+    params.delete('zakup');
+    history.replaceState(null, '', location.pathname + (params.toString() ? `?${params}` : '') + location.hash);
+    setTimeout(() => {
+        if (state === 'ok') showError('Dziękujemy! Zakup pojawi się na koncie za chwilę', true);
+        else showError('Płatność anulowana', true);
+    }, 600);
+})();
+
+// odświeżenie sklepu, gdy przyjdą nowe zakupy (Inventory - "shop_owned")
+if (typeof Inventory !== 'undefined') Inventory.onChange(() => { if (currentScreen === 'screen-shop') renderShopContent(); if (currentScreen === 'screen-shop-host') renderProductDetails(); });
 
 // ===== ZAKŁADKI SKLEPU =====
 
@@ -115,24 +134,30 @@ function renderShopTabs() {
 function renderShopContent(animate = false) {
     const content = byId('shop-content');
     content.scrollTop = 0;
+    if (!shopCatalog) {
+        content.replaceChildren(createElement('p', 'shop-hint', 'Nie udało się wczytać sklepu - sprawdź połączenie'));
+        return;
+    }
+    const P = shopCatalog.products;
     if (shopTab === 'featured') {
         content.replaceChildren(
-            renderHostHero(),
-            createElement('div', 'shop-section', 'Nowy wygląd'),
-            renderLooksGrid(SHOP_LOOKS.slice(0, 2)),
+            renderHostHero(P.host),
+            renderSupporter(P.supporter),
             createElement('div', 'shop-section', 'Komplet'),
-            renderBundle()
+            renderBundle(P.komplet)
         );
     } else if (shopTab === 'looks') {
+        const bundles = Object.entries(P).filter(([id]) => id.startsWith('bundle-'));
         content.replaceChildren(
-            createElement('p', 'shop-hint', 'Animowane rzeczy widzą wszyscy w pokoju'),
-            renderLooksGrid(SHOP_LOOKS)
+            createElement('p', 'shop-hint', 'Zestawy, których nie ma na ścieżce. Jedna płatność - kilka rzeczy.'),
+            ...bundles.map(([id, p]) => renderLookBundle(id, p))
         );
     } else {
         const hint = createElement('button', 'shop-hint-gold');
         hint.append('Wszystkie paczki są w ', createElement('b', '', 'Pakiecie Hosta'), ' ->');
         hint.onclick = openHostPack;
-        content.replaceChildren(hint, ...SHOP_PACKS.map(renderPackRow));
+        const packs = Object.entries(P).filter(([id]) => id.startsWith('cat-'));
+        content.replaceChildren(hint, ...packs.map(([id, p]) => renderPackRow(id, p)));
     }
     if (animate) {     // krótkie przenikanie przy zmianie zakładki
         content.classList.remove('shop-fade');
@@ -147,143 +172,219 @@ function shopIcon(name, className = 'shop-row-icon') {
     return span;
 }
 
-function buyButton(label, extraClass = '') {
-    const button = createElement('button', `shop-buy ${extraClass}`.trim(), label);
-    button.onclick = event => { event.stopPropagation(); shopBuy(); };
+function buyButton(productId, product, label, extraClass = '') {
+    const owned = ownsProduct(productId);
+    const button = createElement('button', `shop-buy ${owned ? 'shop-owned' : ''} ${extraClass}`.trim(), owned ? 'Masz' : (label || price(product.price)));
+    button.onclick = event => { event.stopPropagation(); shopBuy(productId); };
     return button;
 }
 
-function renderHostHero() {
+function renderHostHero(product) {
     const card = createElement('div', 'shop-card shop-hero');
     card.onclick = openHostPack;
     card.append(
         createElement('span', 'shop-ribbon', 'Na zawsze'),
-        createElement('h2', 'shop-hero-title', HOST_PACK.name),
-        createElement('p', 'shop-hero-sub', 'Korzysta cały pokój')
+        createElement('h2', 'shop-hero-title', 'Pakiet Hosta'),
+        createElement('p', 'shop-hero-sub', 'Kupujesz raz - korzysta cały pokój')
     );
     const list = createElement('ul', 'shop-perks');
-    HOST_HERO_PERKS.forEach(text => list.append(createElement('li', '', text)));
-    card.append(list, buyButton(`Kup za ${HOST_PACK.price} zł`, 'shop-buy-gold shop-buy-wide'), createElement('div', 'shop-more', 'Zobacz więcej ->'));
+    ['Wszystkie paczki haseł', 'Złota korona i złoty nick', 'Złoty pasek w poczekalni', 'Kolejne funkcje za darmo w aktualizacjach']
+        .forEach(text => list.append(createElement('li', '', text)));
+    card.append(list, buyButton('host', product, `Kup za ${price(product.price)}`, 'shop-buy-gold shop-buy-wide'), createElement('div', 'shop-more', 'Zobacz więcej ->'));
     return card;
 }
 
-function renderLooksGrid(items) {
-    const grid = createElement('div', 'shop-grid');
-    items.forEach(item => {
-        const tile = createElement('div', 'shop-item');
-        if (item.animated) tile.append(createElement('span', 'shop-anim', 'Anim'));
-        tile.append(renderShopPreview(item.preview));
-        const name = createElement('div', 'shop-item-name', item.name);
-        if (item.note) name.append(createElement('small', '', item.note));
-        tile.append(name, buyButton(`${item.price} zł`));
-        grid.append(tile);
+function renderSupporter(product) {
+    const card = createElement('div', 'shop-card shop-supporter');
+    const icon = createElement('span', 'shop-sup-icon');
+    icon.innerHTML = PIX_HEART_SVG;
+    const text = createElement('div', 'shop-row-text');
+    text.append(createElement('b', '', 'Wspierający'), createElement('small', '', 'Złoty nick z serduszkiem - wspierasz twórcę gry'));
+    card.append(icon, text, buyButton('supporter', product));
+    return card;
+}
+
+// Zestaw wyglądu: obrazki rzeczy (części na Twoim awatarze, ramka, efekt, skórka) i cena
+// Kolor tła obrazków zestawu (jak na makiecie: części awatara na tle w kolorze zestawu)
+const BUNDLE_COLORS = { 'bundle-maszyna': '263238', 'bundle-slodziak': 'e91e63', 'bundle-detektyw': '795548' };
+
+function renderLookBundle(id, product) {
+    const card = createElement('div', 'shop-card shop-look-bundle');
+    card.onclick = () => openProduct(id);
+    const pics = createElement('div', 'bundle-pics');
+    // obrazki: same części awatara (bez ramek, efektów i skórek - te są w opisie)
+    product.items.filter(item => item.startsWith('part:')).forEach(item => {
+        const info = Inventory.info(item);
+        const img = createElement('img');
+        img.src = avatarUrl({ style: avatarCatalog.rewards.style, [info.slot]: info.id, background: BUNDLE_COLORS[id] || '555555' });     // animowane się ruszają
+        img.alt = '';
+        pics.append(img);
     });
-    return grid;
+    const text = createElement('div', 'shop-row-text');
+    text.append(createElement('b', '', product.name.replace('Zestaw ', '')));
+    const list = createElement('small', 'bundle-list');
+    product.items.forEach((item, i) => {
+        const info = Inventory.info(item);
+        if (i) list.append(' · ');
+        list.append(createElement('span', `rc-${info.rarity}`, info.name.replace(/^[^:]+: /, '')));
+    });
+    text.append(list);
+    text.append(createElement('span', 'shop-only', 'Tylko w sklepie'));
+    card.append(pics, text, buyButton(id, product));
+    return card;
 }
 
-// Miniaturka: twój awatar z dodatkiem z przedmiotu - od razu widać, jak to będzie wyglądać
-function renderShopPreview(kind) {
-    const pic = createElement('div', `shop-pic shop-pic-${kind}`);
-    if (kind === 'nick') {
-        pic.append(createElement('span', 'shop-nick-rainbow', byId('input-name').value.trim() || 'Twój nick'));
-        return pic;
-    }
-    if (kind.startsWith('card-')) {
-        const card = createElement('div', 'shop-mini-card');
-        card.append(createElement('span', 'shop-mini-stamp', 'Tajne'));
-        pic.append(card);
-        return pic;
-    }
-    const avatar = createElement('div', 'shop-pic-avatar');
-    const img = createElement('img');
-    img.src = avatarUrl(botConfig);
-    img.alt = '';
-    avatar.append(img);
-    if (kind === 'mafia') avatar.insertAdjacentHTML('beforeend', SHOP_HAT);
-    if (kind === 'space') avatar.insertAdjacentHTML('beforeend', SHOP_HELMET);
-    if (kind === 'aura' || kind === 'fire') avatar.append(createElement('span', 'shop-aura'));
-    pic.append(avatar);
-    return pic;
-}
-
-function renderPackRow(pack) {
+function renderPackRow(id, product) {
     const row = createElement('div', 'shop-card shop-pack');
-    const text = createElement('div', 'shop-row-text', pack.name);
-    text.append(createElement('small', '', pack.note));
-    row.append(shopIcon('secret'), text, buyButton(`${pack.price} zł`));
+    const text = createElement('div', 'shop-row-text', product.name.replace('Paczka haseł: ', ''));
+    text.append(createElement('small', '', '100 haseł · gdy jesteś gospodarzem'));
+    row.append(shopIcon('secret'), text, buyButton(id, product));
     return row;
 }
 
-function renderBundle() {
+function renderBundle(product) {
     const card = createElement('div', 'shop-card shop-bundle');
-    const fullPrice = HOST_PACK.price + SHOP_LOOKS.reduce((sum, item) => sum + item.price, 0);
     const text = createElement('div', 'shop-row-text');
-    text.append(createElement('b', '', 'Wszystko'), 'Pakiet Hosta i cały wygląd');
-    text.append(createElement('small', '', ''));
-    text.lastChild.append('zamiast ', createElement('s', '', `${fullPrice} zł`));
-    card.append(text, buyButton(`${SHOP_BUNDLE_PRICE} zł`));
+    text.append(createElement('b', '', 'Wszystko'), 'Pakiet Hosta i wszystkie zestawy wyglądu');
+    card.append(text, buyButton('komplet', product));
     return card;
 }
 
-// ===== SZCZEGÓŁY PAKIETU HOSTA: kafelki, dotknięcie pokazuje opis =====
+// ===== SZCZEGÓŁY PRODUKTU (Pakiet Hosta albo zestaw wyglądu): podgląd na górze, lista zawartości, cena =====
+let detailProduct = 'host';
 
-function renderHostDetails() {
+const ITEM_DESCRIPTIONS = {
+    kick: 'Efekt, gdy zostaniesz wyrzucony - widzi go cały pokój. Dotknij, aby zobaczyć',
+    skin: 'Wygląd Twojej karty roli w czasie gry'
+};
+const SLOT_LABELS = { eyes: 'Oczy', mouth: 'Buzia', pattern: 'Wzór', background: 'Tło' };
+
+function openProduct(id) {
+    detailProduct = id;
+    renderProductDetails();
+    showScreen('screen-shop-host');
+}
+const openHostPack = () => openProduct('host');
+
+function closeHostPack() {
+    showScreen('screen-shop');
+}
+
+function renderProductDetails() {
+    const id = detailProduct;
+    const isHost = id === 'host';
+    const product = shopCatalog && shopCatalog.products[id];
     const content = byId('shop-host-content');
     content.scrollTop = 0;
 
-    const avatar = createElement('div', 'shop-host-avatar');
-    const img = createElement('img');
-    img.src = avatarUrl(botConfig);
-    img.alt = '';
-    avatar.append(img);
-    avatar.insertAdjacentHTML('beforeend', SHOP_CROWN);
-    avatar.append(createElement('span', 'shop-host-tag', HOST_PACK.name));
-
-    content.replaceChildren(
-        avatar,
-        createElement('div', 'shop-group', 'Dla całego pokoju'), renderPerkTiles(HOST_PACK.room),
-        createElement('div', 'shop-group', 'Dla ciebie'), renderPerkTiles(HOST_PACK.me),
-        createElement('p', 'shop-hint', 'Dotknij kafelka, aby zobaczyć opis')
-    );
-}
-
-function renderPerkTiles(perks) {
-    const grid = createElement('div', 'shop-tiles');
-    perks.forEach(perk => {
-        const tile = createElement('button', `shop-tile shop-tile-${perk.color}${perk.wide ? ' shop-tile-wide' : ''}`);
-        tile.append(shopIcon(perk.icon, 'shop-tile-icon'), createElement('span', 'shop-tile-name', perk.name));
-        tile.onclick = () => togglePerk(grid, tile, perk);
-        grid.append(tile);
-    });
-    return grid;
-}
-
-// Opis wsuwa się pod rzędem dotkniętego kafelka (na całą szerokość). Drugie dotknięcie chowa
-function togglePerk(grid, tile, perk) {
-    const content = byId('shop-host-content');
-    const wasOpen = tile.classList.contains('open');
-    content.querySelectorAll('.shop-tile.open').forEach(t => t.classList.remove('open'));
-    content.querySelectorAll('.shop-desc').forEach(d => d.remove());
-    if (wasOpen) return;
-
-    tile.classList.add('open');
-    const desc = createElement('div', `shop-desc shop-tile-${perk.color}`);
-    desc.append(createElement('b', '', perk.name), createElement('p', '', perk.desc));
-    // ostatni kafelek w tym samym rzędzie: szerokie zajmują cały rząd, zwykłe są po dwa
-    const tiles = [...grid.children].filter(el => el.classList.contains('shop-tile'));
-    let rowEnd = tile;
-    if (!tile.classList.contains('shop-tile-wide')) {
-        let column = 0;
-        for (const t of tiles) {
-            if (t.classList.contains('shop-tile-wide')) { column = 0; continue; }
-            if (t === tile) {
-                const next = tiles[tiles.indexOf(t) + 1];
-                if (column === 0 && next && !next.classList.contains('shop-tile-wide')) rowEnd = next;
-                break;
-            }
-            column = (column + 1) % 2;
-        }
+    byId('shop-detail-title').textContent = isHost ? 'Pakiet Hosta' : (product ? product.name.replace('Zestaw ', '') : '');
+    byId('shop-detail-title').classList.toggle('shop-title-violet', !isHost);
+    byId('shop-detail-sub').textContent = isHost ? 'Kupujesz raz - korzysta cały pokój' : 'Zestaw tylko ze sklepu - kupujesz raz, na zawsze';
+    if (product) {
+        byId('shop-host-price').textContent = price(product.price);
+        const buy = byId('shop-host-buy');
+        const owned = ownsProduct(id);
+        buy.textContent = owned ? 'Masz to' : isHost ? 'Kup Pakiet Hosta' : 'Kup zestaw';
+        buy.classList.toggle('shop-owned', owned);
+        buy.classList.toggle('shop-buy-gold', isHost);
+        buy.onclick = () => shopBuy(id);
     }
-    rowEnd.after(desc);
-    desc.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+    // podgląd: Pakiet Hosta - Twój awatar ze złotą koroną; zestaw - wszystkie jego rzeczy osobno (jak miniaturki w panelu)
+    let preview;
+    if (isHost) {
+        preview = createElement('div', 'detail-preview host');
+        const img = createElement('img');
+        img.src = avatarUrl(botConfig);
+        img.alt = '';
+        preview.append(img);
+        preview.insertAdjacentHTML('beforeend', SHOP_CROWN);
+    } else {
+        // tło w kolorze zestawu (jak na karcie zestawu w sklepie), części narysowane na nim
+        const color = BUNDLE_COLORS[id] || '555555';
+        preview = createElement('div', 'detail-items');
+        preview.style.setProperty('--bundle-bg', `#${color}`);
+        (product ? product.items : []).forEach(item => {
+            const info = Inventory.info(item);
+            const box = createElement('div', `detail-item r-${info.rarity}`);
+            const pic = rewardPicture(item, null, true);
+            const img = pic.querySelector('img');
+            if (img && info.kind === 'part') img.src = avatarUrl({ style: avatarCatalog.rewards.style, [info.slot]: info.id, background: color });
+            box.append(pic);
+            preview.append(box);
+        });
+    }
+
+    const rows = isHost ? hostRows() : (product ? product.items.map(item => itemRow(item, preview)) : []);
+    content.replaceChildren(preview, ...rows);
 }
+
+// Wiersz zawartości: obrazek, nazwa, krótki opis (i plakietka "Wkrótce")
+function detailRow(picture, name, desc, extraClass = '', soon = false) {
+    const row = createElement('div', `detail-row ${extraClass}`.trim());
+    row.append(picture);
+    const text = createElement('div', 'detail-text', name);
+    if (desc) text.append(createElement('small', '', desc));
+    row.append(text);
+    if (soon) row.append(createElement('span', 'shop-soon-tag', 'Wkrótce'));
+    return row;
+}
+
+function itemRow(item, preview) {
+    const info = Inventory.info(item);
+    const rarity = { common: 'Zwykła', rare: 'Rzadka', epic: 'Epicka', legendary: 'Złota' }[info.rarity] || '';
+    const name = info.kind === 'part' ? info.name : { kick: 'Efekt: ', skin: 'Karta: ' }[info.kind] + info.name;
+    const desc = info.kind === 'part' ? `${SLOT_LABELS[info.slot] || ''} awatara · ${rarity}` : ITEM_DESCRIPTIONS[info.kind];
+    const row = detailRow(rewardPicture(item, null, true), name, desc, `r-${info.rarity}`);
+    if (info.kind === 'kick') {
+        row.classList.add('clickable');
+        row.onclick = () => {
+            const box = [...preview.querySelectorAll('.detail-item')].find(b => b.querySelector('.kick-thumb'));
+            Cosmetics.playKick(box || preview, info.id);
+        };
+    }
+    return row;
+}
+
+// Porównanie "Za darmo" i "Pakiet Hosta": [nazwa, za darmo, w pakiecie, wkrótce]
+const HOST_COMPARE = [
+    ['Gra i wszystkie tryby', true, true],
+    ['Darmowe kategorie haseł', true, true],
+    ['Własne kategorie', true, true],
+    ['Paczki haseł (Seriale, Polska i każda nowa)', false, true],
+    ['Złoty pasek w poczekalni', false, true],
+    ['Złota korona i złoty nick', false, true],
+    ['Turniej z podium', false, true, true],
+    ['Własne role i ustawienia', false, true, true],
+    ['Stały pokój ekipy', false, true, true],
+    ['Historia wieczoru', false, true, true]
+];
+const PIX_YES = '<svg viewBox="0 0 7 6" shape-rendering="crispEdges"><path d="M6 0h1v2H6zM5 2h1v1H5zM4 3h1v1H4zM3 4h1v1H3zM2 5h1v1H2zM1 4h1v1H1zM0 3h1v1H0z" fill="currentColor"/></svg>';
+
+function hostRows() {
+    const table = createElement('div', 'compare-table');
+    const head = createElement('div', 'compare-row compare-head');
+    head.append(createElement('span', 'compare-name'), createElement('span', 'compare-col', 'Za darmo'), createElement('span', 'compare-col compare-host', 'Pakiet'));
+    table.append(head);
+    HOST_COMPARE.forEach(([name, free, host, soon]) => {
+        const row = createElement('div', soon ? 'compare-row compare-soon' : 'compare-row');
+        const label = createElement('span', 'compare-name', name);
+        if (soon) label.append(createElement('small', '', 'wkrótce'));
+        const cell = (yes, extra) => {
+            const c = createElement('span', `compare-col ${extra || ''}`.trim());
+            if (yes) c.innerHTML = PIX_YES;
+            else c.append(createElement('i', 'compare-no'));
+            c.classList.toggle('yes', yes);
+            return c;
+        };
+        row.append(label, cell(free), cell(host, 'compare-host'));
+        table.append(row);
+    });
+    return [
+        table,
+        createElement('p', 'shop-hint', '„Wkrótce” - kupujący dostaną za darmo, gdy będzie gotowe. Paczki działają w pokojach, w których jesteś gospodarzem.')
+    ];
+}
+
+// cena paczek w wyborze kategorii i stan "Masz" - katalog wczytany od razu
+loadShopCatalog();

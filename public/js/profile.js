@@ -266,16 +266,24 @@ function historyDate(at) {
     return date.toLocaleDateString('pl-PL', { day: 'numeric', month: 'short' });
 }
 
+const HISTORY_ROLE_ICONS = { IMPOSTOR: 'bluffer', GRACZ: 'clean', WSPOLNIK: 'accomplice', BLAZEN: 'jester', DETEKTYW: 'detective', PODMIENIEC: 'changeling' };
+
 function renderHistoryTab(profile) {
     if (!profile.history.length) return [createElement('p', 'profile-empty', 'Tu zobaczysz swoje ostatnie rundy.')];
     return profile.history.map(game => {
+        // ikona roli po lewej (obrys w kolorze wyniku), wynik jako pigułka, hasło w przerywanej ramce jak na karcie roli
         const row = createElement('div', `history-row ${game.won ? 'is-win' : 'is-lose'}`);
+        const icon = createElement('span', 'history-icon');
+        const iconId = HISTORY_ROLE_ICONS[game.role] || 'secret';
+        if (GameIcons.has(iconId)) icon.append(GameIcons.element(iconId));
+        const body = createElement('div', 'history-body');
         const top = createElement('div', 'history-top');
         top.append(createElement('span', 'history-result', game.won ? 'Wygrana' : 'Przegrana'),
             createElement('span', 'history-date', historyDate(game.at)));
         const details = [MODE_NAMES[game.mode] || game.mode, game.category, ROLE_LABELS[game.role] || game.role, `${game.players} graczy`].filter(Boolean);
-        row.append(top, createElement('div', 'history-details', details.join(' · ')));
-        if (game.subject) row.append(createElement('div', 'history-subject', game.subject));
+        body.append(top, createElement('div', 'history-details', details.join(' · ')));
+        if (game.subject) body.append(createElement('div', 'history-subject', game.subject));
+        row.append(icon, body);
         return row;
     });
 }

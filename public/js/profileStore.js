@@ -99,6 +99,13 @@
             return commit();
         },
 
+        // Zmiana profilu gościa (np. odebrana nagroda ze ścieżki - inventory.js); przy koncie zmienia serwer
+        async updateLocal(fn) {
+            if (account) return profile;
+            fn(profile);
+            return commit();
+        },
+
         onChange(fn) { listeners.add(fn); },
 
         // ===== KONTO =====

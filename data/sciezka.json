@@ -1,0 +1,407 @@
+{
+  "$comment": "ŚCIEŻKA NAGRÓD i dostępność wyglądu (public/js/rewards.js). starter - części dla każdego od razu (reszta zwykłych jest na ścieżce). shopOnly - tylko w sklepie (zestawy w payments.js). path - nagroda za poziom: {part: \"slot:id\"} wiadomo jaka, {random: rzadkość} losowa część bez powtórek, {kick|skin: id}, {hostTrial: true}. Po ostatnim poziomie z listy: co poziom losowa część (afterPath). Rzeczy id: part:<zestaw>:<slot>:<id>, kick:<id>, skin:<id>.",
+  "style": "bottts",
+  "names": {
+    "eyes": {
+      "bulging": "Wyłupiaste",
+      "dizzy": "Zawroty",
+      "frame1": "Wizjer",
+      "frame2": "Wizjer zielony",
+      "happy": "Radosne",
+      "round": "Kropki",
+      "roundFrame01": "Opaska",
+      "roundFrame02": "Opaska z oczami",
+      "sensor": "Czujnik",
+      "wink": "Oczko",
+      "cyclops": "Cyklop",
+      "sleepy": "Śpiące",
+      "angry": "Gniewne",
+      "crying": "Płaczące",
+      "nerd": "Okularnik",
+      "screws": "Śrubki",
+      "baymax": "Robocik",
+      "pixel": "Pikselowe",
+      "tired": "Zmęczone",
+      "eva": "Maska",
+      "glow": "Poświata",
+      "robocop": "Strażnik",
+      "shade01": "Gogle",
+      "visor": "Wizjer pomarańczowy",
+      "stars": "Gwiazdki",
+      "scanner": "Skaner",
+      "cat": "Kocie",
+      "skull": "Czaszka",
+      "camera": "Kamera",
+      "portholes": "Bulaje",
+      "goggles": "Gogle pilota",
+      "binoculars": "Lornetka",
+      "sus": "Podejrzliwe",
+      "blink": "Mrugające",
+      "aviators": "Pilotki",
+      "anime": "Błyszczące",
+      "hearts": "Serca",
+      "spiral": "Spirale",
+      "battery": "Bateria",
+      "hal": "Czerwone oko",
+      "nightvision": "Noktowizor",
+      "lcdtears": "Łzy LCD",
+      "look": "Rozglądanie",
+      "monocle": "Monokl",
+      "cylon": "Patrol",
+      "loading": "Ładowanie",
+      "laser": "Lasery"
+    },
+    "mouth": {
+      "bite": "Zęby",
+      "grill01": "Kratka mała",
+      "grill02": "Kratka",
+      "grill03": "Białe zęby",
+      "smile01": "Uśmiech",
+      "smile02": "Szeroki uśmiech",
+      "square01": "Kreska",
+      "square02": "Linia",
+      "tongue": "Język",
+      "zigzag": "Zygzak",
+      "speaker": "Głośnik",
+      "oh": "Zdziwienie",
+      "sad": "Smutek",
+      "pixel": "Pikselowy uśmiech",
+      "grin": "Szczerzenie",
+      "vent": "Wentylacja",
+      "teethgrid": "Siekacze",
+      "smirk": "Uśmieszek",
+      "fangs": "Kły",
+      "mustache": "Wąsy",
+      "kiss": "Buziak",
+      "keypad": "Klawiatura",
+      "barcode": "Kod kreskowy",
+      "loading": "Pasek ładowania",
+      "cablestache": "Kablowe wąsy",
+      "zipper": "Zamek",
+      "mask": "Maseczka",
+      "diagram": "EKG",
+      "goldtooth": "Złoty ząb",
+      "equalizer": "Equalizer",
+      "respirator": "Respirator",
+      "talk": "Gadanie",
+      "whistle": "Gwizd",
+      "bubblegum": "Guma balonowa"
+    },
+    "pattern": {
+      "camo01": "Moro",
+      "camo02": "Ciemne moro",
+      "circuits": "Obwody",
+      "dirty01": "Smugi",
+      "dirty02": "Zacieki",
+      "dots": "Kropki",
+      "grunge01": "Przetarcia",
+      "grunge02": "Rysy",
+      "stripes": "Paski",
+      "checker": "Szachownica",
+      "rings": "Kręgi",
+      "chevrons": "Jodełka",
+      "panels": "Panele",
+      "rust": "Rdza",
+      "cracks": "Pęknięcia",
+      "waves": "Fale",
+      "pixels": "Piksele",
+      "sparkles": "Iskry",
+      "hearts": "Serduszka",
+      "honeycomb": "Plaster miodu",
+      "serial": "Numer seryjny",
+      "caution": "Taśma ostrzegawcza",
+      "tiger": "Tygrys",
+      "patches": "Łaty",
+      "bubbles": "Bąbelki",
+      "scanlines": "Linie skanera",
+      "lightlines": "Świetlne linie",
+      "helmet": "Hełm",
+      "reactor": "Reaktor",
+      "rain": "Deszcz",
+      "snow": "Śnieg",
+      "gears": "Zębatki",
+      "matrix": "Kod",
+      "flames": "Płomienie"
+    }
+  },
+  "kicks": {
+    "confetti": {
+      "name": "Konfetti",
+      "rarity": "epic"
+    },
+    "explosion": {
+      "name": "Wybuch",
+      "rarity": "legendary"
+    },
+    "blackhole": {
+      "name": "Czarna dziura",
+      "rarity": "legendary"
+    },
+    "anvil": {
+      "name": "Kowadło",
+      "rarity": "epic"
+    }
+  },
+  "skins": {
+    "pirate": {
+      "name": "Piracka mapa",
+      "rarity": "rare"
+    },
+    "space": {
+      "name": "Kosmiczna przepustka",
+      "rarity": "rare"
+    },
+    "cyber": {
+      "name": "Neon cyber",
+      "rarity": "epic"
+    },
+    "noir": {
+      "name": "Akta noir",
+      "rarity": "epic"
+    }
+  },
+  "starter": {
+    "eyes": [
+      "round",
+      "bulging",
+      "happy",
+      "wink",
+      "sleepy",
+      "angry",
+      "frame1",
+      "roundFrame01",
+      "dizzy",
+      "baymax"
+    ],
+    "mouth": [
+      "smile01",
+      "smile02",
+      "bite",
+      "grin",
+      "oh",
+      "tongue",
+      "sad",
+      "square01",
+      "grill02"
+    ],
+    "pattern": [
+      "camo01",
+      "camo02",
+      "dots",
+      "stripes",
+      "checker",
+      "circuits",
+      "dirty01",
+      "grunge01"
+    ],
+    "background": [
+      "555555",
+      "f44336",
+      "e91e63",
+      "9c27b0",
+      "673ab7",
+      "3f51b5",
+      "2196f3",
+      "009688",
+      "4caf50",
+      "8bc34a",
+      "cddc39",
+      "ffeb3b",
+      "ffc107",
+      "ff9800",
+      "ff5722",
+      "795548",
+      "9e9e9e",
+      "607d8b",
+      "263238",
+      "olive",
+      "navy",
+      "burgundy",
+      "robotGray"
+    ]
+  },
+  "shopOnly": [
+    "part:bottts:eyes:cylon",
+    "part:bottts:eyes:hearts",
+    "part:bottts:eyes:monocle",
+    "part:bottts:mouth:equalizer",
+    "part:bottts:mouth:bubblegum",
+    "part:bottts:mouth:goldtooth",
+    "part:bottts:pattern:matrix",
+    "part:bottts:pattern:sparkles",
+    "kick:explosion",
+    "skin:noir"
+  ],
+  "path": {
+    "2": {
+      "part": "eyes:nerd"
+    },
+    "3": {
+      "random": "common"
+    },
+    "4": {
+      "part": "mouth:mustache"
+    },
+    "5": {
+      "part": "pattern:honeycomb"
+    },
+    "6": {
+      "random": "rare"
+    },
+    "7": {
+      "part": "pattern:waves"
+    },
+    "8": {
+      "kick": "confetti"
+    },
+    "9": {
+      "random": "epic"
+    },
+    "10": {
+      "random": "legendary"
+    },
+    "11": {
+      "skin": "pirate"
+    },
+    "12": {
+      "random": "common"
+    },
+    "13": {
+      "part": "background:steel"
+    },
+    "14": {
+      "part": "eyes:look"
+    },
+    "15": {
+      "part": "eyes:spiral"
+    },
+    "16": {
+      "random": "rare"
+    },
+    "17": {
+      "part": "mouth:smirk"
+    },
+    "18": {
+      "part": "eyes:aviators"
+    },
+    "19": {
+      "random": "epic"
+    },
+    "20": {
+      "random": "legendary"
+    },
+    "21": {
+      "skin": "space"
+    },
+    "22": {
+      "random": "common"
+    },
+    "23": {
+      "part": "pattern:tiger"
+    },
+    "24": {
+      "random": "rare"
+    },
+    "25": {
+      "part": "mouth:whistle"
+    },
+    "26": {
+      "part": "eyes:tired"
+    },
+    "27": {
+      "random": "rare"
+    },
+    "28": {
+      "kick": "blackhole"
+    },
+    "29": {
+      "random": "epic"
+    },
+    "30": {
+      "hostTrial": true
+    },
+    "31": {
+      "skin": "cyber"
+    },
+    "32": {
+      "random": "common"
+    },
+    "33": {
+      "part": "mouth:talk"
+    },
+    "34": {
+      "random": "rare"
+    },
+    "35": {
+      "part": "pattern:rain"
+    },
+    "36": {
+      "part": "pattern:chevrons"
+    },
+    "37": {
+      "random": "rare"
+    },
+    "38": {
+      "kick": "anvil"
+    },
+    "39": {
+      "random": "epic"
+    },
+    "40": {
+      "random": "legendary"
+    },
+    "41": {
+      "part": "background:galaxy"
+    },
+    "42": {
+      "random": "common"
+    },
+    "43": {
+      "part": "mouth:kiss"
+    },
+    "44": {
+      "random": "rare"
+    },
+    "45": {
+      "part": "eyes:laser"
+    },
+    "46": {
+      "random": "common"
+    },
+    "47": {
+      "random": "rare"
+    },
+    "48": {
+      "part": "pattern:snow"
+    },
+    "49": {
+      "random": "epic"
+    },
+    "50": {
+      "random": "legendary"
+    }
+  },
+  "afterPath": {
+    "every10": [
+      "legendary",
+      "epic",
+      "rare",
+      "common"
+    ],
+    "every5": [
+      "epic",
+      "rare",
+      "common"
+    ],
+    "odd": [
+      "rare",
+      "common",
+      "epic"
+    ],
+    "even": [
+      "common",
+      "rare",
+      "epic"
+    ]
+  }
+}
