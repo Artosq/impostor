@@ -214,6 +214,7 @@
                 <!-- Pakiet Hosta gospodarza (albo jego darmowy wieczór ze ścieżki) - renderLobby -->
                 <div id="host-pack-bar" class="host-pack-bar hidden"></div>
                 <div id="players-list"></div>
+                <p id="room-limit" class="room-limit"></p>
 
                 <div id="host-controls" class="hidden">
                     <p>Tryb:</p>
@@ -411,7 +412,7 @@
                 <h1 class="shop-title">Sklep</h1>
                 <div id="shop-tabs" class="profile-tabs shop-tabs"></div>
                 <div id="shop-content" class="shop-content"></div>
-                <button class="btn-join" onclick="closeShop()">Powrót do menu -></button>
+                <button class="btn-join" id="btn-shop-back" onclick="closeShop()">Powrót do menu -></button>
             </div>
 
             <!-- Szczegóły Pakietu Hosta (shop.js) - osobny ekran, żeby działało przejście -->

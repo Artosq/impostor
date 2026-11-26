@@ -22,7 +22,8 @@ accounts.setRewards(rewards);
 // USTAWIENIA
 const PORT = process.env.PORT || 10000;
 const MAX_ROOMS = 500;
-const MAX_PLAYERS = 16;
+const MAX_PLAYERS = 16;              // z Pakietem Hosta
+const FREE_MAX_PLAYERS = 8;          // bez Pakietu Hosta
 const MAX_NAME_LENGTH = 12;
 const MAX_LEVEL = 999;
 
@@ -204,7 +205,8 @@ const LOOK_SLOTS = ['kick'];
 // DEV_UNLOCK_ALL=1 - TYLKO do testów lokalnych: każdy gracz (także gość) ma wszystko. Nigdy na Renderze.
 const DEV_UNLOCK_ALL = process.env.DEV_UNLOCK_ALL === '1';
 if (DEV_UNLOCK_ALL) console.warn('UWAGA: DEV_UNLOCK_ALL=1 - wszyscy mają wszystko (tylko do testów lokalnych)');
-const DEV_GUEST = { unlocks: new Set(['dev:all', 'host', 'supporter', 'cat:movies', 'cat:poland']) };
+// wszystkie paczki haseł ze sklepu (payments.js)
+const DEV_GUEST = { unlocks: new Set(['dev:all', 'host', 'supporter', ...Object.values(payments.PRODUCTS).flatMap(p => p.items).filter(i => i.startsWith('cat:'))]) };
 
 function cleanLook(look) {
     const out = {};
@@ -253,6 +255,16 @@ function applyLook(socket, player) {
 }
 
 // Paczki haseł gospodarza: kupione osobno, w Pakiecie Hosta albo w trakcie darmowego wieczoru ze ścieżki
+// Pakiet Hosta pokoju: gospodarz go kupił albo ma włączony darmowy wieczór (lokalnie: DEV_UNLOCK_ALL)
+function roomHasHostPack(room) {
+    const host = room.players.find(p => p.userId === room.host);
+    const socket = host && io.sockets.sockets.get(host.socketId);
+    const account = socket && socket.data.account;
+    if (!account) return Boolean(DEV_UNLOCK_ALL && host);
+    return account.unlocks.has('host') || Boolean(rewards.trialState(account.profile).activeUntil);
+}
+const playerLimit = room => (roomHasHostPack(room) ? MAX_PLAYERS : FREE_MAX_PLAYERS);
+
 function hostPacks(room) {
     const host = room.players.find(p => p.userId === room.host);
     const socket = host && io.sockets.sockets.get(host.socketId);
@@ -332,7 +344,9 @@ function lobbyView(room) {
         isPrivate: room.isPrivate,
         settings: room.settings,
         hostId: host ? host.publicId : null,
-        players: room.players.map(p => ({ ...publicPlayer(p), away: Boolean(p.away) }))
+        players: room.players.map(p => ({ ...publicPlayer(p), away: Boolean(p.away) })),
+        maxPlayers: playerLimit(room),
+        hostPack: roomHasHostPack(room)
     };
 }
 
@@ -428,7 +442,7 @@ function roomListView() {
         .map(room => {
             const host = findHost(room) || room.players[0];
             const isWaiting = room.status === 'waiting';
-            const state = !isWaiting ? LIST_PLAYING : room.players.length >= MAX_PLAYERS ? LIST_FULL : LIST_OPEN;
+            const state = !isWaiting ? LIST_PLAYING : room.players.length >= playerLimit(room) ? LIST_FULL : LIST_OPEN;
             return [
                 isWaiting ? room.code : null,
                 state,
@@ -734,7 +748,7 @@ io.on('connection', (socket) => {
 
         // Ten sam gracz nie dołącza drugi raz - przejmuje swoje miejsce
         let player = room.players.find(p => p.userId === userId);
-        if (!player && room.players.length >= MAX_PLAYERS) {
+        if (!player && room.players.length >= playerLimit(room)) {
             return socket.emit('error', 'Pokój jest pełny!');
         }
 
@@ -844,7 +858,7 @@ io.on('connection', (socket) => {
                 ? { id: customCategory.id, name: customCategory.name, count: customCategory.entries.length }
                 : null,
             // przełączniki z okna "Ustawienia gry"; bez nowych wartości zostają dotychczasowe (przy zmianie trybu - domyślne)
-            options: cleanOptions(mode, options || (mode.id === room.settings.mode ? room.settings.options : null))
+            options: cleanOptions(mode, options || (mode.id === room.settings.mode ? room.settings.options : null), roomHasHostPack(room))
         };
         emitLobby(room);
     });
@@ -861,7 +875,9 @@ io.on('connection', (socket) => {
         // Kto nie wrócił z ekranu wyników, nie gra w rewanżu
         ejectAwayPlayers(room);
 
-        const error = mode.start(room, { ...room.settings, customCategory: room.customCategory, packs: hostPacks(room) });
+        // gospodarz mógł stracić Pakiet (np. skończył się darmowy wieczór) - wtedy bez jego przełączników
+        const options = cleanOptions(mode, room.settings.options, roomHasHostPack(room));
+        const error = mode.start(room, { ...room.settings, options, customCategory: room.customCategory, packs: hostPacks(room) });
         if (error) return socket.emit('error', error);
 
         room.mode = mode;

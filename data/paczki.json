@@ -3,211 +3,4831 @@
   "Seriale": {
     "item": "cat:movies",
     "words": [
-      { "word": "Gra o tron", "hints": ["Smoki", "Żelazny tron", "Zima"] },
-      { "word": "Breaking Bad", "hints": ["Nauczyciel", "Pustynia", "Kamper"] },
-      { "word": "Przyjaciele", "hints": ["Kawiarnia", "Nowy Jork", "Szóstka"] },
-      { "word": "Stranger Things", "hints": ["Lata 80.", "Rowery", "Druga strona"] },
-      { "word": "Wiedźmin", "hints": ["Rivia", "Potwory", "Medalion"] },
-      { "word": "Squid Game", "hints": ["Gry dziecięce", "Dług", "Zielone dresy"] },
-      { "word": "Dom z papieru", "hints": ["Maski", "Napad", "Profesor"] },
-      { "word": "Ranczo", "hints": ["Wieś", "Ławeczka", "Wójt"] },
-      { "word": "Świat według Kiepskich", "hints": ["Wrocław", "Kanapa", "Kamienica"] },
-      { "word": "Klan", "hints": ["Rodzina", "Telenowela", "Lata emisji"] },
-      { "word": "M jak miłość", "hints": ["Gródek", "Rodzina", "Telenowela"] },
-      { "word": "Czterej pancerni i pies", "hints": ["Czołg", "Pies", "Wojna"] },
-      { "word": "Rodzina zastępcza", "hints": ["Dzieci", "Rodzina", "Komedia"] },
-      { "word": "Ojciec Mateusz", "hints": ["Ksiądz", "Rower", "Zagadki"] },
-      { "word": "Ślepnąc od świateł", "hints": ["Warszawa", "Diler", "Noc"] },
-      { "word": "1670", "hints": ["Szlachta", "Wieś", "Komedia"] },
-      { "word": "Simpsonowie", "hints": ["Żółci", "Pączek", "Springfield"] },
-      { "word": "South Park", "hints": ["Kolorado", "Czwórka chłopców", "Wycinanki"] },
-      { "word": "Rick i Morty", "hints": ["Naukowiec", "Portal", "Wnuk"] },
-      { "word": "Family Guy", "hints": ["Pies", "Niemowlę", "Komedia"] },
-      { "word": "Gwiezdne wojny: Mandalorianin", "hints": ["Hełm", "Łowca nagród", "Mała zielona postać"] },
-      { "word": "The Office", "hints": ["Biuro", "Papier", "Szef"] },
-      { "word": "Teoria wielkiego podrywu", "hints": ["Fizycy", "Kanapa", "Kumple"] },
-      { "word": "Jak poznałem waszą matkę", "hints": ["Bar", "Opowieść", "Dzieci"] },
-      { "word": "Sherlock", "hints": ["Londyn", "Detektyw", "Lekarz"] },
-      { "word": "Peaky Blinders", "hints": ["Birmingham", "Czapki", "Gang"] },
-      { "word": "Wednesday", "hints": ["Szkoła", "Rączka", "Czerń"] },
-      { "word": "The Last of Us", "hints": ["Grzyby", "Podróż", "Dziewczyna"] },
-      { "word": "The Witcher", "hints": ["Monety", "Bard", "Miecze"] },
-      { "word": "Lucyfer", "hints": ["Diabeł", "Klub", "Los Angeles"] },
-      { "word": "Doktor House", "hints": ["Laska", "Szpital", "Diagnoza"] },
-      { "word": "Chirurdzy", "hints": ["Seattle", "Szpital", "Stażyści"] },
-      { "word": "Dexter", "hints": ["Miami", "Policja", "Tajemnica"] },
-      { "word": "Prison Break", "hints": ["Tatuaż", "Więzienie", "Bracia"] },
-      { "word": "Lost", "hints": ["Wyspa", "Katastrofa", "Liczby"] },
-      { "word": "Czarne lustro", "hints": ["Technologia", "Przyszłość", "Osobne odcinki"] },
-      { "word": "The Crown", "hints": ["Królowa", "Pałac", "Wielka Brytania"] },
-      { "word": "Bridgertonowie", "hints": ["Bale", "Plotki", "Rodzeństwo"] },
-      { "word": "Euforia", "hints": ["Liceum", "Brokat", "Nastolatki"] },
-      { "word": "Sex Education", "hints": ["Szkoła", "Porady", "Mama"] },
-      { "word": "Wikingowie", "hints": ["Łodzie", "Topory", "Najazdy"] },
-      { "word": "Narcos", "hints": ["Kolumbia", "Kartel", "Agenci"] },
-      { "word": "Ozark", "hints": ["Jezioro", "Pranie", "Rodzina"] },
-      { "word": "Fargo", "hints": ["Śnieg", "Minnesota", "Zbrodnia"] },
-      { "word": "Detektyw", "hints": ["Luizjana", "Para śledczych", "Mrok"] },
-      { "word": "Sukcesja", "hints": ["Media", "Rodzina", "Spadek"] },
-      { "word": "Ród smoka", "hints": ["Targaryenowie", "Smoki", "Wojna"] },
-      { "word": "Władca Pierścieni: Pierścienie Władzy", "hints": ["Śródziemie", "Elfy", "Kowal"] },
-      { "word": "Ted Lasso", "hints": ["Trener", "Piłka nożna", "Wąsy"] },
-      { "word": "Gilmore Girls", "hints": ["Mama i córka", "Kawa", "Miasteczko"] },
-      { "word": "Gotowe na wszystko", "hints": ["Ulica", "Sąsiadki", "Sekrety"] },
-      { "word": "Zagubieni w kosmosie", "hints": ["Robot", "Rodzina", "Planeta"] },
-      { "word": "Star Trek", "hints": ["Statek", "Uszy", "Galaktyka"] },
-      { "word": "Doktor Who", "hints": ["Budka", "Podróże w czasie", "Śrubokręt"] },
-      { "word": "Z archiwum X", "hints": ["Kosmici", "Agenci", "Spisek"] },
-      { "word": "Twin Peaks", "hints": ["Kawa", "Ciasto", "Miasteczko"] },
-      { "word": "Rodzina Soprano", "hints": ["Mafia", "Terapeutka", "New Jersey"] },
-      { "word": "The Walking Dead", "hints": ["Zombie", "Szeryf", "Przetrwanie"] },
-      { "word": "Bojack Horseman", "hints": ["Koń", "Hollywood", "Animacja"] },
-      { "word": "Arcane", "hints": ["Siostry", "Miasto", "Gra komputerowa"] },
-      { "word": "Avatar: Legenda Aanga", "hints": ["Żywioły", "Strzałka", "Mnich"] },
-      { "word": "Pokémon", "hints": ["Kieszonkowe stworki", "Trener", "Ewolucja"] },
-      { "word": "Scooby-Doo", "hints": ["Pies", "Furgonetka", "Duchy"] },
-      { "word": "Gumball", "hints": ["Kot", "Szkoła", "Animacja"] },
-      { "word": "Pora na przygodę", "hints": ["Pies", "Chłopiec", "Kraina"] },
-      { "word": "Spongebob", "hints": ["Ananas", "Ocean", "Kraboburger"] },
-      { "word": "Smerfy", "hints": ["Niebieskie", "Grzyby", "Wioska"] },
-      { "word": "Świnka Peppa", "hints": ["Kałuże", "Rodzina", "Bajka"] },
-      { "word": "Bolek i Lolek", "hints": ["Bracia", "Przygody", "Polska bajka"] },
-      { "word": "Reksio", "hints": ["Pies", "Polska bajka", "Szczekanie"] },
-      { "word": "Miodowe lata", "hints": ["Tramwaj", "Sąsiedzi", "Komedia"] },
-      { "word": "Kiler", "hints": ["Pomyłka", "Taksówkarz", "Komedia"] },
-      { "word": "Alternatywy 4", "hints": ["Blok", "Gospodarz", "PRL"] },
-      { "word": "Stawka większa niż życie", "hints": ["Szpieg", "Wojna", "Mundur"] },
-      { "word": "Ucho Prezesa", "hints": ["Polityka", "Gabinet", "Satyra"] },
-      { "word": "Watahy", "hints": ["Bieszczady", "Straż graniczna", "Las"] },
-      { "word": "Belfer", "hints": ["Nauczyciel", "Zagadka", "Szkoła"] },
-      { "word": "Rojst", "hints": ["Śledztwo", "Las", "PRL"] },
-      { "word": "Wielka woda", "hints": ["Powódź", "Wrocław", "Wały"] },
-      { "word": "Sexify", "hints": ["Studentki", "Aplikacja", "Badania"] },
-      { "word": "Kasta", "hints": ["Prawnicy", "Sąd", "Kariera"] },
-      { "word": "Szadź", "hints": ["Seryjny morderca", "Zimno", "Śledztwo"] },
-      { "word": "Pitbull", "hints": ["Policja", "Gangi", "Warszawa"] },
-      { "word": "Na Wspólnej", "hints": ["Ulica", "Mieszkańcy", "Telenowela"] },
-      { "word": "Barwy szczęścia", "hints": ["Kamienica", "Rodziny", "Telenowela"] },
-      { "word": "Ojciec Chrzestny", "hints": ["Mafia", "Rodzina", "Oferta"] },
-      { "word": "Mr. Robot", "hints": ["Haker", "Kaptur", "Korporacja"] },
-      { "word": "Westworld", "hints": ["Park rozrywki", "Androidy", "Dziki Zachód"] },
-      { "word": "Mroczne materie", "hints": ["Dajmon", "Kompas", "Światy"] },
-      { "word": "Dark", "hints": ["Jaskinia", "Podróże w czasie", "Niemcy"] },
-      { "word": "Lupin", "hints": ["Złodziej", "Paryż", "Przebrania"] },
-      { "word": "Kobra", "hints": ["Autostrada", "Pościgi", "Policja"] },
-      { "word": "Komisarz Rex", "hints": ["Pies", "Wiedeń", "Bułka"] },
-      { "word": "Magda M.", "hints": ["Prawniczka", "Warszawa", "Miłość"] },
-      { "word": "Usta usta", "hints": ["Przyjaciele", "Komedia", "Związki"] },
-      { "word": "Herkules", "hints": ["Siłacz", "Starożytność", "Bogowie"] },
-      { "word": "Xena", "hints": ["Wojowniczka", "Czakram", "Starożytność"] },
-      { "word": "Słoneczny patrol", "hints": ["Plaża", "Ratownicy", "Czerwone stroje"] },
-      { "word": "Strażnik Teksasu", "hints": ["Kowboj", "Kopniak", "Teksas"] },
-      { "word": "Zwariowany świat Malcolma", "hints": ["Bracia", "Geniusz", "Rodzina"] }
+      {
+        "word": "Gra o tron",
+        "hints": [
+          "Smoki",
+          "Żelazny tron",
+          "Zima"
+        ]
+      },
+      {
+        "word": "Breaking Bad",
+        "hints": [
+          "Nauczyciel",
+          "Pustynia",
+          "Kamper"
+        ]
+      },
+      {
+        "word": "Przyjaciele",
+        "hints": [
+          "Kawiarnia",
+          "Nowy Jork",
+          "Szóstka"
+        ]
+      },
+      {
+        "word": "Stranger Things",
+        "hints": [
+          "Lata 80.",
+          "Rowery",
+          "Druga strona"
+        ]
+      },
+      {
+        "word": "Wiedźmin",
+        "hints": [
+          "Rivia",
+          "Potwory",
+          "Medalion"
+        ]
+      },
+      {
+        "word": "Squid Game",
+        "hints": [
+          "Gry dziecięce",
+          "Dług",
+          "Zielone dresy"
+        ]
+      },
+      {
+        "word": "Dom z papieru",
+        "hints": [
+          "Maski",
+          "Napad",
+          "Profesor"
+        ]
+      },
+      {
+        "word": "Ranczo",
+        "hints": [
+          "Wieś",
+          "Ławeczka",
+          "Wójt"
+        ]
+      },
+      {
+        "word": "Świat według Kiepskich",
+        "hints": [
+          "Wrocław",
+          "Kanapa",
+          "Kamienica"
+        ]
+      },
+      {
+        "word": "Klan",
+        "hints": [
+          "Rodzina",
+          "Telenowela",
+          "Lata emisji"
+        ]
+      },
+      {
+        "word": "M jak miłość",
+        "hints": [
+          "Gródek",
+          "Rodzina",
+          "Telenowela"
+        ]
+      },
+      {
+        "word": "Czterej pancerni i pies",
+        "hints": [
+          "Czołg",
+          "Pies",
+          "Wojna"
+        ]
+      },
+      {
+        "word": "Rodzina zastępcza",
+        "hints": [
+          "Dzieci",
+          "Rodzina",
+          "Komedia"
+        ]
+      },
+      {
+        "word": "Ojciec Mateusz",
+        "hints": [
+          "Ksiądz",
+          "Rower",
+          "Zagadki"
+        ]
+      },
+      {
+        "word": "Ślepnąc od świateł",
+        "hints": [
+          "Warszawa",
+          "Diler",
+          "Noc"
+        ]
+      },
+      {
+        "word": "1670",
+        "hints": [
+          "Szlachta",
+          "Wieś",
+          "Komedia"
+        ]
+      },
+      {
+        "word": "Simpsonowie",
+        "hints": [
+          "Żółci",
+          "Pączek",
+          "Springfield"
+        ]
+      },
+      {
+        "word": "South Park",
+        "hints": [
+          "Kolorado",
+          "Czwórka chłopców",
+          "Wycinanki"
+        ]
+      },
+      {
+        "word": "Rick i Morty",
+        "hints": [
+          "Naukowiec",
+          "Portal",
+          "Wnuk"
+        ]
+      },
+      {
+        "word": "Family Guy",
+        "hints": [
+          "Pies",
+          "Niemowlę",
+          "Komedia"
+        ]
+      },
+      {
+        "word": "Gwiezdne wojny: Mandalorianin",
+        "hints": [
+          "Hełm",
+          "Łowca nagród",
+          "Mała zielona postać"
+        ]
+      },
+      {
+        "word": "The Office",
+        "hints": [
+          "Biuro",
+          "Papier",
+          "Szef"
+        ]
+      },
+      {
+        "word": "Teoria wielkiego podrywu",
+        "hints": [
+          "Fizycy",
+          "Kanapa",
+          "Kumple"
+        ]
+      },
+      {
+        "word": "Jak poznałem waszą matkę",
+        "hints": [
+          "Bar",
+          "Opowieść",
+          "Dzieci"
+        ]
+      },
+      {
+        "word": "Sherlock",
+        "hints": [
+          "Londyn",
+          "Detektyw",
+          "Lekarz"
+        ]
+      },
+      {
+        "word": "Peaky Blinders",
+        "hints": [
+          "Birmingham",
+          "Czapki",
+          "Gang"
+        ]
+      },
+      {
+        "word": "Wednesday",
+        "hints": [
+          "Szkoła",
+          "Rączka",
+          "Czerń"
+        ]
+      },
+      {
+        "word": "The Last of Us",
+        "hints": [
+          "Grzyby",
+          "Podróż",
+          "Dziewczyna"
+        ]
+      },
+      {
+        "word": "The Witcher",
+        "hints": [
+          "Monety",
+          "Bard",
+          "Miecze"
+        ]
+      },
+      {
+        "word": "Lucyfer",
+        "hints": [
+          "Diabeł",
+          "Klub",
+          "Los Angeles"
+        ]
+      },
+      {
+        "word": "Doktor House",
+        "hints": [
+          "Laska",
+          "Szpital",
+          "Diagnoza"
+        ]
+      },
+      {
+        "word": "Chirurdzy",
+        "hints": [
+          "Seattle",
+          "Szpital",
+          "Stażyści"
+        ]
+      },
+      {
+        "word": "Dexter",
+        "hints": [
+          "Miami",
+          "Policja",
+          "Tajemnica"
+        ]
+      },
+      {
+        "word": "Prison Break",
+        "hints": [
+          "Tatuaż",
+          "Więzienie",
+          "Bracia"
+        ]
+      },
+      {
+        "word": "Lost",
+        "hints": [
+          "Wyspa",
+          "Katastrofa",
+          "Liczby"
+        ]
+      },
+      {
+        "word": "Czarne lustro",
+        "hints": [
+          "Technologia",
+          "Przyszłość",
+          "Osobne odcinki"
+        ]
+      },
+      {
+        "word": "The Crown",
+        "hints": [
+          "Królowa",
+          "Pałac",
+          "Wielka Brytania"
+        ]
+      },
+      {
+        "word": "Bridgertonowie",
+        "hints": [
+          "Bale",
+          "Plotki",
+          "Rodzeństwo"
+        ]
+      },
+      {
+        "word": "Euforia",
+        "hints": [
+          "Liceum",
+          "Brokat",
+          "Nastolatki"
+        ]
+      },
+      {
+        "word": "Sex Education",
+        "hints": [
+          "Szkoła",
+          "Porady",
+          "Mama"
+        ]
+      },
+      {
+        "word": "Wikingowie",
+        "hints": [
+          "Łodzie",
+          "Topory",
+          "Najazdy"
+        ]
+      },
+      {
+        "word": "Narcos",
+        "hints": [
+          "Kolumbia",
+          "Kartel",
+          "Agenci"
+        ]
+      },
+      {
+        "word": "Ozark",
+        "hints": [
+          "Jezioro",
+          "Pranie",
+          "Rodzina"
+        ]
+      },
+      {
+        "word": "Fargo",
+        "hints": [
+          "Śnieg",
+          "Minnesota",
+          "Zbrodnia"
+        ]
+      },
+      {
+        "word": "Detektyw",
+        "hints": [
+          "Luizjana",
+          "Para śledczych",
+          "Mrok"
+        ]
+      },
+      {
+        "word": "Sukcesja",
+        "hints": [
+          "Media",
+          "Rodzina",
+          "Spadek"
+        ]
+      },
+      {
+        "word": "Ród smoka",
+        "hints": [
+          "Targaryenowie",
+          "Smoki",
+          "Wojna"
+        ]
+      },
+      {
+        "word": "Władca Pierścieni: Pierścienie Władzy",
+        "hints": [
+          "Śródziemie",
+          "Elfy",
+          "Kowal"
+        ]
+      },
+      {
+        "word": "Ted Lasso",
+        "hints": [
+          "Trener",
+          "Piłka nożna",
+          "Wąsy"
+        ]
+      },
+      {
+        "word": "Gilmore Girls",
+        "hints": [
+          "Mama i córka",
+          "Kawa",
+          "Miasteczko"
+        ]
+      },
+      {
+        "word": "Gotowe na wszystko",
+        "hints": [
+          "Ulica",
+          "Sąsiadki",
+          "Sekrety"
+        ]
+      },
+      {
+        "word": "Zagubieni w kosmosie",
+        "hints": [
+          "Robot",
+          "Rodzina",
+          "Planeta"
+        ]
+      },
+      {
+        "word": "Star Trek",
+        "hints": [
+          "Statek",
+          "Uszy",
+          "Galaktyka"
+        ]
+      },
+      {
+        "word": "Doktor Who",
+        "hints": [
+          "Budka",
+          "Podróże w czasie",
+          "Śrubokręt"
+        ]
+      },
+      {
+        "word": "Z archiwum X",
+        "hints": [
+          "Kosmici",
+          "Agenci",
+          "Spisek"
+        ]
+      },
+      {
+        "word": "Twin Peaks",
+        "hints": [
+          "Kawa",
+          "Ciasto",
+          "Miasteczko"
+        ]
+      },
+      {
+        "word": "Rodzina Soprano",
+        "hints": [
+          "Mafia",
+          "Terapeutka",
+          "New Jersey"
+        ]
+      },
+      {
+        "word": "The Walking Dead",
+        "hints": [
+          "Zombie",
+          "Szeryf",
+          "Przetrwanie"
+        ]
+      },
+      {
+        "word": "Bojack Horseman",
+        "hints": [
+          "Koń",
+          "Hollywood",
+          "Animacja"
+        ]
+      },
+      {
+        "word": "Arcane",
+        "hints": [
+          "Siostry",
+          "Miasto",
+          "Gra komputerowa"
+        ]
+      },
+      {
+        "word": "Avatar: Legenda Aanga",
+        "hints": [
+          "Żywioły",
+          "Strzałka",
+          "Mnich"
+        ]
+      },
+      {
+        "word": "Pokémon",
+        "hints": [
+          "Kieszonkowe stworki",
+          "Trener",
+          "Ewolucja"
+        ]
+      },
+      {
+        "word": "Scooby-Doo",
+        "hints": [
+          "Pies",
+          "Furgonetka",
+          "Duchy"
+        ]
+      },
+      {
+        "word": "Gumball",
+        "hints": [
+          "Kot",
+          "Szkoła",
+          "Animacja"
+        ]
+      },
+      {
+        "word": "Pora na przygodę",
+        "hints": [
+          "Pies",
+          "Chłopiec",
+          "Kraina"
+        ]
+      },
+      {
+        "word": "Spongebob",
+        "hints": [
+          "Ananas",
+          "Ocean",
+          "Kraboburger"
+        ]
+      },
+      {
+        "word": "Smerfy",
+        "hints": [
+          "Niebieskie",
+          "Grzyby",
+          "Wioska"
+        ]
+      },
+      {
+        "word": "Świnka Peppa",
+        "hints": [
+          "Kałuże",
+          "Rodzina",
+          "Bajka"
+        ]
+      },
+      {
+        "word": "Bolek i Lolek",
+        "hints": [
+          "Bracia",
+          "Przygody",
+          "Polska bajka"
+        ]
+      },
+      {
+        "word": "Reksio",
+        "hints": [
+          "Pies",
+          "Polska bajka",
+          "Szczekanie"
+        ]
+      },
+      {
+        "word": "Miodowe lata",
+        "hints": [
+          "Tramwaj",
+          "Sąsiedzi",
+          "Komedia"
+        ]
+      },
+      {
+        "word": "Kiler",
+        "hints": [
+          "Pomyłka",
+          "Taksówkarz",
+          "Komedia"
+        ]
+      },
+      {
+        "word": "Alternatywy 4",
+        "hints": [
+          "Blok",
+          "Gospodarz",
+          "PRL"
+        ]
+      },
+      {
+        "word": "Stawka większa niż życie",
+        "hints": [
+          "Szpieg",
+          "Wojna",
+          "Mundur"
+        ]
+      },
+      {
+        "word": "Ucho Prezesa",
+        "hints": [
+          "Polityka",
+          "Gabinet",
+          "Satyra"
+        ]
+      },
+      {
+        "word": "Watahy",
+        "hints": [
+          "Bieszczady",
+          "Straż graniczna",
+          "Las"
+        ]
+      },
+      {
+        "word": "Belfer",
+        "hints": [
+          "Nauczyciel",
+          "Zagadka",
+          "Szkoła"
+        ]
+      },
+      {
+        "word": "Rojst",
+        "hints": [
+          "Śledztwo",
+          "Las",
+          "PRL"
+        ]
+      },
+      {
+        "word": "Wielka woda",
+        "hints": [
+          "Powódź",
+          "Wrocław",
+          "Wały"
+        ]
+      },
+      {
+        "word": "Sexify",
+        "hints": [
+          "Studentki",
+          "Aplikacja",
+          "Badania"
+        ]
+      },
+      {
+        "word": "Kasta",
+        "hints": [
+          "Prawnicy",
+          "Sąd",
+          "Kariera"
+        ]
+      },
+      {
+        "word": "Szadź",
+        "hints": [
+          "Seryjny morderca",
+          "Zimno",
+          "Śledztwo"
+        ]
+      },
+      {
+        "word": "Pitbull",
+        "hints": [
+          "Policja",
+          "Gangi",
+          "Warszawa"
+        ]
+      },
+      {
+        "word": "Na Wspólnej",
+        "hints": [
+          "Ulica",
+          "Mieszkańcy",
+          "Telenowela"
+        ]
+      },
+      {
+        "word": "Barwy szczęścia",
+        "hints": [
+          "Kamienica",
+          "Rodziny",
+          "Telenowela"
+        ]
+      },
+      {
+        "word": "Ojciec Chrzestny",
+        "hints": [
+          "Mafia",
+          "Rodzina",
+          "Oferta"
+        ]
+      },
+      {
+        "word": "Mr. Robot",
+        "hints": [
+          "Haker",
+          "Kaptur",
+          "Korporacja"
+        ]
+      },
+      {
+        "word": "Westworld",
+        "hints": [
+          "Park rozrywki",
+          "Androidy",
+          "Dziki Zachód"
+        ]
+      },
+      {
+        "word": "Mroczne materie",
+        "hints": [
+          "Dajmon",
+          "Kompas",
+          "Światy"
+        ]
+      },
+      {
+        "word": "Dark",
+        "hints": [
+          "Jaskinia",
+          "Podróże w czasie",
+          "Niemcy"
+        ]
+      },
+      {
+        "word": "Lupin",
+        "hints": [
+          "Złodziej",
+          "Paryż",
+          "Przebrania"
+        ]
+      },
+      {
+        "word": "Kobra",
+        "hints": [
+          "Autostrada",
+          "Pościgi",
+          "Policja"
+        ]
+      },
+      {
+        "word": "Komisarz Rex",
+        "hints": [
+          "Pies",
+          "Wiedeń",
+          "Bułka"
+        ]
+      },
+      {
+        "word": "Magda M.",
+        "hints": [
+          "Prawniczka",
+          "Warszawa",
+          "Miłość"
+        ]
+      },
+      {
+        "word": "Usta usta",
+        "hints": [
+          "Przyjaciele",
+          "Komedia",
+          "Związki"
+        ]
+      },
+      {
+        "word": "Herkules",
+        "hints": [
+          "Siłacz",
+          "Starożytność",
+          "Bogowie"
+        ]
+      },
+      {
+        "word": "Xena",
+        "hints": [
+          "Wojowniczka",
+          "Czakram",
+          "Starożytność"
+        ]
+      },
+      {
+        "word": "Słoneczny patrol",
+        "hints": [
+          "Plaża",
+          "Ratownicy",
+          "Czerwone stroje"
+        ]
+      },
+      {
+        "word": "Strażnik Teksasu",
+        "hints": [
+          "Kowboj",
+          "Kopniak",
+          "Teksas"
+        ]
+      },
+      {
+        "word": "Zwariowany świat Malcolma",
+        "hints": [
+          "Bracia",
+          "Geniusz",
+          "Rodzina"
+        ]
+      }
     ]
   },
   "Polska": {
     "item": "cat:poland",
     "words": [
-      { "word": "Pierogi", "hints": ["Ciasto", "Farsz", "Wigilia"] },
-      { "word": "Bigos", "hints": ["Kapusta", "Mięso", "Myśliwy"] },
-      { "word": "Żurek", "hints": ["Zakwas", "Jajko", "Wielkanoc"] },
-      { "word": "Schabowy", "hints": ["Panierka", "Obiad", "Niedziela"] },
-      { "word": "Oscypek", "hints": ["Ser", "Góry", "Wędzenie"] },
-      { "word": "Pączek", "hints": ["Tłusty czwartek", "Lukier", "Nadzienie"] },
-      { "word": "Obwarzanek", "hints": ["Kraków", "Kółko", "Mak"] },
-      { "word": "Kiełbasa", "hints": ["Grill", "Wędlina", "Musztarda"] },
-      { "word": "Rosół", "hints": ["Niedziela", "Makaron", "Kura"] },
-      { "word": "Gołąbki", "hints": ["Kapusta", "Ryż", "Sos"] },
-      { "word": "Placki ziemniaczane", "hints": ["Tarka", "Patelnia", "Śmietana"] },
-      { "word": "Barszcz", "hints": ["Buraki", "Uszka", "Czerwony"] },
-      { "word": "Sernik", "hints": ["Twaróg", "Ciasto", "Rodzynki"] },
-      { "word": "Makowiec", "hints": ["Ciasto", "Święta", "Zwinięty"] },
-      { "word": "Kopytka", "hints": ["Ziemniaki", "Kluski", "Kształt"] },
-      { "word": "Ogórek kiszony", "hints": ["Słoik", "Koper", "Kwaśny"] },
-      { "word": "Kompot", "hints": ["Owoce", "Obiad", "Dzbanek"] },
-      { "word": "Zapiekanka", "hints": ["Bagietka", "Pieczarki", "Ketchup"] },
-      { "word": "Kebab", "hints": ["Nocą", "Sos", "Mięso"] },
-      { "word": "Krówki", "hints": ["Cukierki", "Mleko", "Ciągnące"] },
-      { "word": "Ptasie mleczko", "hints": ["Pianka", "Czekolada", "Pudełko"] },
-      { "word": "Wawel", "hints": ["Zamek", "Kraków", "Smok"] },
-      { "word": "Smok Wawelski", "hints": ["Legenda", "Szewc", "Owca"] },
-      { "word": "Morskie Oko", "hints": ["Jezioro", "Tatry", "Szlak"] },
-      { "word": "Giewont", "hints": ["Krzyż", "Śpiący rycerz", "Szczyt"] },
-      { "word": "Zakopane", "hints": ["Krupówki", "Góry", "Zima"] },
-      { "word": "Bałtyk", "hints": ["Morze", "Plaża", "Zimna woda"] },
-      { "word": "Hel", "hints": ["Półwysep", "Foki", "Koniec Polski"] },
-      { "word": "Mazury", "hints": ["Jeziora", "Żagle", "Kraina"] },
-      { "word": "Bieszczady", "hints": ["Połoniny", "Dzikość", "Wschód"] },
-      { "word": "Pałac Kultury", "hints": ["Warszawa", "Wieżowiec", "Dar"] },
-      { "word": "Syrenka", "hints": ["Miecz", "Tarcza", "Warszawa"] },
-      { "word": "Kolumna Zygmunta", "hints": ["Plac Zamkowy", "Król", "Pomnik"] },
-      { "word": "Malbork", "hints": ["Zamek", "Krzyżacy", "Cegła"] },
-      { "word": "Wieliczka", "hints": ["Kopalnia", "Sól", "Podziemia"] },
-      { "word": "Toruń", "hints": ["Pierniki", "Kopernik", "Gotyk"] },
-      { "word": "Gdańsk", "hints": ["Neptun", "Żuraw", "Stocznia"] },
-      { "word": "Wrocław", "hints": ["Krasnale", "Mosty", "Odra"] },
-      { "word": "Poznań", "hints": ["Koziołki", "Rogale", "Ratusz"] },
-      { "word": "Łódź", "hints": ["Piotrkowska", "Fabryki", "Film"] },
-      { "word": "Częstochowa", "hints": ["Jasna Góra", "Pielgrzymka", "Obraz"] },
-      { "word": "Białowieża", "hints": ["Puszcza", "Żubry", "Las"] },
-      { "word": "Żubr", "hints": ["Puszcza", "Rogi", "Ciężki"] },
-      { "word": "Bocian", "hints": ["Gniazdo", "Komin", "Wiosna"] },
-      { "word": "Orzeł Biały", "hints": ["Godło", "Korona", "Czerwone tło"] },
-      { "word": "Hymn", "hints": ["Dąbrowski", "Stojąco", "Mazurek"] },
-      { "word": "Konstytucja 3 Maja", "hints": ["1791", "Święto", "Ustawa"] },
-      { "word": "Bitwa pod Grunwaldem", "hints": ["1410", "Krzyżacy", "Miecze"] },
-      { "word": "Solidarność", "hints": ["Związek", "Stocznia", "Strajk"] },
-      { "word": "Mikołaj Kopernik", "hints": ["Astronom", "Słońce", "Toruń"] },
-      { "word": "Maria Skłodowska-Curie", "hints": ["Nobel", "Rad", "Paryż"] },
-      { "word": "Fryderyk Chopin", "hints": ["Fortepian", "Mazurki", "Żelazowa Wola"] },
-      { "word": "Adam Mickiewicz", "hints": ["Pan Tadeusz", "Wieszcz", "Litwa"] },
-      { "word": "Pan Tadeusz", "hints": ["Epopeja", "Soplicowo", "Szkolna lektura"] },
-      { "word": "Robert Lewandowski", "hints": ["Napastnik", "Gole", "Kapitan"] },
-      { "word": "Adam Małysz", "hints": ["Skoki", "Wąsy", "Wisła"] },
-      { "word": "Iga Świątek", "hints": ["Tenis", "Rakieta", "Paryż"] },
-      { "word": "Wiedźmin Geralt", "hints": ["Sapkowski", "Miecze", "Białe włosy"] },
-      { "word": "Polonez", "hints": ["Taniec", "Studniówka", "Pary"] },
-      { "word": "Studniówka", "hints": ["Matura", "Bal", "Liceum"] },
-      { "word": "Matura", "hints": ["Egzamin", "Maj", "Szkoła"] },
-      { "word": "Wigilia", "hints": ["Opłatek", "Pierwsza gwiazdka", "Dwanaście potraw"] },
-      { "word": "Opłatek", "hints": ["Życzenia", "Wigilia", "Cienki"] },
-      { "word": "Śmigus-dyngus", "hints": ["Woda", "Poniedziałek", "Wiadro"] },
-      { "word": "Andrzejki", "hints": ["Wróżby", "Wosk", "Listopad"] },
-      { "word": "Tłusty czwartek", "hints": ["Pączki", "Faworki", "Karnawał"] },
-      { "word": "Majówka", "hints": ["Grill", "Długi weekend", "Wiosna"] },
-      { "word": "Wszystkich Świętych", "hints": ["Znicze", "Cmentarz", "Listopad"] },
-      { "word": "Dożynki", "hints": ["Wieniec", "Żniwa", "Wieś"] },
-      { "word": "Pisanka", "hints": ["Jajko", "Wielkanoc", "Wzory"] },
-      { "word": "Palma wielkanocna", "hints": ["Kościół", "Wierzba", "Niedziela"] },
-      { "word": "Kolęda", "hints": ["Śpiew", "Święta", "Księża"] },
-      { "word": "Szopka krakowska", "hints": ["Kolory", "Konkurs", "Boże Narodzenie"] },
-      { "word": "Wycinanka", "hints": ["Papier", "Ludowe", "Nożyczki"] },
-      { "word": "Ciupaga", "hints": ["Góral", "Laska", "Toporek"] },
-      { "word": "Góral", "hints": ["Kapelusz", "Oscypek", "Podhale"] },
-      { "word": "Fiat 126p", "hints": ["Maluch", "Samochód", "PRL"] },
-      { "word": "Polonez samochód", "hints": ["FSO", "PRL", "Auto"] },
-      { "word": "Syrenka samochód", "hints": ["FSO", "Lata 60.", "Auto"] },
-      { "word": "PKP", "hints": ["Pociąg", "Opóźnienie", "Dworzec"] },
-      { "word": "Pendolino", "hints": ["Pociąg", "Szybki", "Biało-czerwony"] },
-      { "word": "Żabka", "hints": ["Sklep", "Hot dog", "Za rogiem"] },
-      { "word": "Biedronka", "hints": ["Sklep", "Kropki", "Promocje"] },
-      { "word": "Allegro", "hints": ["Aukcje", "Internet", "Paczka"] },
-      { "word": "Paczkomat", "hints": ["Kod", "Skrytki", "Odbiór"] },
-      { "word": "Blok z wielkiej płyty", "hints": ["Osiedle", "Beton", "PRL"] },
-      { "word": "Meblościanka", "hints": ["Kryształy", "Salon", "Segment"] },
-      { "word": "Dywan na ścianie", "hints": ["Babcia", "Wzory", "PRL"] },
-      { "word": "Trzepak", "hints": ["Podwórko", "Dywan", "Dzieciaki"] },
-      { "word": "Kapcie", "hints": ["Goście", "Dom", "Wygoda"] },
-      { "word": "Działka", "hints": ["Ogródek", "Altana", "Weekend"] },
-      { "word": "Grzybobranie", "hints": ["Las", "Koszyk", "Jesień"] },
-      { "word": "Sanatorium", "hints": ["Uzdrowisko", "Kuracjusze", "Wieczorki"] },
-      { "word": "Disco polo", "hints": ["Wesele", "Keyboard", "Przeboje"] },
-      { "word": "Wesele", "hints": ["Oczepiny", "Wódka", "Pierwszy taniec"] },
-      { "word": "Sto lat", "hints": ["Urodziny", "Śpiew", "Toast"] },
-      { "word": "Kawa zbożowa", "hints": ["Przedszkole", "Kubek", "Napój"] },
-      { "word": "Woda z sokiem", "hints": ["Dzieci", "Szklanka", "Malina"] },
-      { "word": "Twaróg", "hints": ["Biały ser", "Krajanka", "Śniadanie"] },
-      { "word": "Chleb ze smalcem", "hints": ["Skwarki", "Kromka", "Ogórek"] }
+      {
+        "word": "Pierogi",
+        "hints": [
+          "Ciasto",
+          "Farsz",
+          "Wigilia"
+        ]
+      },
+      {
+        "word": "Bigos",
+        "hints": [
+          "Kapusta",
+          "Mięso",
+          "Myśliwy"
+        ]
+      },
+      {
+        "word": "Żurek",
+        "hints": [
+          "Zakwas",
+          "Jajko",
+          "Wielkanoc"
+        ]
+      },
+      {
+        "word": "Schabowy",
+        "hints": [
+          "Panierka",
+          "Obiad",
+          "Niedziela"
+        ]
+      },
+      {
+        "word": "Oscypek",
+        "hints": [
+          "Ser",
+          "Góry",
+          "Wędzenie"
+        ]
+      },
+      {
+        "word": "Pączek",
+        "hints": [
+          "Tłusty czwartek",
+          "Lukier",
+          "Nadzienie"
+        ]
+      },
+      {
+        "word": "Obwarzanek",
+        "hints": [
+          "Kraków",
+          "Kółko",
+          "Mak"
+        ]
+      },
+      {
+        "word": "Kiełbasa",
+        "hints": [
+          "Grill",
+          "Wędlina",
+          "Musztarda"
+        ]
+      },
+      {
+        "word": "Rosół",
+        "hints": [
+          "Niedziela",
+          "Makaron",
+          "Kura"
+        ]
+      },
+      {
+        "word": "Gołąbki",
+        "hints": [
+          "Kapusta",
+          "Ryż",
+          "Sos"
+        ]
+      },
+      {
+        "word": "Placki ziemniaczane",
+        "hints": [
+          "Tarka",
+          "Patelnia",
+          "Śmietana"
+        ]
+      },
+      {
+        "word": "Barszcz",
+        "hints": [
+          "Buraki",
+          "Uszka",
+          "Czerwony"
+        ]
+      },
+      {
+        "word": "Sernik",
+        "hints": [
+          "Twaróg",
+          "Ciasto",
+          "Rodzynki"
+        ]
+      },
+      {
+        "word": "Makowiec",
+        "hints": [
+          "Ciasto",
+          "Święta",
+          "Zwinięty"
+        ]
+      },
+      {
+        "word": "Kopytka",
+        "hints": [
+          "Ziemniaki",
+          "Kluski",
+          "Kształt"
+        ]
+      },
+      {
+        "word": "Ogórek kiszony",
+        "hints": [
+          "Słoik",
+          "Koper",
+          "Kwaśny"
+        ]
+      },
+      {
+        "word": "Kompot",
+        "hints": [
+          "Owoce",
+          "Obiad",
+          "Dzbanek"
+        ]
+      },
+      {
+        "word": "Zapiekanka",
+        "hints": [
+          "Bagietka",
+          "Pieczarki",
+          "Ketchup"
+        ]
+      },
+      {
+        "word": "Kebab",
+        "hints": [
+          "Nocą",
+          "Sos",
+          "Mięso"
+        ]
+      },
+      {
+        "word": "Krówki",
+        "hints": [
+          "Cukierki",
+          "Mleko",
+          "Ciągnące"
+        ]
+      },
+      {
+        "word": "Ptasie mleczko",
+        "hints": [
+          "Pianka",
+          "Czekolada",
+          "Pudełko"
+        ]
+      },
+      {
+        "word": "Wawel",
+        "hints": [
+          "Zamek",
+          "Kraków",
+          "Smok"
+        ]
+      },
+      {
+        "word": "Smok Wawelski",
+        "hints": [
+          "Legenda",
+          "Szewc",
+          "Owca"
+        ]
+      },
+      {
+        "word": "Morskie Oko",
+        "hints": [
+          "Jezioro",
+          "Tatry",
+          "Szlak"
+        ]
+      },
+      {
+        "word": "Giewont",
+        "hints": [
+          "Krzyż",
+          "Śpiący rycerz",
+          "Szczyt"
+        ]
+      },
+      {
+        "word": "Zakopane",
+        "hints": [
+          "Krupówki",
+          "Góry",
+          "Zima"
+        ]
+      },
+      {
+        "word": "Bałtyk",
+        "hints": [
+          "Morze",
+          "Plaża",
+          "Zimna woda"
+        ]
+      },
+      {
+        "word": "Hel",
+        "hints": [
+          "Półwysep",
+          "Foki",
+          "Koniec Polski"
+        ]
+      },
+      {
+        "word": "Mazury",
+        "hints": [
+          "Jeziora",
+          "Żagle",
+          "Kraina"
+        ]
+      },
+      {
+        "word": "Bieszczady",
+        "hints": [
+          "Połoniny",
+          "Dzikość",
+          "Wschód"
+        ]
+      },
+      {
+        "word": "Pałac Kultury",
+        "hints": [
+          "Warszawa",
+          "Wieżowiec",
+          "Dar"
+        ]
+      },
+      {
+        "word": "Syrenka",
+        "hints": [
+          "Miecz",
+          "Tarcza",
+          "Warszawa"
+        ]
+      },
+      {
+        "word": "Kolumna Zygmunta",
+        "hints": [
+          "Plac Zamkowy",
+          "Król",
+          "Pomnik"
+        ]
+      },
+      {
+        "word": "Malbork",
+        "hints": [
+          "Zamek",
+          "Krzyżacy",
+          "Cegła"
+        ]
+      },
+      {
+        "word": "Wieliczka",
+        "hints": [
+          "Kopalnia",
+          "Sól",
+          "Podziemia"
+        ]
+      },
+      {
+        "word": "Toruń",
+        "hints": [
+          "Pierniki",
+          "Kopernik",
+          "Gotyk"
+        ]
+      },
+      {
+        "word": "Gdańsk",
+        "hints": [
+          "Neptun",
+          "Żuraw",
+          "Stocznia"
+        ]
+      },
+      {
+        "word": "Wrocław",
+        "hints": [
+          "Krasnale",
+          "Mosty",
+          "Odra"
+        ]
+      },
+      {
+        "word": "Poznań",
+        "hints": [
+          "Koziołki",
+          "Rogale",
+          "Ratusz"
+        ]
+      },
+      {
+        "word": "Łódź",
+        "hints": [
+          "Piotrkowska",
+          "Fabryki",
+          "Film"
+        ]
+      },
+      {
+        "word": "Częstochowa",
+        "hints": [
+          "Jasna Góra",
+          "Pielgrzymka",
+          "Obraz"
+        ]
+      },
+      {
+        "word": "Białowieża",
+        "hints": [
+          "Puszcza",
+          "Żubry",
+          "Las"
+        ]
+      },
+      {
+        "word": "Żubr",
+        "hints": [
+          "Puszcza",
+          "Rogi",
+          "Ciężki"
+        ]
+      },
+      {
+        "word": "Bocian",
+        "hints": [
+          "Gniazdo",
+          "Komin",
+          "Wiosna"
+        ]
+      },
+      {
+        "word": "Orzeł Biały",
+        "hints": [
+          "Godło",
+          "Korona",
+          "Czerwone tło"
+        ]
+      },
+      {
+        "word": "Hymn",
+        "hints": [
+          "Dąbrowski",
+          "Stojąco",
+          "Mazurek"
+        ]
+      },
+      {
+        "word": "Konstytucja 3 Maja",
+        "hints": [
+          "1791",
+          "Święto",
+          "Ustawa"
+        ]
+      },
+      {
+        "word": "Bitwa pod Grunwaldem",
+        "hints": [
+          "1410",
+          "Krzyżacy",
+          "Miecze"
+        ]
+      },
+      {
+        "word": "Solidarność",
+        "hints": [
+          "Związek",
+          "Stocznia",
+          "Strajk"
+        ]
+      },
+      {
+        "word": "Mikołaj Kopernik",
+        "hints": [
+          "Astronom",
+          "Słońce",
+          "Toruń"
+        ]
+      },
+      {
+        "word": "Maria Skłodowska-Curie",
+        "hints": [
+          "Nobel",
+          "Rad",
+          "Paryż"
+        ]
+      },
+      {
+        "word": "Fryderyk Chopin",
+        "hints": [
+          "Fortepian",
+          "Mazurki",
+          "Żelazowa Wola"
+        ]
+      },
+      {
+        "word": "Adam Mickiewicz",
+        "hints": [
+          "Pan Tadeusz",
+          "Wieszcz",
+          "Litwa"
+        ]
+      },
+      {
+        "word": "Pan Tadeusz",
+        "hints": [
+          "Epopeja",
+          "Soplicowo",
+          "Szkolna lektura"
+        ]
+      },
+      {
+        "word": "Robert Lewandowski",
+        "hints": [
+          "Napastnik",
+          "Gole",
+          "Kapitan"
+        ]
+      },
+      {
+        "word": "Adam Małysz",
+        "hints": [
+          "Skoki",
+          "Wąsy",
+          "Wisła"
+        ]
+      },
+      {
+        "word": "Iga Świątek",
+        "hints": [
+          "Tenis",
+          "Rakieta",
+          "Paryż"
+        ]
+      },
+      {
+        "word": "Wiedźmin Geralt",
+        "hints": [
+          "Sapkowski",
+          "Miecze",
+          "Białe włosy"
+        ]
+      },
+      {
+        "word": "Polonez",
+        "hints": [
+          "Taniec",
+          "Studniówka",
+          "Pary"
+        ]
+      },
+      {
+        "word": "Studniówka",
+        "hints": [
+          "Matura",
+          "Bal",
+          "Liceum"
+        ]
+      },
+      {
+        "word": "Matura",
+        "hints": [
+          "Egzamin",
+          "Maj",
+          "Szkoła"
+        ]
+      },
+      {
+        "word": "Wigilia",
+        "hints": [
+          "Opłatek",
+          "Pierwsza gwiazdka",
+          "Dwanaście potraw"
+        ]
+      },
+      {
+        "word": "Opłatek",
+        "hints": [
+          "Życzenia",
+          "Wigilia",
+          "Cienki"
+        ]
+      },
+      {
+        "word": "Śmigus-dyngus",
+        "hints": [
+          "Woda",
+          "Poniedziałek",
+          "Wiadro"
+        ]
+      },
+      {
+        "word": "Andrzejki",
+        "hints": [
+          "Wróżby",
+          "Wosk",
+          "Listopad"
+        ]
+      },
+      {
+        "word": "Tłusty czwartek",
+        "hints": [
+          "Pączki",
+          "Faworki",
+          "Karnawał"
+        ]
+      },
+      {
+        "word": "Majówka",
+        "hints": [
+          "Grill",
+          "Długi weekend",
+          "Wiosna"
+        ]
+      },
+      {
+        "word": "Wszystkich Świętych",
+        "hints": [
+          "Znicze",
+          "Cmentarz",
+          "Listopad"
+        ]
+      },
+      {
+        "word": "Dożynki",
+        "hints": [
+          "Wieniec",
+          "Żniwa",
+          "Wieś"
+        ]
+      },
+      {
+        "word": "Pisanka",
+        "hints": [
+          "Jajko",
+          "Wielkanoc",
+          "Wzory"
+        ]
+      },
+      {
+        "word": "Palma wielkanocna",
+        "hints": [
+          "Kościół",
+          "Wierzba",
+          "Niedziela"
+        ]
+      },
+      {
+        "word": "Kolęda",
+        "hints": [
+          "Śpiew",
+          "Święta",
+          "Księża"
+        ]
+      },
+      {
+        "word": "Szopka krakowska",
+        "hints": [
+          "Kolory",
+          "Konkurs",
+          "Boże Narodzenie"
+        ]
+      },
+      {
+        "word": "Wycinanka",
+        "hints": [
+          "Papier",
+          "Ludowe",
+          "Nożyczki"
+        ]
+      },
+      {
+        "word": "Ciupaga",
+        "hints": [
+          "Góral",
+          "Laska",
+          "Toporek"
+        ]
+      },
+      {
+        "word": "Góral",
+        "hints": [
+          "Kapelusz",
+          "Oscypek",
+          "Podhale"
+        ]
+      },
+      {
+        "word": "Fiat 126p",
+        "hints": [
+          "Maluch",
+          "Samochód",
+          "PRL"
+        ]
+      },
+      {
+        "word": "Polonez samochód",
+        "hints": [
+          "FSO",
+          "PRL",
+          "Auto"
+        ]
+      },
+      {
+        "word": "Syrenka samochód",
+        "hints": [
+          "FSO",
+          "Lata 60.",
+          "Auto"
+        ]
+      },
+      {
+        "word": "PKP",
+        "hints": [
+          "Pociąg",
+          "Opóźnienie",
+          "Dworzec"
+        ]
+      },
+      {
+        "word": "Pendolino",
+        "hints": [
+          "Pociąg",
+          "Szybki",
+          "Biało-czerwony"
+        ]
+      },
+      {
+        "word": "Żabka",
+        "hints": [
+          "Sklep",
+          "Hot dog",
+          "Za rogiem"
+        ]
+      },
+      {
+        "word": "Biedronka",
+        "hints": [
+          "Sklep",
+          "Kropki",
+          "Promocje"
+        ]
+      },
+      {
+        "word": "Allegro",
+        "hints": [
+          "Aukcje",
+          "Internet",
+          "Paczka"
+        ]
+      },
+      {
+        "word": "Paczkomat",
+        "hints": [
+          "Kod",
+          "Skrytki",
+          "Odbiór"
+        ]
+      },
+      {
+        "word": "Blok z wielkiej płyty",
+        "hints": [
+          "Osiedle",
+          "Beton",
+          "PRL"
+        ]
+      },
+      {
+        "word": "Meblościanka",
+        "hints": [
+          "Kryształy",
+          "Salon",
+          "Segment"
+        ]
+      },
+      {
+        "word": "Dywan na ścianie",
+        "hints": [
+          "Babcia",
+          "Wzory",
+          "PRL"
+        ]
+      },
+      {
+        "word": "Trzepak",
+        "hints": [
+          "Podwórko",
+          "Dywan",
+          "Dzieciaki"
+        ]
+      },
+      {
+        "word": "Kapcie",
+        "hints": [
+          "Goście",
+          "Dom",
+          "Wygoda"
+        ]
+      },
+      {
+        "word": "Działka",
+        "hints": [
+          "Ogródek",
+          "Altana",
+          "Weekend"
+        ]
+      },
+      {
+        "word": "Grzybobranie",
+        "hints": [
+          "Las",
+          "Koszyk",
+          "Jesień"
+        ]
+      },
+      {
+        "word": "Sanatorium",
+        "hints": [
+          "Uzdrowisko",
+          "Kuracjusze",
+          "Wieczorki"
+        ]
+      },
+      {
+        "word": "Disco polo",
+        "hints": [
+          "Wesele",
+          "Keyboard",
+          "Przeboje"
+        ]
+      },
+      {
+        "word": "Wesele",
+        "hints": [
+          "Oczepiny",
+          "Wódka",
+          "Pierwszy taniec"
+        ]
+      },
+      {
+        "word": "Sto lat",
+        "hints": [
+          "Urodziny",
+          "Śpiew",
+          "Toast"
+        ]
+      },
+      {
+        "word": "Kawa zbożowa",
+        "hints": [
+          "Przedszkole",
+          "Kubek",
+          "Napój"
+        ]
+      },
+      {
+        "word": "Woda z sokiem",
+        "hints": [
+          "Dzieci",
+          "Szklanka",
+          "Malina"
+        ]
+      },
+      {
+        "word": "Twaróg",
+        "hints": [
+          "Biały ser",
+          "Krajanka",
+          "Śniadanie"
+        ]
+      },
+      {
+        "word": "Chleb ze smalcem",
+        "hints": [
+          "Skwarki",
+          "Kromka",
+          "Ogórek"
+        ]
+      }
+    ]
+  },
+  "Superbohaterowie": {
+    "item": "cat:heroes",
+    "words": [
+      {
+        "word": "Spider-Man",
+        "hints": [
+          "Pajęczyna",
+          "Nastolatek",
+          "Nowy Jork"
+        ]
+      },
+      {
+        "word": "Batman",
+        "hints": [
+          "Noc",
+          "Gadżety",
+          "Jaskinia"
+        ]
+      },
+      {
+        "word": "Superman",
+        "hints": [
+          "Peleryna",
+          "Kryptonit",
+          "Dziennikarz"
+        ]
+      },
+      {
+        "word": "Wonder Woman",
+        "hints": [
+          "Amazonka",
+          "Lasso",
+          "Wyspa"
+        ]
+      },
+      {
+        "word": "Iron Man",
+        "hints": [
+          "Zbroja",
+          "Miliarder",
+          "Reaktor"
+        ]
+      },
+      {
+        "word": "Kapitan Ameryka",
+        "hints": [
+          "Tarcza",
+          "Żołnierz",
+          "Gwiazda"
+        ]
+      },
+      {
+        "word": "Thor",
+        "hints": [
+          "Młot",
+          "Piorun",
+          "Asgard"
+        ]
+      },
+      {
+        "word": "Hulk",
+        "hints": [
+          "Zielony",
+          "Złość",
+          "Naukowiec"
+        ]
+      },
+      {
+        "word": "Czarna Wdowa",
+        "hints": [
+          "Szpieg",
+          "Agentka",
+          "Rosja"
+        ]
+      },
+      {
+        "word": "Hawkeye",
+        "hints": [
+          "Łuk",
+          "Strzały",
+          "Celność"
+        ]
+      },
+      {
+        "word": "Doktor Strange",
+        "hints": [
+          "Magia",
+          "Peleryna",
+          "Czas"
+        ]
+      },
+      {
+        "word": "Czarna Pantera",
+        "hints": [
+          "Wakanda",
+          "Król",
+          "Pazury"
+        ]
+      },
+      {
+        "word": "Ant-Man",
+        "hints": [
+          "Mały",
+          "Mrówki",
+          "Kombinezon"
+        ]
+      },
+      {
+        "word": "Kapitan Marvel",
+        "hints": [
+          "Kosmos",
+          "Pilotka",
+          "Energia"
+        ]
+      },
+      {
+        "word": "Deadpool",
+        "hints": [
+          "Czerwony kostium",
+          "Żarty",
+          "Nieśmiertelny"
+        ]
+      },
+      {
+        "word": "Wolverine",
+        "hints": [
+          "Pazury",
+          "Regeneracja",
+          "Bokobrody"
+        ]
+      },
+      {
+        "word": "Profesor X",
+        "hints": [
+          "Wózek",
+          "Telepatia",
+          "Szkoła"
+        ]
+      },
+      {
+        "word": "Magneto",
+        "hints": [
+          "Metal",
+          "Hełm",
+          "Mutant"
+        ]
+      },
+      {
+        "word": "Storm",
+        "hints": [
+          "Pogoda",
+          "Błyskawice",
+          "Białe włosy"
+        ]
+      },
+      {
+        "word": "Cyklop",
+        "hints": [
+          "Okulary",
+          "Promień",
+          "Mutant"
+        ]
+      },
+      {
+        "word": "Groot",
+        "hints": [
+          "Drzewo",
+          "Jedno zdanie",
+          "Kosmos"
+        ]
+      },
+      {
+        "word": "Star-Lord",
+        "hints": [
+          "Kaseta",
+          "Kosmos",
+          "Maska"
+        ]
+      },
+      {
+        "word": "Thanos",
+        "hints": [
+          "Rękawica",
+          "Kamienie",
+          "Pstryknięcie"
+        ]
+      },
+      {
+        "word": "Loki",
+        "hints": [
+          "Kłamstwa",
+          "Rogi",
+          "Brat"
+        ]
+      },
+      {
+        "word": "Venom",
+        "hints": [
+          "Symbiont",
+          "Czarny",
+          "Zęby"
+        ]
+      },
+      {
+        "word": "Zielony Goblin",
+        "hints": [
+          "Szybowiec",
+          "Bomby",
+          "Maska"
+        ]
+      },
+      {
+        "word": "Doktor Octopus",
+        "hints": [
+          "Macki",
+          "Naukowiec",
+          "Okulary"
+        ]
+      },
+      {
+        "word": "Ultron",
+        "hints": [
+          "Robot",
+          "Sztuczna inteligencja",
+          "Armia"
+        ]
+      },
+      {
+        "word": "Czerwona Czaszka",
+        "hints": [
+          "Hydra",
+          "Symbol",
+          "Wróg"
+        ]
+      },
+      {
+        "word": "Joker",
+        "hints": [
+          "Uśmiech",
+          "Karty",
+          "Chaos"
+        ]
+      },
+      {
+        "word": "Harley Quinn",
+        "hints": [
+          "Kij bejsbolowy",
+          "Kucyki",
+          "Psychiatra"
+        ]
+      },
+      {
+        "word": "Pingwin",
+        "hints": [
+          "Parasol",
+          "Cylinder",
+          "Gotham"
+        ]
+      },
+      {
+        "word": "Człowiek-Zagadka",
+        "hints": [
+          "Zagadki",
+          "Znak zapytania",
+          "Zielony"
+        ]
+      },
+      {
+        "word": "Dwie Twarze",
+        "hints": [
+          "Moneta",
+          "Blizna",
+          "Prokurator"
+        ]
+      },
+      {
+        "word": "Bane",
+        "hints": [
+          "Maska",
+          "Siła",
+          "Kręgosłup"
+        ]
+      },
+      {
+        "word": "Catwoman",
+        "hints": [
+          "Kot",
+          "Złodziejka",
+          "Bicz"
+        ]
+      },
+      {
+        "word": "Trujący Bluszcz",
+        "hints": [
+          "Rośliny",
+          "Pocałunek",
+          "Trucizna"
+        ]
+      },
+      {
+        "word": "Lex Luthor",
+        "hints": [
+          "Łysy",
+          "Biznesmen",
+          "Wróg"
+        ]
+      },
+      {
+        "word": "Flash",
+        "hints": [
+          "Szybkość",
+          "Błyskawica",
+          "Czerwony"
+        ]
+      },
+      {
+        "word": "Aquaman",
+        "hints": [
+          "Ocean",
+          "Trójząb",
+          "Ryby"
+        ]
+      },
+      {
+        "word": "Zielona Latarnia",
+        "hints": [
+          "Pierścień",
+          "Przysięga",
+          "Zielone światło"
+        ]
+      },
+      {
+        "word": "Robin",
+        "hints": [
+          "Pomocnik",
+          "Chłopiec",
+          "Akrobata"
+        ]
+      },
+      {
+        "word": "Supergirl",
+        "hints": [
+          "Kuzynka",
+          "Peleryna",
+          "Kosmitka"
+        ]
+      },
+      {
+        "word": "Cyborg",
+        "hints": [
+          "Implanty",
+          "Pół-maszyna",
+          "Komputer"
+        ]
+      },
+      {
+        "word": "Shazam",
+        "hints": [
+          "Słowo",
+          "Chłopiec",
+          "Błyskawica"
+        ]
+      },
+      {
+        "word": "Doktor Doom",
+        "hints": [
+          "Metalowa maska",
+          "Władca",
+          "Zielona peleryna"
+        ]
+      },
+      {
+        "word": "Galactus",
+        "hints": [
+          "Pożeracz",
+          "Planety",
+          "Olbrzym"
+        ]
+      },
+      {
+        "word": "Mystique",
+        "hints": [
+          "Niebieska skóra",
+          "Zmiennokształtna",
+          "Mutantka"
+        ]
+      },
+      {
+        "word": "Jean Grey",
+        "hints": [
+          "Telekineza",
+          "Feniks",
+          "Rude włosy"
+        ]
+      },
+      {
+        "word": "Szkarłatna Czarownica",
+        "hints": [
+          "Magia",
+          "Chaos",
+          "Czerwień"
+        ]
+      },
+      {
+        "word": "Vision",
+        "hints": [
+          "Kamień w czole",
+          "Android",
+          "Peleryna"
+        ]
+      },
+      {
+        "word": "Nick Fury",
+        "hints": [
+          "Opaska na oko",
+          "Dyrektor",
+          "Agenci"
+        ]
+      },
+      {
+        "word": "Srebrny Surfer",
+        "hints": [
+          "Deska",
+          "Kosmos",
+          "Srebro"
+        ]
+      },
+      {
+        "word": "Ghost Rider",
+        "hints": [
+          "Płonąca czaszka",
+          "Motocykl",
+          "Łańcuch"
+        ]
+      },
+      {
+        "word": "Daredevil",
+        "hints": [
+          "Niewidomy",
+          "Prawnik",
+          "Diabeł"
+        ]
+      },
+      {
+        "word": "Punisher",
+        "hints": [
+          "Czaszka",
+          "Zemsta",
+          "Broń"
+        ]
+      },
+      {
+        "word": "Blade",
+        "hints": [
+          "Wampiry",
+          "Miecz",
+          "Okulary"
+        ]
+      },
+      {
+        "word": "Ludzka Pochodnia",
+        "hints": [
+          "Ogień",
+          "Latanie",
+          "Czwórka"
+        ]
+      },
+      {
+        "word": "Niewidzialna Kobieta",
+        "hints": [
+          "Niewidzialność",
+          "Pole siłowe",
+          "Czwórka"
+        ]
+      },
+      {
+        "word": "Hellboy",
+        "hints": [
+          "Rogi",
+          "Czerwony",
+          "Kamienna ręka"
+        ]
+      },
+      {
+        "word": "Pan Iniemamocny",
+        "hints": [
+          "Rodzina",
+          "Siła",
+          "Kostium"
+        ]
+      },
+      {
+        "word": "Elastyna",
+        "hints": [
+          "Rozciąganie",
+          "Mama",
+          "Rodzina"
+        ]
+      },
+      {
+        "word": "Megamocny",
+        "hints": [
+          "Niebieska głowa",
+          "Złoczyńca",
+          "Miasto"
+        ]
+      },
+      {
+        "word": "Gru",
+        "hints": [
+          "Minionki",
+          "Łysy",
+          "Księżyc"
+        ]
+      },
+      {
+        "word": "Minionki",
+        "hints": [
+          "Żółte",
+          "Banany",
+          "Gogle"
+        ]
+      },
+      {
+        "word": "Doktor Zło",
+        "hints": [
+          "Mały palec",
+          "Kot",
+          "Plan"
+        ]
+      },
+      {
+        "word": "Darth Vader",
+        "hints": [
+          "Oddech",
+          "Czarny hełm",
+          "Ojciec"
+        ]
+      },
+      {
+        "word": "Imperator Palpatine",
+        "hints": [
+          "Kaptur",
+          "Błyskawice",
+          "Senat"
+        ]
+      },
+      {
+        "word": "Voldemort",
+        "hints": [
+          "Bez nosa",
+          "Różdżka",
+          "Horkruksy"
+        ]
+      },
+      {
+        "word": "Sauron",
+        "hints": [
+          "Oko",
+          "Pierścień",
+          "Mordor"
+        ]
+      },
+      {
+        "word": "Saruman",
+        "hints": [
+          "Biały czarodziej",
+          "Wieża",
+          "Zdrajca"
+        ]
+      },
+      {
+        "word": "Kapitan Hak",
+        "hints": [
+          "Hak",
+          "Krokodyl",
+          "Pirat"
+        ]
+      },
+      {
+        "word": "Cruella de Mon",
+        "hints": [
+          "Dalmatyńczyki",
+          "Futro",
+          "Czarno-białe włosy"
+        ]
+      },
+      {
+        "word": "Skaza",
+        "hints": [
+          "Lew",
+          "Blizna",
+          "Brat"
+        ]
+      },
+      {
+        "word": "Diabolina",
+        "hints": [
+          "Rogi",
+          "Klątwa",
+          "Wrzeciono"
+        ]
+      },
+      {
+        "word": "Urszula",
+        "hints": [
+          "Ośmiornica",
+          "Głos",
+          "Morze"
+        ]
+      },
+      {
+        "word": "Dżafar",
+        "hints": [
+          "Lampa",
+          "Wezyr",
+          "Papuga"
+        ]
+      },
+      {
+        "word": "Królowa Śniegu",
+        "hints": [
+          "Lód",
+          "Zima",
+          "Lustro"
+        ]
+      },
+      {
+        "word": "Zła Królowa",
+        "hints": [
+          "Lustro",
+          "Jabłko",
+          "Zazdrość"
+        ]
+      },
+      {
+        "word": "Hades",
+        "hints": [
+          "Niebieskie włosy",
+          "Podziemie",
+          "Ogień"
+        ]
+      },
+      {
+        "word": "Herkules",
+        "hints": [
+          "Siła",
+          "Grecja",
+          "Pegaz"
+        ]
+      },
+      {
+        "word": "Zorro",
+        "hints": [
+          "Maska",
+          "Szpada",
+          "Litera Z"
+        ]
+      },
+      {
+        "word": "Robin Hood",
+        "hints": [
+          "Łuk",
+          "Bogaci",
+          "Las"
+        ]
+      },
+      {
+        "word": "Tarzan",
+        "hints": [
+          "Dżungla",
+          "Liana",
+          "Małpy"
+        ]
+      },
+      {
+        "word": "Power Rangers",
+        "hints": [
+          "Kolorowe stroje",
+          "Drużyna",
+          "Kaski"
+        ]
+      },
+      {
+        "word": "Wojownicze Żółwie Ninja",
+        "hints": [
+          "Pizza",
+          "Kanały",
+          "Maski"
+        ]
+      },
+      {
+        "word": "Czarodziejka z Księżyca",
+        "hints": [
+          "Księżyc",
+          "Mundurek",
+          "Przemiana"
+        ]
+      },
+      {
+        "word": "Son Goku",
+        "hints": [
+          "Smocze kule",
+          "Trening",
+          "Sterczące włosy"
+        ]
+      },
+      {
+        "word": "Kapitan Planeta",
+        "hints": [
+          "Ekologia",
+          "Pierścienie",
+          "Zielone włosy"
+        ]
+      },
+      {
+        "word": "Inspektor Gadżet",
+        "hints": [
+          "Wysuwane ręce",
+          "Kapelusz",
+          "Niezdarny"
+        ]
+      },
+      {
+        "word": "Godzilla",
+        "hints": [
+          "Potwór",
+          "Japonia",
+          "Ryk"
+        ]
+      },
+      {
+        "word": "King Kong",
+        "hints": [
+          "Małpa",
+          "Wieżowiec",
+          "Wyspa"
+        ]
+      },
+      {
+        "word": "Terminator",
+        "hints": [
+          "Robot",
+          "Przyszłość",
+          "Okulary"
+        ]
+      },
+      {
+        "word": "Predator",
+        "hints": [
+          "Kosmita",
+          "Polowanie",
+          "Maskowanie"
+        ]
+      },
+      {
+        "word": "Obcy",
+        "hints": [
+          "Kosmita",
+          "Statek",
+          "Kwas"
+        ]
+      },
+      {
+        "word": "Freddy Krueger",
+        "hints": [
+          "Sny",
+          "Pazury",
+          "Sweter"
+        ]
+      },
+      {
+        "word": "Klaun Pennywise",
+        "hints": [
+          "Balon",
+          "Kanały",
+          "Strach"
+        ]
+      },
+      {
+        "word": "Batgirl",
+        "hints": [
+          "Nietoperz",
+          "Rude włosy",
+          "Gotham"
+        ]
+      },
+      {
+        "word": "Sandman",
+        "hints": [
+          "Piasek",
+          "Złoczyńca",
+          "Burza"
+        ]
+      },
+      {
+        "word": "Mysterio",
+        "hints": [
+          "Iluzje",
+          "Szklana kula",
+          "Złoczyńca"
+        ]
+      }
+    ]
+  },
+  "Jedzenie": {
+    "item": "cat:food",
+    "words": [
+      {
+        "word": "Pizza",
+        "hints": [
+          "Włochy",
+          "Ser",
+          "Trójkąty"
+        ]
+      },
+      {
+        "word": "Hamburger",
+        "hints": [
+          "Bułka",
+          "Kotlet",
+          "Fast food"
+        ]
+      },
+      {
+        "word": "Hot dog",
+        "hints": [
+          "Parówka",
+          "Bułka",
+          "Musztarda"
+        ]
+      },
+      {
+        "word": "Kebab",
+        "hints": [
+          "Mięso",
+          "Sos",
+          "Budka"
+        ]
+      },
+      {
+        "word": "Sushi",
+        "hints": [
+          "Ryż",
+          "Ryba",
+          "Pałeczki"
+        ]
+      },
+      {
+        "word": "Pierogi",
+        "hints": [
+          "Ciasto",
+          "Farsz",
+          "Ruskie"
+        ]
+      },
+      {
+        "word": "Schabowy",
+        "hints": [
+          "Panierka",
+          "Ziemniaki",
+          "Niedziela"
+        ]
+      },
+      {
+        "word": "Bigos",
+        "hints": [
+          "Kapusta",
+          "Kiełbasa",
+          "Garnek"
+        ]
+      },
+      {
+        "word": "Żurek",
+        "hints": [
+          "Jajko",
+          "Kwaśny",
+          "Wielkanoc"
+        ]
+      },
+      {
+        "word": "Rosół",
+        "hints": [
+          "Makaron",
+          "Niedziela",
+          "Kura"
+        ]
+      },
+      {
+        "word": "Barszcz czerwony",
+        "hints": [
+          "Buraki",
+          "Wigilia",
+          "Uszka"
+        ]
+      },
+      {
+        "word": "Gołąbki",
+        "hints": [
+          "Kapusta",
+          "Ryż",
+          "Sos pomidorowy"
+        ]
+      },
+      {
+        "word": "Placki ziemniaczane",
+        "hints": [
+          "Tarka",
+          "Śmietana",
+          "Patelnia"
+        ]
+      },
+      {
+        "word": "Naleśniki",
+        "hints": [
+          "Patelnia",
+          "Dżem",
+          "Zwijane"
+        ]
+      },
+      {
+        "word": "Kotlet mielony",
+        "hints": [
+          "Mięso",
+          "Bułka tarta",
+          "Obiad"
+        ]
+      },
+      {
+        "word": "Kopytka",
+        "hints": [
+          "Ziemniaki",
+          "Sos",
+          "Kształt"
+        ]
+      },
+      {
+        "word": "Zapiekanka",
+        "hints": [
+          "Bagietka",
+          "Pieczarki",
+          "Keczup"
+        ]
+      },
+      {
+        "word": "Frytki",
+        "hints": [
+          "Ziemniaki",
+          "Olej",
+          "Paski"
+        ]
+      },
+      {
+        "word": "Spaghetti",
+        "hints": [
+          "Makaron",
+          "Sos",
+          "Włochy"
+        ]
+      },
+      {
+        "word": "Lasagne",
+        "hints": [
+          "Warstwy",
+          "Beszamel",
+          "Piekarnik"
+        ]
+      },
+      {
+        "word": "Risotto",
+        "hints": [
+          "Ryż",
+          "Kremowe",
+          "Włochy"
+        ]
+      },
+      {
+        "word": "Tacos",
+        "hints": [
+          "Meksyk",
+          "Tortilla",
+          "Ostre"
+        ]
+      },
+      {
+        "word": "Burrito",
+        "hints": [
+          "Zawijane",
+          "Fasola",
+          "Meksyk"
+        ]
+      },
+      {
+        "word": "Ramen",
+        "hints": [
+          "Bulion",
+          "Makaron",
+          "Japonia"
+        ]
+      },
+      {
+        "word": "Curry",
+        "hints": [
+          "Przyprawy",
+          "Indie",
+          "Ryż"
+        ]
+      },
+      {
+        "word": "Paella",
+        "hints": [
+          "Hiszpania",
+          "Owoce morza",
+          "Patelnia"
+        ]
+      },
+      {
+        "word": "Croissant",
+        "hints": [
+          "Francja",
+          "Rogal",
+          "Masło"
+        ]
+      },
+      {
+        "word": "Bagietka",
+        "hints": [
+          "Francja",
+          "Chleb",
+          "Długa"
+        ]
+      },
+      {
+        "word": "Precel",
+        "hints": [
+          "Niemcy",
+          "Sól",
+          "Supeł"
+        ]
+      },
+      {
+        "word": "Gofr",
+        "hints": [
+          "Kratka",
+          "Bita śmietana",
+          "Nad morzem"
+        ]
+      },
+      {
+        "word": "Pączek",
+        "hints": [
+          "Tłusty czwartek",
+          "Lukier",
+          "Nadzienie"
+        ]
+      },
+      {
+        "word": "Sernik",
+        "hints": [
+          "Twaróg",
+          "Ciasto",
+          "Kremowy"
+        ]
+      },
+      {
+        "word": "Szarlotka",
+        "hints": [
+          "Jabłka",
+          "Kruszonka",
+          "Cynamon"
+        ]
+      },
+      {
+        "word": "Makowiec",
+        "hints": [
+          "Mak",
+          "Święta",
+          "Zwijany"
+        ]
+      },
+      {
+        "word": "Tiramisu",
+        "hints": [
+          "Kawa",
+          "Mascarpone",
+          "Włochy"
+        ]
+      },
+      {
+        "word": "Brownie",
+        "hints": [
+          "Czekolada",
+          "Kwadrat",
+          "Wilgotne"
+        ]
+      },
+      {
+        "word": "Muffinka",
+        "hints": [
+          "Foremka",
+          "Jagody",
+          "Mała"
+        ]
+      },
+      {
+        "word": "Tort",
+        "hints": [
+          "Urodziny",
+          "Świeczki",
+          "Warstwy"
+        ]
+      },
+      {
+        "word": "Lody",
+        "hints": [
+          "Gałka",
+          "Wafel",
+          "Lato"
+        ]
+      },
+      {
+        "word": "Czekolada",
+        "hints": [
+          "Kakao",
+          "Tabliczka",
+          "Słodka"
+        ]
+      },
+      {
+        "word": "Popcorn",
+        "hints": [
+          "Kino",
+          "Kukurydza",
+          "Prażony"
+        ]
+      },
+      {
+        "word": "Jajecznica",
+        "hints": [
+          "Jajka",
+          "Patelnia",
+          "Śniadanie"
+        ]
+      },
+      {
+        "word": "Owsianka",
+        "hints": [
+          "Płatki",
+          "Mleko",
+          "Śniadanie"
+        ]
+      },
+      {
+        "word": "Kanapka",
+        "hints": [
+          "Chleb",
+          "Masło",
+          "Drugie śniadanie"
+        ]
+      },
+      {
+        "word": "Tost",
+        "hints": [
+          "Opiekacz",
+          "Ser",
+          "Szynka"
+        ]
+      },
+      {
+        "word": "Omlet",
+        "hints": [
+          "Jajka",
+          "Puszysty",
+          "Patelnia"
+        ]
+      },
+      {
+        "word": "Kiełbasa",
+        "hints": [
+          "Grill",
+          "Mięso",
+          "Ognisko"
+        ]
+      },
+      {
+        "word": "Parówki",
+        "hints": [
+          "Śniadanie",
+          "Musztarda",
+          "Gotowane"
+        ]
+      },
+      {
+        "word": "Kaszanka",
+        "hints": [
+          "Kasza",
+          "Grill",
+          "Ciemna"
+        ]
+      },
+      {
+        "word": "Smalec",
+        "hints": [
+          "Tłuszcz",
+          "Skwarki",
+          "Chleb"
+        ]
+      },
+      {
+        "word": "Oscypek",
+        "hints": [
+          "Góry",
+          "Wędzony",
+          "Żurawina"
+        ]
+      },
+      {
+        "word": "Twaróg",
+        "hints": [
+          "Biały ser",
+          "Szczypiorek",
+          "Kostka"
+        ]
+      },
+      {
+        "word": "Ser żółty",
+        "hints": [
+          "Plasterki",
+          "Dziury",
+          "Krowa"
+        ]
+      },
+      {
+        "word": "Masło",
+        "hints": [
+          "Kostka",
+          "Smarowanie",
+          "Mleko"
+        ]
+      },
+      {
+        "word": "Jogurt",
+        "hints": [
+          "Kubeczek",
+          "Owoce",
+          "Kremowy"
+        ]
+      },
+      {
+        "word": "Mleko",
+        "hints": [
+          "Krowa",
+          "Karton",
+          "Białe"
+        ]
+      },
+      {
+        "word": "Kawa",
+        "hints": [
+          "Kofeina",
+          "Ziarna",
+          "Poranek"
+        ]
+      },
+      {
+        "word": "Herbata",
+        "hints": [
+          "Torebka",
+          "Cytryna",
+          "Wrzątek"
+        ]
+      },
+      {
+        "word": "Lemoniada",
+        "hints": [
+          "Cytryny",
+          "Lato",
+          "Dzbanek"
+        ]
+      },
+      {
+        "word": "Kompot",
+        "hints": [
+          "Owoce",
+          "Babcia",
+          "Obiad"
+        ]
+      },
+      {
+        "word": "Kakao",
+        "hints": [
+          "Mleko",
+          "Czekolada",
+          "Kubek"
+        ]
+      },
+      {
+        "word": "Jabłko",
+        "hints": [
+          "Owoc",
+          "Sad",
+          "Ogryzek"
+        ]
+      },
+      {
+        "word": "Banan",
+        "hints": [
+          "Żółty",
+          "Skórka",
+          "Małpa"
+        ]
+      },
+      {
+        "word": "Truskawki",
+        "hints": [
+          "Czerwone",
+          "Lato",
+          "Śmietana"
+        ]
+      },
+      {
+        "word": "Arbuz",
+        "hints": [
+          "Pestki",
+          "Zielony",
+          "Lato"
+        ]
+      },
+      {
+        "word": "Ananas",
+        "hints": [
+          "Kolce",
+          "Tropiki",
+          "Hawajska"
+        ]
+      },
+      {
+        "word": "Pomarańcza",
+        "hints": [
+          "Cytrus",
+          "Sok",
+          "Witamina C"
+        ]
+      },
+      {
+        "word": "Cytryna",
+        "hints": [
+          "Kwaśna",
+          "Żółta",
+          "Herbata"
+        ]
+      },
+      {
+        "word": "Winogrona",
+        "hints": [
+          "Kiść",
+          "Wino",
+          "Pestki"
+        ]
+      },
+      {
+        "word": "Wiśnie",
+        "hints": [
+          "Pestki",
+          "Drzewo",
+          "Czerwone"
+        ]
+      },
+      {
+        "word": "Gruszka",
+        "hints": [
+          "Owoc",
+          "Kształt",
+          "Sad"
+        ]
+      },
+      {
+        "word": "Śliwki",
+        "hints": [
+          "Powidła",
+          "Fioletowe",
+          "Pestka"
+        ]
+      },
+      {
+        "word": "Kokos",
+        "hints": [
+          "Palma",
+          "Włochaty",
+          "Mleczko"
+        ]
+      },
+      {
+        "word": "Awokado",
+        "hints": [
+          "Pestka",
+          "Guacamole",
+          "Zielone"
+        ]
+      },
+      {
+        "word": "Mango",
+        "hints": [
+          "Tropiki",
+          "Słodkie",
+          "Pestka"
+        ]
+      },
+      {
+        "word": "Kiwi",
+        "hints": [
+          "Włochate",
+          "Zielone",
+          "Nowa Zelandia"
+        ]
+      },
+      {
+        "word": "Marchewka",
+        "hints": [
+          "Pomarańczowa",
+          "Królik",
+          "Chrupiąca"
+        ]
+      },
+      {
+        "word": "Ziemniak",
+        "hints": [
+          "Bulwa",
+          "Pole",
+          "Obierki"
+        ]
+      },
+      {
+        "word": "Pomidor",
+        "hints": [
+          "Czerwony",
+          "Sałatka",
+          "Krzak"
+        ]
+      },
+      {
+        "word": "Ogórek",
+        "hints": [
+          "Zielony",
+          "Kiszony",
+          "Mizeria"
+        ]
+      },
+      {
+        "word": "Cebula",
+        "hints": [
+          "Łzy",
+          "Warstwy",
+          "Smażenie"
+        ]
+      },
+      {
+        "word": "Czosnek",
+        "hints": [
+          "Ząbki",
+          "Wampiry",
+          "Zapach"
+        ]
+      },
+      {
+        "word": "Brokuł",
+        "hints": [
+          "Zielony",
+          "Drzewko",
+          "Zdrowy"
+        ]
+      },
+      {
+        "word": "Kukurydza",
+        "hints": [
+          "Kolba",
+          "Żółta",
+          "Pole"
+        ]
+      },
+      {
+        "word": "Papryka",
+        "hints": [
+          "Czerwona",
+          "Chrupiąca",
+          "Faszerowana"
+        ]
+      },
+      {
+        "word": "Grzyby",
+        "hints": [
+          "Las",
+          "Koszyk",
+          "Sos"
+        ]
+      },
+      {
+        "word": "Fasolka po bretońsku",
+        "hints": [
+          "Fasola",
+          "Sos pomidorowy",
+          "Kiełbasa"
+        ]
+      },
+      {
+        "word": "Sałatka jarzynowa",
+        "hints": [
+          "Majonez",
+          "Święta",
+          "Kostka"
+        ]
+      },
+      {
+        "word": "Mizeria",
+        "hints": [
+          "Ogórek",
+          "Śmietana",
+          "Lato"
+        ]
+      },
+      {
+        "word": "Śledź",
+        "hints": [
+          "Ryba",
+          "Wigilia",
+          "Cebula"
+        ]
+      },
+      {
+        "word": "Karp",
+        "hints": [
+          "Wanna",
+          "Wigilia",
+          "Łuski"
+        ]
+      },
+      {
+        "word": "Krewetki",
+        "hints": [
+          "Owoce morza",
+          "Różowe",
+          "Ogonki"
+        ]
+      },
+      {
+        "word": "Kurczak",
+        "hints": [
+          "Udko",
+          "Pieczony",
+          "Skrzydełka"
+        ]
+      },
+      {
+        "word": "Stek",
+        "hints": [
+          "Wołowina",
+          "Krwisty",
+          "Grill"
+        ]
+      },
+      {
+        "word": "Ryż",
+        "hints": [
+          "Ziarna",
+          "Azja",
+          "Biały"
+        ]
+      },
+      {
+        "word": "Chleb",
+        "hints": [
+          "Bochenek",
+          "Piekarnia",
+          "Kromka"
+        ]
+      },
+      {
+        "word": "Miód",
+        "hints": [
+          "Pszczoły",
+          "Słoik",
+          "Słodki"
+        ]
+      },
+      {
+        "word": "Ketchup",
+        "hints": [
+          "Pomidory",
+          "Butelka",
+          "Frytki"
+        ]
+      },
+      {
+        "word": "Majonez",
+        "hints": [
+          "Słoik",
+          "Jajka",
+          "Sałatki"
+        ]
+      },
+      {
+        "word": "Żelki",
+        "hints": [
+          "Misie",
+          "Gumowe",
+          "Kolorowe"
+        ]
+      }
+    ]
+  },
+  "Historia": {
+    "item": "cat:history",
+    "words": [
+      {
+        "word": "Piramidy",
+        "hints": [
+          "Egipt",
+          "Faraon",
+          "Grobowiec"
+        ]
+      },
+      {
+        "word": "Mumia",
+        "hints": [
+          "Bandaże",
+          "Egipt",
+          "Sarkofag"
+        ]
+      },
+      {
+        "word": "Faraon",
+        "hints": [
+          "Egipt",
+          "Władca",
+          "Złota maska"
+        ]
+      },
+      {
+        "word": "Sfinks",
+        "hints": [
+          "Lew",
+          "Egipt",
+          "Zagadka"
+        ]
+      },
+      {
+        "word": "Hieroglify",
+        "hints": [
+          "Pismo",
+          "Obrazki",
+          "Egipt"
+        ]
+      },
+      {
+        "word": "Koloseum",
+        "hints": [
+          "Rzym",
+          "Gladiatorzy",
+          "Arena"
+        ]
+      },
+      {
+        "word": "Gladiator",
+        "hints": [
+          "Arena",
+          "Walka",
+          "Rzym"
+        ]
+      },
+      {
+        "word": "Legionista",
+        "hints": [
+          "Rzym",
+          "Tarcza",
+          "Wojsko"
+        ]
+      },
+      {
+        "word": "Akwedukt",
+        "hints": [
+          "Woda",
+          "Rzym",
+          "Łuki"
+        ]
+      },
+      {
+        "word": "Igrzyska olimpijskie",
+        "hints": [
+          "Grecja",
+          "Znicz",
+          "Medale"
+        ]
+      },
+      {
+        "word": "Partenon",
+        "hints": [
+          "Ateny",
+          "Kolumny",
+          "Świątynia"
+        ]
+      },
+      {
+        "word": "Koń trojański",
+        "hints": [
+          "Podstęp",
+          "Drewno",
+          "Troja"
+        ]
+      },
+      {
+        "word": "Spartanie",
+        "hints": [
+          "Wojownicy",
+          "Grecja",
+          "Termopile"
+        ]
+      },
+      {
+        "word": "Wikingowie",
+        "hints": [
+          "Łodzie",
+          "Hełmy",
+          "Skandynawia"
+        ]
+      },
+      {
+        "word": "Rycerz",
+        "hints": [
+          "Zbroja",
+          "Miecz",
+          "Koń"
+        ]
+      },
+      {
+        "word": "Zamek średniowieczny",
+        "hints": [
+          "Mury",
+          "Fosa",
+          "Wieże"
+        ]
+      },
+      {
+        "word": "Turniej rycerski",
+        "hints": [
+          "Kopia",
+          "Konie",
+          "Herb"
+        ]
+      },
+      {
+        "word": "Krzyżacy",
+        "hints": [
+          "Zakon",
+          "Malbork",
+          "Czarny krzyż"
+        ]
+      },
+      {
+        "word": "Bitwa pod Grunwaldem",
+        "hints": [
+          "1410",
+          "Jagiełło",
+          "Dwa miecze"
+        ]
+      },
+      {
+        "word": "Wyprawy krzyżowe",
+        "hints": [
+          "Jerozolima",
+          "Rycerze",
+          "Krzyż"
+        ]
+      },
+      {
+        "word": "Inkwizycja",
+        "hints": [
+          "Kościół",
+          "Sąd",
+          "Heretycy"
+        ]
+      },
+      {
+        "word": "Czarna śmierć",
+        "hints": [
+          "Zaraza",
+          "Średniowiecze",
+          "Szczury"
+        ]
+      },
+      {
+        "word": "Samuraj",
+        "hints": [
+          "Japonia",
+          "Katana",
+          "Honor"
+        ]
+      },
+      {
+        "word": "Ninja",
+        "hints": [
+          "Japonia",
+          "Cień",
+          "Skrytobójca"
+        ]
+      },
+      {
+        "word": "Wielki Mur Chiński",
+        "hints": [
+          "Chiny",
+          "Długi",
+          "Obrona"
+        ]
+      },
+      {
+        "word": "Terakotowa armia",
+        "hints": [
+          "Chiny",
+          "Żołnierze",
+          "Glina"
+        ]
+      },
+      {
+        "word": "Jedwabny szlak",
+        "hints": [
+          "Handel",
+          "Chiny",
+          "Karawany"
+        ]
+      },
+      {
+        "word": "Aztekowie",
+        "hints": [
+          "Meksyk",
+          "Piramidy",
+          "Złoto"
+        ]
+      },
+      {
+        "word": "Majowie",
+        "hints": [
+          "Kalendarz",
+          "Dżungla",
+          "Piramidy"
+        ]
+      },
+      {
+        "word": "Inkowie",
+        "hints": [
+          "Peru",
+          "Góry",
+          "Machu Picchu"
+        ]
+      },
+      {
+        "word": "Odkrycie Ameryki",
+        "hints": [
+          "1492",
+          "Statki",
+          "Nowy Ląd"
+        ]
+      },
+      {
+        "word": "Piraci",
+        "hints": [
+          "Statek",
+          "Skarb",
+          "Opaska"
+        ]
+      },
+      {
+        "word": "Konkwistadorzy",
+        "hints": [
+          "Hiszpania",
+          "Złoto",
+          "Podbój"
+        ]
+      },
+      {
+        "word": "Renesans",
+        "hints": [
+          "Sztuka",
+          "Włochy",
+          "Odrodzenie"
+        ]
+      },
+      {
+        "word": "Prasa drukarska",
+        "hints": [
+          "Książki",
+          "Czcionki",
+          "Gutenberg"
+        ]
+      },
+      {
+        "word": "Kompas",
+        "hints": [
+          "Północ",
+          "Igła",
+          "Żegluga"
+        ]
+      },
+      {
+        "word": "Proch strzelniczy",
+        "hints": [
+          "Chiny",
+          "Wybuch",
+          "Armaty"
+        ]
+      },
+      {
+        "word": "Armata",
+        "hints": [
+          "Kula",
+          "Wystrzał",
+          "Twierdza"
+        ]
+      },
+      {
+        "word": "Muszkieterowie",
+        "hints": [
+          "Szpada",
+          "Francja",
+          "Kapelusz"
+        ]
+      },
+      {
+        "word": "Rewolucja francuska",
+        "hints": [
+          "Bastylia",
+          "Wolność",
+          "Lud"
+        ]
+      },
+      {
+        "word": "Gilotyna",
+        "hints": [
+          "Ostrze",
+          "Egzekucja",
+          "Francja"
+        ]
+      },
+      {
+        "word": "Konstytucja 3 maja",
+        "hints": [
+          "1791",
+          "Ustawa",
+          "Święto"
+        ]
+      },
+      {
+        "word": "Rozbiory Polski",
+        "hints": [
+          "Zaborcy",
+          "1795",
+          "Mapa"
+        ]
+      },
+      {
+        "word": "Powstanie styczniowe",
+        "hints": [
+          "1863",
+          "Zabory",
+          "Partyzanci"
+        ]
+      },
+      {
+        "word": "Husaria",
+        "hints": [
+          "Skrzydła",
+          "Kawaleria",
+          "Wiedeń"
+        ]
+      },
+      {
+        "word": "Odsiecz wiedeńska",
+        "hints": [
+          "1683",
+          "Sobieski",
+          "Turcy"
+        ]
+      },
+      {
+        "word": "Unia lubelska",
+        "hints": [
+          "Litwa",
+          "1569",
+          "Rzeczpospolita"
+        ]
+      },
+      {
+        "word": "Chrzest Polski",
+        "hints": [
+          "966",
+          "Mieszko",
+          "Kościół"
+        ]
+      },
+      {
+        "word": "Rewolucja przemysłowa",
+        "hints": [
+          "Fabryki",
+          "Para",
+          "Anglia"
+        ]
+      },
+      {
+        "word": "Maszyna parowa",
+        "hints": [
+          "Para",
+          "Węgiel",
+          "Tłok"
+        ]
+      },
+      {
+        "word": "Lokomotywa",
+        "hints": [
+          "Pociąg",
+          "Dym",
+          "Tory"
+        ]
+      },
+      {
+        "word": "Telegraf",
+        "hints": [
+          "Morse",
+          "Kropki",
+          "Wiadomość"
+        ]
+      },
+      {
+        "word": "Dziki Zachód",
+        "hints": [
+          "Kowboje",
+          "Saloon",
+          "Rewolwer"
+        ]
+      },
+      {
+        "word": "Gorączka złota",
+        "hints": [
+          "Kopacze",
+          "Kalifornia",
+          "Złoto"
+        ]
+      },
+      {
+        "word": "Titanic",
+        "hints": [
+          "Góra lodowa",
+          "Statek",
+          "1912"
+        ]
+      },
+      {
+        "word": "I wojna światowa",
+        "hints": [
+          "Okopy",
+          "1914",
+          "Gaz"
+        ]
+      },
+      {
+        "word": "II wojna światowa",
+        "hints": [
+          "1939",
+          "Front",
+          "Alianci"
+        ]
+      },
+      {
+        "word": "Powstanie warszawskie",
+        "hints": [
+          "1944",
+          "Kotwica",
+          "Barykady"
+        ]
+      },
+      {
+        "word": "Enigma",
+        "hints": [
+          "Szyfr",
+          "Kryptolodzy",
+          "Maszyna"
+        ]
+      },
+      {
+        "word": "Lądowanie w Normandii",
+        "hints": [
+          "D-Day",
+          "Plaże",
+          "1944"
+        ]
+      },
+      {
+        "word": "Bomba atomowa",
+        "hints": [
+          "Hiroszima",
+          "Grzyb",
+          "Atom"
+        ]
+      },
+      {
+        "word": "Zimna wojna",
+        "hints": [
+          "USA",
+          "ZSRR",
+          "Wyścig zbrojeń"
+        ]
+      },
+      {
+        "word": "Mur berliński",
+        "hints": [
+          "Niemcy",
+          "Podział",
+          "1989"
+        ]
+      },
+      {
+        "word": "Lądowanie na Księżycu",
+        "hints": [
+          "1969",
+          "Astronauta",
+          "Apollo"
+        ]
+      },
+      {
+        "word": "Sputnik",
+        "hints": [
+          "Satelita",
+          "ZSRR",
+          "Orbita"
+        ]
+      },
+      {
+        "word": "Solidarność",
+        "hints": [
+          "Stocznia",
+          "Strajk",
+          "1980"
+        ]
+      },
+      {
+        "word": "Okrągły Stół",
+        "hints": [
+          "1989",
+          "Rozmowy",
+          "Opozycja"
+        ]
+      },
+      {
+        "word": "Stan wojenny",
+        "hints": [
+          "1981",
+          "Czołgi",
+          "Godzina milicyjna"
+        ]
+      },
+      {
+        "word": "PRL",
+        "hints": [
+          "Kolejki",
+          "Komunizm",
+          "Syrenka"
+        ]
+      },
+      {
+        "word": "Kartki na żywność",
+        "hints": [
+          "PRL",
+          "Kolejki",
+          "Przydział"
+        ]
+      },
+      {
+        "word": "Średniowiecze",
+        "hints": [
+          "Rycerze",
+          "Zamki",
+          "Wieki ciemne"
+        ]
+      },
+      {
+        "word": "Epoka kamienia",
+        "hints": [
+          "Jaskinia",
+          "Krzemień",
+          "Polowanie"
+        ]
+      },
+      {
+        "word": "Neandertalczyk",
+        "hints": [
+          "Prehistoria",
+          "Jaskinia",
+          "Maczuga"
+        ]
+      },
+      {
+        "word": "Malowidła naskalne",
+        "hints": [
+          "Jaskinia",
+          "Zwierzęta",
+          "Ochra"
+        ]
+      },
+      {
+        "word": "Stonehenge",
+        "hints": [
+          "Kamienie",
+          "Anglia",
+          "Krąg"
+        ]
+      },
+      {
+        "word": "Pompeje",
+        "hints": [
+          "Wulkan",
+          "Popiół",
+          "Rzym"
+        ]
+      },
+      {
+        "word": "Atlantyda",
+        "hints": [
+          "Mit",
+          "Zatopiona",
+          "Wyspa"
+        ]
+      },
+      {
+        "word": "Biblioteka Aleksandryjska",
+        "hints": [
+          "Zwoje",
+          "Pożar",
+          "Egipt"
+        ]
+      },
+      {
+        "word": "Rycerze Okrągłego Stołu",
+        "hints": [
+          "Artur",
+          "Camelot",
+          "Graal"
+        ]
+      },
+      {
+        "word": "Excalibur",
+        "hints": [
+          "Miecz",
+          "Kamień",
+          "Artur"
+        ]
+      },
+      {
+        "word": "Święty Graal",
+        "hints": [
+          "Kielich",
+          "Poszukiwanie",
+          "Legenda"
+        ]
+      },
+      {
+        "word": "Templariusze",
+        "hints": [
+          "Zakon",
+          "Krzyż",
+          "Skarb"
+        ]
+      },
+      {
+        "word": "Katapulta",
+        "hints": [
+          "Oblężenie",
+          "Kamienie",
+          "Rzut"
+        ]
+      },
+      {
+        "word": "Taran",
+        "hints": [
+          "Brama",
+          "Oblężenie",
+          "Belka"
+        ]
+      },
+      {
+        "word": "Feudalizm",
+        "hints": [
+          "Pan",
+          "Chłopi",
+          "Ziemia"
+        ]
+      },
+      {
+        "word": "Pańszczyzna",
+        "hints": [
+          "Chłopi",
+          "Praca",
+          "Dwór"
+        ]
+      },
+      {
+        "word": "Kodeks Hammurabiego",
+        "hints": [
+          "Prawo",
+          "Babilon",
+          "Oko za oko"
+        ]
+      },
+      {
+        "word": "Wiszące ogrody Babilonu",
+        "hints": [
+          "Cud świata",
+          "Rośliny",
+          "Tarasy"
+        ]
+      },
+      {
+        "word": "Kolos Rodyjski",
+        "hints": [
+          "Posąg",
+          "Port",
+          "Cud świata"
+        ]
+      },
+      {
+        "word": "Imperium rzymskie",
+        "hints": [
+          "Cesarz",
+          "Legiony",
+          "Toga"
+        ]
+      },
+      {
+        "word": "Rydwan",
+        "hints": [
+          "Konie",
+          "Wyścig",
+          "Koła"
+        ]
+      },
+      {
+        "word": "Odzyskanie niepodległości",
+        "hints": [
+          "11 listopada",
+          "1918",
+          "Wolność"
+        ]
+      },
+      {
+        "word": "Bitwa Warszawska",
+        "hints": [
+          "1920",
+          "Cud nad Wisłą",
+          "Bolszewicy"
+        ]
+      },
+      {
+        "word": "Westerplatte",
+        "hints": [
+          "1939",
+          "Gdańsk",
+          "Obrona"
+        ]
+      },
+      {
+        "word": "Wielki Kryzys",
+        "hints": [
+          "1929",
+          "Giełda",
+          "Bezrobocie"
+        ]
+      },
+      {
+        "word": "Prohibicja",
+        "hints": [
+          "Alkohol",
+          "Zakaz",
+          "Gangsterzy"
+        ]
+      },
+      {
+        "word": "Hipisi",
+        "hints": [
+          "Pokój",
+          "Kwiaty",
+          "Lata 60."
+        ]
+      },
+      {
+        "word": "Woodstock",
+        "hints": [
+          "Festiwal",
+          "Błoto",
+          "1969"
+        ]
+      },
+      {
+        "word": "Bastylia",
+        "hints": [
+          "Więzienie",
+          "Paryż",
+          "Szturm"
+        ]
+      },
+      {
+        "word": "Pergamin",
+        "hints": [
+          "Skóra",
+          "Pisanie",
+          "Zwój"
+        ]
+      }
+    ]
+  },
+  "Zwierzęta": {
+    "item": "cat:animals",
+    "words": [
+      {
+        "word": "Pies",
+        "hints": [
+          "Szczeka",
+          "Smycz",
+          "Buda"
+        ]
+      },
+      {
+        "word": "Kot",
+        "hints": [
+          "Mruczy",
+          "Myszy",
+          "Kuweta"
+        ]
+      },
+      {
+        "word": "Chomik",
+        "hints": [
+          "Kołowrotek",
+          "Policzki",
+          "Klatka"
+        ]
+      },
+      {
+        "word": "Królik",
+        "hints": [
+          "Uszy",
+          "Marchewka",
+          "Skacze"
+        ]
+      },
+      {
+        "word": "Świnka morska",
+        "hints": [
+          "Piszczy",
+          "Klatka",
+          "Gryzoń"
+        ]
+      },
+      {
+        "word": "Papuga",
+        "hints": [
+          "Kolorowa",
+          "Mówi",
+          "Pióra"
+        ]
+      },
+      {
+        "word": "Złota rybka",
+        "hints": [
+          "Akwarium",
+          "Życzenia",
+          "Pomarańczowa"
+        ]
+      },
+      {
+        "word": "Żółw",
+        "hints": [
+          "Skorupa",
+          "Powolny",
+          "Długowieczny"
+        ]
+      },
+      {
+        "word": "Koń",
+        "hints": [
+          "Grzywa",
+          "Siodło",
+          "Galop"
+        ]
+      },
+      {
+        "word": "Krowa",
+        "hints": [
+          "Mleko",
+          "Łaty",
+          "Muczy"
+        ]
+      },
+      {
+        "word": "Świnia",
+        "hints": [
+          "Błoto",
+          "Ryjek",
+          "Chrumka"
+        ]
+      },
+      {
+        "word": "Owca",
+        "hints": [
+          "Wełna",
+          "Stado",
+          "Beczy"
+        ]
+      },
+      {
+        "word": "Koza",
+        "hints": [
+          "Rogi",
+          "Bródka",
+          "Ser"
+        ]
+      },
+      {
+        "word": "Kura",
+        "hints": [
+          "Jajka",
+          "Grzebie",
+          "Kurnik"
+        ]
+      },
+      {
+        "word": "Kogut",
+        "hints": [
+          "Pieje",
+          "Grzebień",
+          "Poranek"
+        ]
+      },
+      {
+        "word": "Kaczka",
+        "hints": [
+          "Kwacze",
+          "Staw",
+          "Płaskie nogi"
+        ]
+      },
+      {
+        "word": "Gęś",
+        "hints": [
+          "Syczy",
+          "Pierze",
+          "Klucz"
+        ]
+      },
+      {
+        "word": "Indyk",
+        "hints": [
+          "Święto Dziękczynienia",
+          "Gulgocze",
+          "Ogon"
+        ]
+      },
+      {
+        "word": "Osioł",
+        "hints": [
+          "Uparty",
+          "Długie uszy",
+          "Ryczy"
+        ]
+      },
+      {
+        "word": "Lama",
+        "hints": [
+          "Pluje",
+          "Andy",
+          "Wełna"
+        ]
+      },
+      {
+        "word": "Lew",
+        "hints": [
+          "Grzywa",
+          "Król",
+          "Sawanna"
+        ]
+      },
+      {
+        "word": "Tygrys",
+        "hints": [
+          "Paski",
+          "Pomarańczowy",
+          "Azja"
+        ]
+      },
+      {
+        "word": "Gepard",
+        "hints": [
+          "Szybki",
+          "Cętki",
+          "Sprint"
+        ]
+      },
+      {
+        "word": "Pantera",
+        "hints": [
+          "Czarna",
+          "Skrada się",
+          "Dżungla"
+        ]
+      },
+      {
+        "word": "Słoń",
+        "hints": [
+          "Trąba",
+          "Kły",
+          "Wielki"
+        ]
+      },
+      {
+        "word": "Żyrafa",
+        "hints": [
+          "Szyja",
+          "Łaty",
+          "Wysoka"
+        ]
+      },
+      {
+        "word": "Zebra",
+        "hints": [
+          "Paski",
+          "Sawanna",
+          "Stado"
+        ]
+      },
+      {
+        "word": "Hipopotam",
+        "hints": [
+          "Rzeka",
+          "Wielki pysk",
+          "Ciężki"
+        ]
+      },
+      {
+        "word": "Nosorożec",
+        "hints": [
+          "Róg",
+          "Pancerz",
+          "Szarżuje"
+        ]
+      },
+      {
+        "word": "Krokodyl",
+        "hints": [
+          "Zęby",
+          "Rzeka",
+          "Łzy"
+        ]
+      },
+      {
+        "word": "Szympans",
+        "hints": [
+          "Banany",
+          "Inteligentny",
+          "Małpa"
+        ]
+      },
+      {
+        "word": "Goryl",
+        "hints": [
+          "Silny",
+          "Srebrny grzbiet",
+          "Bije się w pierś"
+        ]
+      },
+      {
+        "word": "Orangutan",
+        "hints": [
+          "Rudy",
+          "Długie ręce",
+          "Borneo"
+        ]
+      },
+      {
+        "word": "Lemur",
+        "hints": [
+          "Ogon w paski",
+          "Madagaskar",
+          "Wielkie oczy"
+        ]
+      },
+      {
+        "word": "Leniwiec",
+        "hints": [
+          "Powolny",
+          "Gałąź",
+          "Śpi"
+        ]
+      },
+      {
+        "word": "Kapibara",
+        "hints": [
+          "Spokojna",
+          "Gryzoń",
+          "Woda"
+        ]
+      },
+      {
+        "word": "Kangur",
+        "hints": [
+          "Skacze",
+          "Torba",
+          "Australia"
+        ]
+      },
+      {
+        "word": "Koala",
+        "hints": [
+          "Eukaliptus",
+          "Śpi",
+          "Australia"
+        ]
+      },
+      {
+        "word": "Dziobak",
+        "hints": [
+          "Dziób",
+          "Jaja",
+          "Australia"
+        ]
+      },
+      {
+        "word": "Panda",
+        "hints": [
+          "Bambus",
+          "Czarno-biała",
+          "Chiny"
+        ]
+      },
+      {
+        "word": "Niedźwiedź brunatny",
+        "hints": [
+          "Miód",
+          "Las",
+          "Sen zimowy"
+        ]
+      },
+      {
+        "word": "Niedźwiedź polarny",
+        "hints": [
+          "Biały",
+          "Lód",
+          "Arktyka"
+        ]
+      },
+      {
+        "word": "Pingwin",
+        "hints": [
+          "Lód",
+          "Fraki",
+          "Nie lata"
+        ]
+      },
+      {
+        "word": "Foka",
+        "hints": [
+          "Lód",
+          "Wąsy",
+          "Ryby"
+        ]
+      },
+      {
+        "word": "Mors",
+        "hints": [
+          "Kły",
+          "Wąsy",
+          "Arktyka"
+        ]
+      },
+      {
+        "word": "Delfin",
+        "hints": [
+          "Inteligentny",
+          "Skoki",
+          "Ocean"
+        ]
+      },
+      {
+        "word": "Wieloryb",
+        "hints": [
+          "Ogromny",
+          "Fontanna",
+          "Ocean"
+        ]
+      },
+      {
+        "word": "Rekin",
+        "hints": [
+          "Płetwa",
+          "Zęby",
+          "Ocean"
+        ]
+      },
+      {
+        "word": "Ośmiornica",
+        "hints": [
+          "Macki",
+          "Atrament",
+          "Osiem"
+        ]
+      },
+      {
+        "word": "Meduza",
+        "hints": [
+          "Galaretka",
+          "Parzy",
+          "Morze"
+        ]
+      },
+      {
+        "word": "Krab",
+        "hints": [
+          "Szczypce",
+          "Bokiem",
+          "Plaża"
+        ]
+      },
+      {
+        "word": "Rozgwiazda",
+        "hints": [
+          "Ramiona",
+          "Dno",
+          "Kształt"
+        ]
+      },
+      {
+        "word": "Konik morski",
+        "hints": [
+          "Ogon",
+          "Pyszczek",
+          "Tata nosi młode"
+        ]
+      },
+      {
+        "word": "Orzeł",
+        "hints": [
+          "Szpony",
+          "Godło",
+          "Wysoko"
+        ]
+      },
+      {
+        "word": "Sowa",
+        "hints": [
+          "Noc",
+          "Huka",
+          "Mądra"
+        ]
+      },
+      {
+        "word": "Bocian",
+        "hints": [
+          "Gniazdo",
+          "Dzieci",
+          "Czerwony dziób"
+        ]
+      },
+      {
+        "word": "Flaming",
+        "hints": [
+          "Różowy",
+          "Jedna noga",
+          "Jezioro"
+        ]
+      },
+      {
+        "word": "Paw",
+        "hints": [
+          "Ogon",
+          "Kolorowe pióra",
+          "Duma"
+        ]
+      },
+      {
+        "word": "Struś",
+        "hints": [
+          "Wielki",
+          "Szybko biega",
+          "Głowa w piasku"
+        ]
+      },
+      {
+        "word": "Kruk",
+        "hints": [
+          "Czarny",
+          "Mądry",
+          "Kracze"
+        ]
+      },
+      {
+        "word": "Wróbel",
+        "hints": [
+          "Mały",
+          "Ćwierka",
+          "Miasto"
+        ]
+      },
+      {
+        "word": "Jaskółka",
+        "hints": [
+          "Wiosna",
+          "Gniazdo",
+          "Szybka"
+        ]
+      },
+      {
+        "word": "Dzięcioł",
+        "hints": [
+          "Drzewo",
+          "Stuka",
+          "Czerwona czapka"
+        ]
+      },
+      {
+        "word": "Łabędź",
+        "hints": [
+          "Biały",
+          "Szyja",
+          "Jezioro"
+        ]
+      },
+      {
+        "word": "Pelikan",
+        "hints": [
+          "Dziób",
+          "Worek",
+          "Ryby"
+        ]
+      },
+      {
+        "word": "Koliber",
+        "hints": [
+          "Mały",
+          "Nektar",
+          "Szybkie skrzydła"
+        ]
+      },
+      {
+        "word": "Tukan",
+        "hints": [
+          "Wielki dziób",
+          "Kolorowy",
+          "Tropiki"
+        ]
+      },
+      {
+        "word": "Nietoperz",
+        "hints": [
+          "Noc",
+          "Jaskinia",
+          "Do góry nogami"
+        ]
+      },
+      {
+        "word": "Wilk",
+        "hints": [
+          "Wataha",
+          "Wyje",
+          "Księżyc"
+        ]
+      },
+      {
+        "word": "Lis",
+        "hints": [
+          "Rudy",
+          "Chytry",
+          "Kita"
+        ]
+      },
+      {
+        "word": "Jeleń",
+        "hints": [
+          "Poroże",
+          "Las",
+          "Rykowisko"
+        ]
+      },
+      {
+        "word": "Łoś",
+        "hints": [
+          "Łopaty",
+          "Bagna",
+          "Wielki"
+        ]
+      },
+      {
+        "word": "Żubr",
+        "hints": [
+          "Puszcza",
+          "Polska",
+          "Kudłaty"
+        ]
+      },
+      {
+        "word": "Dzik",
+        "hints": [
+          "Kły",
+          "Las",
+          "Ryje"
+        ]
+      },
+      {
+        "word": "Bóbr",
+        "hints": [
+          "Tama",
+          "Zęby",
+          "Ogon"
+        ]
+      },
+      {
+        "word": "Wiewiórka",
+        "hints": [
+          "Orzechy",
+          "Ruda",
+          "Puszysty ogon"
+        ]
+      },
+      {
+        "word": "Jeż",
+        "hints": [
+          "Kolce",
+          "Kulka",
+          "Jabłko"
+        ]
+      },
+      {
+        "word": "Kret",
+        "hints": [
+          "Kopiec",
+          "Ślepy",
+          "Pod ziemią"
+        ]
+      },
+      {
+        "word": "Borsuk",
+        "hints": [
+          "Nora",
+          "Paski",
+          "Nocny"
+        ]
+      },
+      {
+        "word": "Szop pracz",
+        "hints": [
+          "Maska",
+          "Śmietnik",
+          "Mycie"
+        ]
+      },
+      {
+        "word": "Wąż",
+        "hints": [
+          "Syczy",
+          "Pełza",
+          "Skóra"
+        ]
+      },
+      {
+        "word": "Kobra",
+        "hints": [
+          "Kaptur",
+          "Jad",
+          "Fujarka"
+        ]
+      },
+      {
+        "word": "Jaszczurka",
+        "hints": [
+          "Ogon",
+          "Słońce",
+          "Kamień"
+        ]
+      },
+      {
+        "word": "Kameleon",
+        "hints": [
+          "Kolory",
+          "Język",
+          "Oczy"
+        ]
+      },
+      {
+        "word": "Żaba",
+        "hints": [
+          "Rechocze",
+          "Staw",
+          "Skacze"
+        ]
+      },
+      {
+        "word": "Ślimak",
+        "hints": [
+          "Skorupa",
+          "Powolny",
+          "Śluz"
+        ]
+      },
+      {
+        "word": "Pszczoła",
+        "hints": [
+          "Miód",
+          "Żądło",
+          "Ul"
+        ]
+      },
+      {
+        "word": "Mrówka",
+        "hints": [
+          "Mrowisko",
+          "Pracowita",
+          "Mała"
+        ]
+      },
+      {
+        "word": "Motyl",
+        "hints": [
+          "Skrzydła",
+          "Kwiaty",
+          "Gąsienica"
+        ]
+      },
+      {
+        "word": "Biedronka",
+        "hints": [
+          "Kropki",
+          "Czerwona",
+          "Szczęście"
+        ]
+      },
+      {
+        "word": "Pająk",
+        "hints": [
+          "Sieć",
+          "Osiem nóg",
+          "Kąt"
+        ]
+      },
+      {
+        "word": "Skorpion",
+        "hints": [
+          "Ogon",
+          "Jad",
+          "Pustynia"
+        ]
+      },
+      {
+        "word": "Komar",
+        "hints": [
+          "Bzyczy",
+          "Gryzie",
+          "Lato"
+        ]
+      },
+      {
+        "word": "Wielbłąd",
+        "hints": [
+          "Garb",
+          "Pustynia",
+          "Pluje"
+        ]
+      },
+      {
+        "word": "Hiena",
+        "hints": [
+          "Śmiech",
+          "Padlina",
+          "Sawanna"
+        ]
+      },
+      {
+        "word": "Surykatka",
+        "hints": [
+          "Stoi",
+          "Pustynia",
+          "Czujna"
+        ]
+      },
+      {
+        "word": "Mysz",
+        "hints": [
+          "Ser",
+          "Mała",
+          "Piszczy"
+        ]
+      },
+      {
+        "word": "Gołąb",
+        "hints": [
+          "Miasto",
+          "Gruchanie",
+          "Pomnik"
+        ]
+      },
+      {
+        "word": "Szczur",
+        "hints": [
+          "Kanały",
+          "Długi ogon",
+          "Sprytny"
+        ]
+      },
+      {
+        "word": "Łasica",
+        "hints": [
+          "Smukła",
+          "Drapieżnik",
+          "Kurnik"
+        ]
+      }
     ]
   }
 }

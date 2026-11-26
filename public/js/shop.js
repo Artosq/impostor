@@ -46,15 +46,22 @@ async function loadShopCatalog() {
 
 // ===== OTWIERANIE =====
 
+// Sklep otwarty z poczekalni wraca do poczekalni (gracz dalej jest w pokoju), inaczej do menu
+let shopReturnScreen = 'screen-login';
 async function openShop(tab) {
     if (tab && SHOP_TABS.some(t => t.id === tab)) shopTab = tab;
+    if (['screen-login', 'screen-lobby', 'screen-customize', 'screen-profile', 'screen-path'].includes(currentScreen)) {
+        shopReturnScreen = currentScreen === 'screen-lobby' ? 'screen-lobby' : 'screen-login';
+    }
+    const back = byId('btn-shop-back');
+    if (back) back.textContent = shopReturnScreen === 'screen-lobby' ? 'Powrót do pokoju ->' : 'Powrót do menu ->';
     if (!shopCatalog) await loadShopCatalog();
     renderShopTabs();
     showScreen('screen-shop');
 }
 
 function closeShop() {
-    showScreen('screen-login');
+    showScreen(shopReturnScreen);
 }
 
 // ===== KUPOWANIE =====
@@ -188,7 +195,7 @@ function renderHostHero(product) {
         createElement('p', 'shop-hero-sub', 'Kupujesz raz - korzysta cały pokój')
     );
     const list = createElement('ul', 'shop-perks');
-    ['Wszystkie paczki haseł', 'Złota korona i złoty nick', 'Złoty pasek w poczekalni', 'Kolejne funkcje za darmo w aktualizacjach']
+    ['Wszystkie paczki haseł', 'Do 16 graczy, więcej ról, tryb trudny', 'Nowe funkcje w aktualizacjach', 'Złota korona i złoty nick']
         .forEach(text => list.append(createElement('li', '', text)));
     card.append(list, buyButton('host', product, `Kup za ${price(product.price)}`, 'shop-buy-gold shop-buy-wide'), createElement('div', 'shop-more', 'Zobacz więcej ->'));
     return card;
@@ -360,10 +367,10 @@ const HOST_COMPARE = [
     ['Paczki haseł (Seriale, Polska i każda nowa)', false, true],
     ['Złoty pasek w poczekalni', false, true],
     ['Złota korona i złoty nick', false, true],
-    ['Turniej z podium', false, true, true],
-    ['Własne role i ustawienia', false, true, true],
-    ['Stały pokój ekipy', false, true, true],
-    ['Historia wieczoru', false, true, true]
+    ['Do 16 graczy w pokoju (za darmo 8)', false, true],
+    ['Role Wspólnik i Podmieniec', false, true],
+    ['Tryb trudny (impostor bez podpowiedzi)', false, true],
+    ['Turniej z podium', false, true, true]
 ];
 const PIX_YES = '<svg viewBox="0 0 7 6" shape-rendering="crispEdges"><path d="M6 0h1v2H6zM5 2h1v1H5zM4 3h1v1H4zM3 4h1v1H3zM2 5h1v1H2zM1 4h1v1H1zM0 3h1v1H0z" fill="currentColor"/></svg>';
 

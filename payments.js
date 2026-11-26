@@ -42,6 +42,10 @@ const PRODUCTS = {
     supporter: { name: 'Wspierający', price: 999, items: ['supporter'] },
     'cat-movies': { name: 'Paczka haseł: Seriale', price: 499, items: ['cat:movies'] },
     'cat-poland': { name: 'Paczka haseł: Polska', price: 499, items: ['cat:poland'] },
+    'cat-heroes': { name: 'Paczka haseł: Superbohaterowie', price: 499, items: ['cat:heroes'] },
+    'cat-food': { name: 'Paczka haseł: Jedzenie', price: 499, items: ['cat:food'] },
+    'cat-history': { name: 'Paczka haseł: Historia', price: 499, items: ['cat:history'] },
+    'cat-animals': { name: 'Paczka haseł: Zwierzęta', price: 499, items: ['cat:animals'] },
     ...BUNDLES,
     komplet: { name: 'Komplet: Pakiet Hosta i wszystkie zestawy', price: 4499, items: ['host', ...Object.values(BUNDLES).flatMap(b => b.items)] }
 };

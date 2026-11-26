@@ -4971,13 +4971,13 @@ button.shop-buy.shop-owned{ background: #333; color: var(--secondary); box-shado
 .shop-soon{ position: absolute; top: -8px; right: -6px; padding: 2px 5px; border: 2px solid #111; border-radius: 6px; background: #555; color: #fff; font-size: 8px; }
 
 /* płatne paczki haseł w oknie wyboru kategorii (app.js: renderCategoryPicker) */
-/* paczki haseł: dostępna - złota obwódka; niedostępna - wyszarzona, przerywana obwódka, koszyk w rogu */
-.category-card.category-pack{ position: relative; border-color: #f1c40f; box-shadow: 0 0 12px rgba(241, 196, 15, .25); }
-.category-card.category-pack .category-description{ color: #f1c40f; }
+/* paczki haseł: dostępna - jak zwykła kategoria; niedostępna - wyszarzona, przerywana obwódka, szary koszyk w rogu (bez złota) */
+.category-card.category-pack{ position: relative; }
 .category-card.category-locked{ border-style: dashed; border-color: #555; box-shadow: none; background: #1a1a1a; }
 .category-card.category-locked .category-art, .category-card.category-locked .category-name{ opacity: .4; filter: grayscale(1); }
-.category-card.category-locked .category-description{ color: #c9a227; opacity: .9; }
+.category-card.category-locked .category-description{ color: #888; }
 .category-card .lock-badge{ right: 6px; bottom: auto; top: 6px; }
+.category-card .lock-badge.lock-badge-shop{ background: #555; color: #ddd; box-shadow: none; }
 
 /* ceny w jednej linii */
 .shop-pack button.shop-buy, .shop-bundle button.shop-buy, .shop-supporter button.shop-buy, .shop-look-bundle button.shop-buy{ width: auto; min-width: 76px; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
@@ -5350,3 +5350,28 @@ button.path-dev-reset{ display: block; width: 100%; margin: 14px 0 2px; padding:
 .reveal-deal{ transition: height .35s; }
 .reveal-deal.dealt{ height: 300px; }
 .reveal-deal.dealt .deal-prompt{ top: 176px; }
+
+/* licznik miejsc pod listą graczy (app.js: renderRoomLimit) */
+.room-limit{ margin: 4px 0 10px; color: #888; font-size: 9px; text-align: center; }
+.room-limit.room-full{ color: var(--danger); }
+
+/* ustawienia gry: opcje z Pakietu Hosta - korona w rogu, bez Pakietu przygaszone */
+.option-pack{ position: relative; }
+.option-crown{ position: absolute; top: -9px; right: -7px; z-index: 2; display: flex; padding: 3px 4px; border: 2px solid #111; border-radius: 6px; background: #2a2410; }
+.option-crown svg{ display: block; width: 16px; }
+.option-locked{ opacity: .45; filter: grayscale(.6); }
+.option-locked .option-crown{ filter: none; }
+
+/* okienko pytania (np. paczka w sklepie) */
+.ask-window{ max-width: 320px; text-align: center; }
+.ask-text{ margin: 4px 0 8px; font-size: 12px; line-height: 1.5; }
+.ask-note{ margin: 0 0 12px; color: #888; font-size: 9px; }
+.ask-note:empty{ display: none; }
+.ask-window button{ display: block; width: 100%; }
+
+/* okno wyboru kategorii: paczki ze sklepu pod nagłówkiem "W sklepie", cena w ramce w rogu kafelka */
+.picker-section{ grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin: 10px 0 2px; color: #888; font-size: 10px; letter-spacing: 1px; }
+.picker-section::before, .picker-section::after{ content: ""; flex: 1; height: 3px; border-radius: 2px; background: #333; }
+.price-badge{ position: absolute; top: 6px; right: 6px; z-index: 2; padding: 3px 6px; border: 2px solid #111; border-radius: 6px; background: #333; color: #fff; font-size: 9px; }
+/* cena paczki jako ukośna czerwona taśma w rogu - jak "Na zawsze" w sklepie (.shop-ribbon) */
+#picker-list .price-badge{ top: 12px; right: -34px; padding: 3px 34px; border: 2px solid #111; border-radius: 0; background: var(--danger); color: #fff; font-size: 9px; transform: rotate(35deg); white-space: nowrap; }

@@ -8,6 +8,8 @@
 //   Błazen     - zna hasło; wygrywa sam, jeśli zostanie wyrzucony (wtedy wszyscy inni przegrywają)
 //   Detektyw   - zna hasło i jedną osobę, która na pewno nie jest impostorem; wygrywa z graczami
 //   Podmieniec - dostaje inne losowe hasło z tej samej kategorii i o tym nie wie (karta: "GRACZ"); wygrywa z graczami
+// hostPack: true - przełącznik tylko w pokoju z Pakietem Hosta (Wspólnik, Podmieniec, Tryb trudny)
+// Tryb trudny - impostor nie dostaje podpowiedzi
 
 const { randomItem, shuffle, cleanText, isText, loadData, publicPlayer } = require('../utils');
 const shared = require('./shared');
@@ -62,10 +64,11 @@ const MIN_REGULAR_PLAYERS = 2;      // gdy są dodatkowe role, tylu zwykłych gr
 // color, short - wygląd w oknie (short: krótki opis na kafelku roli); ikonę o tym samym id rysuje public/js/icons.js
 const OPTIONS = [
     { id: 'lastChance', name: 'Ostatnia szansa impostora', description: 'W trakcie głosowania impostor może raz zgadnąć hasło: trafi - wygrywa, pomyli się - przegrywa', default: true, color: '#e74c3c' },
-    { id: 'accomplice', name: 'Wspólnik', description: 'Zna hasło i wie, kto jest impostorem. Wygrywa razem z nim', short: 'Zna hasło i impostora, gra z nim', default: false, players: 1, role: ROLE_ACCOMPLICE, color: '#b16cf0' },
+    { id: 'hard', name: 'Tryb trudny', description: 'Impostor nie dostaje podpowiedzi - zgaduje tylko z tego, co mówią inni', default: false, color: '#f39c12', hostPack: true },
+    { id: 'accomplice', name: 'Wspólnik', description: 'Zna hasło i wie, kto jest impostorem. Wygrywa razem z nim', short: 'Zna hasło i impostora, gra z nim', default: false, players: 1, role: ROLE_ACCOMPLICE, color: '#b16cf0', hostPack: true },
     { id: 'jester', name: 'Błazen', description: 'Zna hasło, ale wygrywa sam, jeśli zostanie wyrzucony', short: 'Wygrywa, gdy go wyrzucą', default: false, players: 1, role: ROLE_JESTER, color: '#f1c40f' },
     { id: 'detective', name: 'Detektyw', description: 'Wie o jednej osobie, że na pewno nie jest impostorem', short: 'Zna jedną niewinną osobę', default: false, players: 1, role: ROLE_DETECTIVE, color: '#3498db' },
-    { id: 'changeling', name: 'Podmieniec', description: 'Dostaje inne hasło z tej kategorii i nie wie o tym', short: 'Ma inne hasło i o tym nie wie', default: false, players: 1, role: ROLE_CHANGELING, color: '#1abc9c' }
+    { id: 'changeling', name: 'Podmieniec', description: 'Dostaje inne hasło z tej kategorii i nie wie o tym', short: 'Ma inne hasło i o tym nie wie', default: false, players: 1, role: ROLE_CHANGELING, color: '#1abc9c', hostPack: true }
 ];
 
 // Drużyna roli - kto wygrywa razem
@@ -138,7 +141,7 @@ module.exports = {
     customLimits: CUSTOM_LIMITS,
     cleanCustomCategory: cleanCustomCategory,
 
-    options: OPTIONS.map(({ id, name, description, short, players, color }) => ({ id, name, description, short, default: OPTIONS.find(o => o.id === id).default, players: players || 0, color })),
+    options: OPTIONS.map(({ id, name, description, short, players, color, hostPack }) => ({ id, name, description, short, default: OPTIONS.find(o => o.id === id).default, players: players || 0, color, hostPack: Boolean(hostPack) })),
 
     start(room, { category: selectedCategory, impostorCount, customCategory, options = {}, packs = new Set() }) {
         const error = shared.checkImpostorCount(room, impostorCount);
@@ -177,6 +180,7 @@ module.exports = {
             entries: entries,   // do losowania nowego hasła w trakcie rundy (reroll)
             guess: null,        // { by, text, correct } - próba odgadnięcia hasła przez impostora
             lastChance: Boolean(options.lastChance),
+            hard: Boolean(options.hard),        // tryb trudny: impostor bez podpowiedzi
             roles: extraRoles,
             clearedName: cleared ? cleared.name : null,
             impostors: impostors,
@@ -196,7 +200,7 @@ module.exports = {
     playerView(room, player) {
         const { category, word, hint, starter, changelingWord, clearedName, impostors, roles } = room.round;
         const view = { category, starter, role: player.role, data: word, roles };
-        if (player.role === shared.ROLE_IMPOSTOR) view.data = hint;
+        if (player.role === shared.ROLE_IMPOSTOR) view.data = room.round.hard ? 'Tryb trudny - bez podpowiedzi' : hint;
         if (player.role === ROLE_CHANGELING) { view.role = shared.ROLE_PLAYER; view.data = changelingWord; }
         if (player.role === ROLE_ACCOMPLICE) view.note = `Impostor: ${impostors.map(p => p.name).join(', ')}`;
         if (player.role === ROLE_DETECTIVE && clearedName) view.note = `${clearedName} na pewno nie jest impostorem`;

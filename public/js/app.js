@@ -1095,6 +1095,7 @@ function closeGameOptions() {
 // Okno budowane raz przy otwarciu (elementy wjeżdżają po kolei). Kliknięcie albo zmiana od serwera
 // tylko przełącza klasy - przełącznik, kółko, ramka i kolor przechodzą płynnie (transition w style.css).
 let gameOptionsMode = null;
+let roomHostPack = false;       // pokój ma Pakiet Hosta (przełączniki z koroną)
 
 function renderGameOptions(fresh = false) {
     const mode = findMode(gameMode);
@@ -1105,6 +1106,7 @@ function renderGameOptions(fresh = false) {
 
     byId('options-list').querySelectorAll('[data-option]').forEach(element => {
         element.classList.toggle('is-on', Boolean(roomOptions[element.dataset.option]));
+        element.classList.toggle('option-locked', element.classList.contains('option-pack') && !roomHostPack);
     });
     const extra = roles.filter(option => roomOptions[option.id]).length;
     const count = byId('options-roles-count');
@@ -1120,7 +1122,14 @@ function buildGameOptions(mode, options, roles) {
         if (option.color) element.style.setProperty('--option-color', option.color);
         // od razu u siebie (szybkie kliknięcia kilku opcji nie cofają się nawzajem), potem do serwera,
         // który i tak odsyła ustawienia pokoju wszystkim
+        if (option.hostPack) {
+            element.classList.add('option-pack');
+            const badge = createElement('span', 'option-crown');
+            badge.innerHTML = PIX_CROWN_SVG;
+            element.append(badge);
+        }
         element.onclick = () => {
+            if (option.hostPack && !roomHostPack) return showError('Ta opcja jest w Pakiecie Hosta', true);
             roomOptions = { ...roomOptions, [option.id]: !roomOptions[option.id] };
             renderGameOptions();
             changeSettings({ options: roomOptions });
@@ -1256,19 +1265,17 @@ function renderCategoryPicker() {
         const locked = c.pack && !hasCategoryPack(c.pack);
         const packPrice = c.pack && typeof shopCatalog !== 'undefined' && shopCatalog
             ? Object.values(shopCatalog.products).find(p => p.items.length === 1 && p.items[0] === c.pack) : null;
-        const lockedText = packPrice ? `${(packPrice.price / 100).toFixed(2).replace('.', ',')} zł · w sklepie` : 'w sklepie';
-        const description = c.random ? 'Inna przy każdej grze' : `${c.count} ${c.unit || 'haseł'}${c.pack ? (locked ? ` · ${lockedText}` : ' · paczka') : ''}`;
+        const priceText = packPrice ? `${(packPrice.price / 100).toFixed(2).replace('.', ',')} zł` : 'Sklep';
+        const description = c.random ? 'Inna przy każdej grze' : `${c.count} ${c.unit || 'haseł'}${c.pack && !locked ? ' · paczka' : ''}`;
         const tile = createCategoryTile(c, description, () => {
-            if (locked) return showError(`Paczka „${c.name}” jest w sklepie (menu -> sklep) albo w Pakiecie Hosta`, true);
+            if (locked) return askOpenShop(c.name, packPrice);
             selectCategory(c.id);
         });
         tile.classList.toggle('selected', c.id === category);
         if (c.pack) tile.classList.add('category-pack');
         if (locked) {
             tile.classList.add('category-locked');
-            const badge = createElement('span', 'lock-badge lock-badge-shop');     // koszyk w rogu - jak w panelu wyglądu
-            badge.innerHTML = PIX_BAG_SVG;
-            tile.append(badge);
+            tile.append(createElement('span', 'price-badge', priceText));        // cena w rogu kafelka
         }
         return tile;
     });
@@ -1288,10 +1295,35 @@ function renderCategoryPicker() {
         list.append(createElement('p', 'picker-empty', 'Brak takiej kategorii'));
     }
     if (mode.custom) list.append(createNewCategoryTile());
-    list.append(...locked);
+    // paczki ze sklepu osobno, pod nagłówkiem
+    if (locked.length) list.append(createElement('div', 'picker-section', 'W sklepie'), ...locked);
 }
 
 const PICKER_CLOSE_MS = 250;    // długość animacji wyjścia w style.css
+
+// Zablokowana paczka haseł: najpierw pytamy - ze sklepu wraca się do pokoju (shop.js: shopReturnScreen)
+function askOpenShop(name, product) {
+    const old = byId('ask-shop');
+    if (old) old.remove();
+    const overlay = createElement('div', 'picker-overlay ask-overlay');
+    overlay.id = 'ask-shop';
+    const close = () => overlay.remove();
+    overlay.onclick = event => { if (event.target === overlay) close(); };
+    const box = createElement('div', 'picker-window ask-window');
+    const price = product ? ` (${(product.price / 100).toFixed(2).replace('.', ',')} zł)` : '';
+    box.append(
+        createElement('div', 'picker-title', '— Paczka haseł —'),
+        createElement('p', 'ask-text', `„${name}”${price} jest w sklepie. Jest też w Pakiecie Hosta.`),
+        createElement('p', 'ask-note', currentRoomCode ? 'Zostajesz w pokoju - ze sklepu wrócisz do poczekalni' : '')
+    );
+    const yes = createElement('button', 'btn-create', 'Zobacz w sklepie');
+    yes.onclick = () => { close(); closeCategoryPicker(); openShop('packs'); };
+    const no = createElement('button', 'btn-join', 'Anuluj');
+    no.onclick = close;
+    box.append(yes, no);
+    overlay.append(box);
+    document.body.append(overlay);
+}
 
 function openCategoryPicker() {
     byId('picker-search').value = "";
@@ -1473,8 +1505,10 @@ function renderLobby(room) {
     byId('room-privacy').classList.toggle('is-host', isHost);
     byId('room-privacy-label').textContent = room.isPrivate ? '\u{1F512} Pokój prywatny' : 'Pokój publiczny';
 
+    roomHostPack = Boolean(room.hostPack);
     applySettings(room.settings);
     renderHostPackBar(room);
+    renderRoomLimit(room);
 
     // Nowy pokój (albo powrót do niego) - wszystkie kafelki wchodzą od nowa
     if (lobbyTilesRoom !== room.code) {
@@ -1520,6 +1554,13 @@ function applyCardSkin() {
 // Złoty pasek: gospodarz ma Pakiet Hosta (albo darmowy wieczór ze ścieżki - pasek przerywany z licznikiem)
 const PIX_CROWN_SVG = '<svg viewBox="0 0 9 7" shape-rendering="crispEdges"><path d="M0 1h1v1H0zM4 0h1v1H4zM8 1h1v1H8zM0 2h1v2h1V3h1v1h1V2h1v2h1V3h1v1h1V2h1v5H0z" fill="#f1c40f"/><path d="M4 4h1v1H4z" fill="#e74c3c"/></svg>';
 const PIX_HEART_SVG = '<svg class="nick-heart" viewBox="0 0 7 6" shape-rendering="crispEdges"><path d="M1 0h2v1h1V0h2v1h1v2H6v1H5v1H4v1H3V5H2V4H1V3H0V1h1z" fill="#e74c3c"/></svg>';
+
+// Licznik miejsc pod listą graczy (limit: 8, z Pakietem Hosta 16 - liczy serwer)
+function renderRoomLimit(room) {
+    const limit = room.maxPlayers || 16;
+    byId('room-limit').textContent = `Gracze: ${room.players.length} / ${limit}`;
+    byId('room-limit').classList.toggle('room-full', room.players.length >= limit);
+}
 
 function renderHostPackBar(room) {
     const bar = byId('host-pack-bar');

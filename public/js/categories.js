@@ -55,6 +55,41 @@ const categoryArt = {
             <path d="M14 25h36"/>
             <path d="M8 58h12"/>`)
     },
+    // maska na oczy - płatna paczka "Superbohaterowie"
+    Superbohaterowie: {
+        emoji: '🦸',
+        svg: categorySvg(`
+            <path d="M6 24c8-6 18-6 26 0 8-6 18-6 26 0-1 14-10 20-19 15l-7-4-7 4c-9 5-18-1-19-15z"/>
+            <path d="M14 30c3-4 9-4 12 0-3 4-9 4-12 0zM38 30c3-4 9-4 12 0-3 4-9 4-12 0z"/>
+            <path d="M6 24l-4-6M58 24l4-6"/>`)
+    },
+    // talerz ze sztućcami - płatna paczka "Jedzenie"
+    Jedzenie: {
+        emoji: '🍕',
+        svg: categorySvg(`
+            <circle cx="32" cy="34" r="16"/>
+            <circle cx="32" cy="34" r="8"/>
+            <path d="M8 14v12a4 4 0 0 0 8 0V14M12 14v44"/>
+            <path d="M54 14c-4 2-6 8-6 14h6v30"/>`)
+    },
+    // kolumna - płatna paczka "Historia"
+    Historia: {
+        emoji: '🏛️',
+        svg: categorySvg(`
+            <path d="M10 20L32 8l22 12z"/>
+            <path d="M12 20h40M16 26v22M26 26v22M38 26v22M48 26v22"/>
+            <path d="M10 52h44M8 58h48"/>`)
+    },
+    // łapa - płatna paczka "Zwierzęta"
+    'Zwierzęta': {
+        emoji: '🐾',
+        svg: categorySvg(`
+            <ellipse cx="32" cy="42" rx="12" ry="10"/>
+            <ellipse cx="16" cy="28" rx="5" ry="7"/>
+            <ellipse cx="26" cy="18" rx="5" ry="7"/>
+            <ellipse cx="38" cy="18" rx="5" ry="7"/>
+            <ellipse cx="48" cy="28" rx="5" ry="7"/>`)
+    },
     Filmy: {
         emoji: '\u{1F3AC}',
         svg: categorySvg(`

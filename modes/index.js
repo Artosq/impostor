@@ -38,11 +38,12 @@ const modesById = new Map(modes.map(mode => [mode.id, mode]));
 console.log(`Wczytane tryby: ${modes.map(mode => mode.name).join(', ')}`);
 
 // Wartości przełączników trybu: znane id, tylko true/false, brakujące = domyślne
-function cleanOptions(mode, input) {
+// hostPack: czy pokój ma Pakiet Hosta - bez niego przełączniki z Pakietu są zawsze wyłączone
+function cleanOptions(mode, input, hostPack = true) {
     const options = {};
     (mode.options || []).forEach(option => {
         const value = input && input[option.id];
-        options[option.id] = typeof value === 'boolean' ? value : Boolean(option.default);
+        options[option.id] = option.hostPack && !hostPack ? false : typeof value === 'boolean' ? value : Boolean(option.default);
     });
     return options;
 }
