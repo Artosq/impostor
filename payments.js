@@ -30,7 +30,10 @@ const PAYMENT_METHODS = ['blik', 'p24', 'card'];
 const BUNDLES = {
     'bundle-maszyna': { name: 'Zestaw Maszyna', price: 999, items: ['part:bottts:eyes:cylon', 'part:bottts:mouth:equalizer', 'part:bottts:pattern:matrix', 'kick:explosion'] },
     'bundle-slodziak': { name: 'Zestaw Słodziak', price: 999, items: ['part:bottts:eyes:hearts', 'part:bottts:mouth:bubblegum', 'part:bottts:pattern:sparkles'] },
-    'bundle-detektyw': { name: 'Zestaw Detektyw', price: 999, items: ['part:bottts:eyes:monocle', 'part:bottts:mouth:goldtooth', 'skin:noir'] }
+    'bundle-detektyw': { name: 'Zestaw Detektyw', price: 999, items: ['part:bottts:eyes:monocle', 'part:bottts:mouth:goldtooth', 'skin:noir'] },
+    'bundle-kosmita': { name: 'Zestaw Kosmita', price: 999, items: ['part:bottts:eyes:alien', 'part:bottts:mouth:wave', 'part:bottts:pattern:craters'] },
+    'bundle-zima': { name: 'Zestaw Zima', price: 999, items: ['part:bottts:eyes:snowflake', 'part:bottts:mouth:icicles', 'part:bottts:pattern:frost'] },
+    'bundle-upior': { name: 'Zestaw Upiór', price: 999, items: ['part:bottts:eyes:ghost', 'part:bottts:mouth:stitches', 'part:bottts:pattern:cobweb'] }
 };
 
 // Ceny w groszach - najniższa 4,99 zł (przy mniejszych kwotach prowizja operatora zjada dużą część)
@@ -40,7 +43,7 @@ const PRODUCTS = {
     'cat-movies': { name: 'Paczka haseł: Seriale', price: 499, items: ['cat:movies'] },
     'cat-poland': { name: 'Paczka haseł: Polska', price: 499, items: ['cat:poland'] },
     ...BUNDLES,
-    komplet: { name: 'Komplet: Pakiet Hosta i wszystkie zestawy', price: 3499, items: ['host', ...Object.values(BUNDLES).flatMap(b => b.items)] }
+    komplet: { name: 'Komplet: Pakiet Hosta i wszystkie zestawy', price: 4499, items: ['host', ...Object.values(BUNDLES).flatMap(b => b.items)] }
 };
 
 function product(id) {

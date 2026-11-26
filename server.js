@@ -636,7 +636,7 @@ io.on('connection', (socket) => {
             .catch(err => console.error('Przeniesienie postępu:', err.message));
     }));
     // Pełny profil (statystyki, historia) - przy otwarciu strony gracza
-    handle('get_profile', withAccount(account => socket.emit('account_profile', account.profile)));
+    handle('get_profile', withAccount(account => socket.emit('account_profile', { ...account.profile, path: accounts.publicPath(account.profile.path) })));
     handle('badges_seen', withAccount(account => accounts.markBadgesSeen(account)));
     // Zgłoszenia do analityki z przeglądarki - tylko zalogowanie (Google / mailem)
     handle('track', (type, data) => {
@@ -665,11 +665,26 @@ io.on('connection', (socket) => {
     // ŚCIEŻKA NAGRÓD (konto): odebranie nagrody poziomu (losuje serwer) i włączenie darmowego wieczoru z Pakietem Hosta
     handle('path_claim', withAccount((account, level) => {
         const result = accounts.claimReward(account, level);
-        socket.emit('path_claimed', { level: Number(level), ...result, path: account.profile.path });
+        socket.emit('path_claimed', { level: Number(level), ...result, path: accounts.publicPath(account.profile.path) });
+    }));
+    // Skrzynka: rozdanie (tylko liczba kart, bez zawartości) i wybór karty (wtedy wszystkie karty jawne)
+    handle('path_deal', withAccount((account, level) => {
+        const result = accounts.dealReward(account, level);
+        socket.emit('path_dealt', { level: Number(level), ...result });
+    }));
+    handle('path_pick', withAccount((account, level, index) => {
+        const result = accounts.pickReward(account, level, index);
+        socket.emit('path_claimed', { level: Number(level), ...result, path: accounts.publicPath(account.profile.path) });
+    }));
+
+    // DEWELOPER: ścieżka od nowa (konto admina albo DEV_UNLOCK_ALL=1)
+    handle('dev_path_reset', withAccount(account => {
+        if (!accounts.resetPath(account)) return;
+        account.sockets.forEach(id => io.to(id).emit('path_reset', accounts.publicPath(account.profile.path)));
     }));
     handle('path_trial', withAccount(account => {
-        if (!accounts.startTrial(account)) return socket.emit('error', 'Darmowy wieczór jest już wykorzystany');
-        account.sockets.forEach(id => { io.to(id).emit('path_trial_started', account.profile.path); refreshLook(id); });
+        if (!accounts.startTrial(account)) return socket.emit('error', 'Nie masz kuponu na darmowy wieczór albo jeden już trwa');
+        account.sockets.forEach(id => { io.to(id).emit('path_trial_started', accounts.publicPath(account.profile.path)); refreshLook(id); });
     }));
 
     // Tworzenie pokoju

@@ -3,13 +3,14 @@
 //
 // Rzecz (item) ma id:  part:<zestaw>:<slot>:<id>  frame:<id>  kick:<id>  skin:<id>  host  supporter  cat:<paczka>  host-trial
 // Posiadane = zestaw startowy + odebrane nagrody ze ścieżki (profile.path.claimed) + zakupy (tabela unlocks).
-// Losowa nagroda wypada przy odebraniu: z puli danej rzadkości, bez rzeczy, które gracz już ma.
+// Skrzynka przy odebraniu losuje rzadkość (szanse: sciezka.json chests), potem rzecz z tej puli, bez rzeczy, które gracz już ma.
 
 (function (root) {
     'use strict';
 
     const RARITIES = ['common', 'rare', 'epic', 'legendary'];
     const TRIAL_MS = 24 * 60 * 60 * 1000;       // darmowy wieczór z Pakietem Hosta
+    const DEAL_SIZE = 5;                        // kart w rozdaniu skrzynki
 
     function create(def, catalogParts) {
         const style = def.style;
@@ -22,7 +23,36 @@
         const starter = new Set(Object.entries(def.starter).flatMap(([slot, ids]) => ids.map(id => partItem(slot, id))));
         const shopOnly = new Set(def.shopOnly);
 
-        // nagroda poziomu w jednej postaci: { item } | { random: [rzadkości po kolei] } | { hostTrial: true }
+        // Skrzynka = 5 kart (sciezka.json: chests). Co najmniej 3 karty mają rzadkość skrzynki (base); jedna jest lepsza
+        // (bonus), z szansą extraBonus% są dwie lepsze; lepsza karta z szansą jackpot% jest jeszcze o stopień wyżej (jackpotRarity).
+        const CHEST_DEF = def.chests || {};
+        const chestDef = tier => CHEST_DEF[tier] || { base: tier };
+        // Szanse na rzadkość wybranej karty (karty są zakryte - tyle samo dla każdej) - do paska szans
+        function chestOdds(tier) {
+            const c = chestDef(tier);
+            if (!c.bonus) return { [c.base]: 100 };
+            const bonusShare = (1 + (c.extraBonus || 0) / 100) / DEAL_SIZE * 100;
+            const jackpot = c.jackpotRarity ? bonusShare * (c.jackpot || 0) / 100 : 0;
+            const odds = { [c.base]: 100 - bonusShare, [c.bonus]: bonusShare - jackpot };
+            if (jackpot) odds[c.jackpotRarity] = jackpot;
+            return Object.fromEntries(Object.entries(odds).map(([r, p]) => [r, Math.round(p * 10) / 10]));
+        }
+        const CHESTS = Object.fromEntries(RARITIES.map(r => [r, chestOdds(r)]));
+        const chest = tier => ({ random: [tier], chest: tier, odds: CHESTS[tier] });
+
+        // Rzadkości kart w rozdaniu (w losowej kolejności - karty są zakryte)
+        function dealRarities(tier, rnd) {
+            const c = chestDef(tier);
+            const list = Array(DEAL_SIZE).fill(c.base);
+            if (c.bonus) {
+                const bonusCards = 1 + (rnd() * 100 < (c.extraBonus || 0) ? 1 : 0);
+                for (let i = 0; i < bonusCards; i++) list[DEAL_SIZE - 1 - i] = c.jackpotRarity && rnd() * 100 < (c.jackpot || 0) ? c.jackpotRarity : c.bonus;
+            }
+            for (let i = list.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)) % (i + 1); [list[i], list[j]] = [list[j], list[i]]; }
+            return list;
+        }
+
+        // nagroda poziomu w jednej postaci: { item } | { random: [rzadkość skrzynki], chest, odds } | { hostTrial: true }
         function rewardAt(level) {
             if (level < 2) return null;
             const r = def.path[level];
@@ -32,10 +62,18 @@
                 if (r.kick) return { item: `kick:${r.kick}` };
                 if (r.skin) return { item: `skin:${r.skin}` };
                 if (r.hostTrial) return { hostTrial: true };
-                if (r.random) return { random: [r.random, ...RARITIES.filter(x => x !== r.random)] };
+                if (r.random) return chest(r.random);
             }
+            // po końcu ścieżki: co 10 darmowy wieczór, co 5 złota skrzynka, na przemian epicka / rzadka
             const a = def.afterPath;
-            return { random: level % 10 === 0 ? a.every10 : level % 5 === 0 ? a.every5 : level % 2 ? a.odd : a.even };
+            const next = level % 10 === 0 ? a.every10 : level % 5 === 0 ? a.every5 : level % 2 ? a.odd : a.even;
+            return next === 'hostTrial' ? { hostTrial: true } : chest(next);
+        }
+
+        // Gdy w puli danej rzadkości nic już nie ma - najpierw lepsze, potem gorsze
+        function rarityOrder(rarity) {
+            const i = RARITIES.indexOf(rarity);
+            return [rarity, ...RARITIES.slice(i + 1), ...RARITIES.slice(0, i).reverse()];
         }
 
         // Losowe pule: części poza zestawem startowym, poza sklepem i poza nagrodami "wiadomo jakimi"
@@ -110,39 +148,80 @@
             const path = pathOf(profile);
             if (Object.hasOwn(path.claimed, level)) return { error: 'Nagroda już odebrana' };
             const reward = rewardAt(level);
-            const have = owned(profile, purchased);
-            let item = null;
-            if (reward.hostTrial) {
-                item = 'host-trial';
-            } else if (reward.item) {
-                item = reward.item;
-            } else {
-                // najpierw losowa zakładka (oczy / buzia / wzór / tło), potem część z niej - inaczej
-                // przeważałyby tła, których rzadkich jest najwięcej
-                const pick = list => list[Math.floor(rnd() * list.length) % list.length];
-                for (const r of reward.random) {
-                    const free = pools[r].filter(it => !have.has(it));
-                    if (!free.length) continue;
-                    const bySlot = {};
-                    free.forEach(it => { const slot = it.split(':')[2]; (bySlot[slot] = bySlot[slot] || []).push(it); });
-                    item = pick(bySlot[pick(Object.keys(bySlot))]);
-                    break;
-                }
-            }
-            path.claimed[level] = item || 'none';      // "none" - wszystko już zebrane
-            return { item: item || 'none', random: Boolean(reward.random) };
+            // skrzynka bez wyboru karty (np. starsza wersja gry) - pierwsza karta z rozdania
+            if (reward.random) return pickCard(profile, level, 0, purchased, rnd);
+            const item = reward.hostTrial ? 'host-trial' : reward.item;
+            path.claimed[level] = item || 'none';
+            return { item: item || 'none', random: false, chest: null };
         }
 
-        // Darmowy wieczór: odebrany, a jeszcze nieużyty -> włączenie na 24 h
+        // Jedna losowa rzecz danej rzadkości: najpierw losowa zakładka (oczy / buzia / wzór / tło), potem część z niej -
+        // inaczej przeważałyby tła, których rzadkich jest najwięcej. Bez rzeczy posiadanych i już wylosowanych.
+        function drawRandom(rarity, have, used, rnd) {
+            const pick = list => list[Math.floor(rnd() * list.length) % list.length];
+            for (const r of rarityOrder(rarity)) {
+                const free = pools[r].filter(it => !have.has(it) && !used.has(it));
+                if (!free.length) continue;
+                const bySlot = {};
+                free.forEach(it => { const slot = it.split(':')[2]; (bySlot[slot] = bySlot[slot] || []).push(it); });
+                return pick(bySlot[pick(Object.keys(bySlot))]);
+            }
+            return null;
+        }
+
+        // SKRZYNKA = ROZDANIE KART. Każda karta to osobno wylosowana rzecz; gracz wybiera jedną i dostaje dokładnie ją.
+        // Rozdanie zapisuje się w profilu (path.deals) - odświeżenie strony nie losuje od nowa.
+        // Przeglądarka konta dostaje tylko liczbę kart; zawartość wszystkich widać dopiero po wyborze.
+        function dealCards(profile, level, purchased, rnd = Math.random) {
+            level = Number(level);
+            if (!Number.isInteger(level) || level < 2 || level > profile.level) return { error: 'Ten poziom jeszcze przed Tobą' };
+            const path = pathOf(profile);
+            if (Object.hasOwn(path.claimed, level)) return { error: 'Nagroda już odebrana' };
+            const reward = rewardAt(level);
+            if (!reward.random) return { error: 'Na tym poziomie nie ma skrzynki' };
+            if (!path.deals || typeof path.deals !== 'object') path.deals = {};
+            if (!Array.isArray(path.deals[level]) || !path.deals[level].length) {
+                const have = owned(profile, purchased);
+                const used = new Set();
+                const cards = [];
+                for (const rarity of dealRarities(reward.chest, rnd)) {
+                    const it = drawRandom(rarity, have, used, rnd);
+                    if (it) used.add(it);
+                    cards.push(it || 'none');       // "none" - wszystko już zebrane
+                }
+                path.deals[level] = cards;
+            }
+            return { level, count: path.deals[level].length, chest: reward.chest };
+        }
+        function pickCard(profile, level, index, purchased, rnd = Math.random) {
+            const dealt = dealCards(profile, level, purchased, rnd);
+            if (dealt.error) return dealt;
+            const path = pathOf(profile);
+            const cards = path.deals[dealt.level];
+            index = Number(index);
+            if (!Number.isInteger(index) || index < 0 || index >= cards.length) return { error: 'Nie ma takiej karty' };
+            const item = cards[index];
+            path.claimed[dealt.level] = item;
+            delete path.deals[dealt.level];
+            return { item, random: true, chest: dealt.chest, cards, index };
+        }
+
+        // Darmowe wieczory z Pakietem Hosta to kupony: każdy odebrany czeka, aż gracz go włączy (24 h).
+        // trialsUsed - ile już włączono (starszy profil: sam trialUntil = 1 użyty)
         function trialState(profile, now = Date.now()) {
             const path = pathOf(profile);
-            const has = [...Object.values(path.claimed), ...(Array.isArray(path.extra) ? path.extra : [])].includes('host-trial');
-            return { available: has && !path.trialUntil, activeUntil: path.trialUntil && path.trialUntil > now ? path.trialUntil : 0, used: Boolean(path.trialUntil) };
+            const total = [...Object.values(path.claimed), ...(Array.isArray(path.extra) ? path.extra : [])].filter(it => it === 'host-trial').length;
+            const used = Math.max(Number(path.trialsUsed) || 0, path.trialUntil ? 1 : 0);
+            const activeUntil = path.trialUntil && path.trialUntil > now ? path.trialUntil : 0;
+            const left = Math.max(0, total - used);
+            return { available: left > 0 && !activeUntil, left, activeUntil, used };
         }
         function startTrial(profile, now = Date.now()) {
             const st = trialState(profile, now);
             if (!st.available) return false;
-            pathOf(profile).trialUntil = now + TRIAL_MS;
+            const path = pathOf(profile);
+            path.trialsUsed = st.used + 1;
+            path.trialUntil = now + TRIAL_MS;
             return true;
         }
 
@@ -155,9 +234,9 @@
         }
 
         return {
-            style, partItem, rewardAt, info, owned, source, unclaimed, claim, trialState, startTrial, canUsePart,
+            style, partItem, rewardAt, info, owned, source, unclaimed, claim, dealCards, pickCard, trialState, startTrial, canUsePart,
             isShopOnly: item => shopOnly.has(item), isStarter: item => starter.has(item), lastPathLevel, rarityOf: item => rarity[item] || null,
-            kicks: def.kicks || {}, skins: def.skins || {}, pools
+            kicks: def.kicks || {}, skins: def.skins || {}, pools, chests: CHESTS
         };
     }
 

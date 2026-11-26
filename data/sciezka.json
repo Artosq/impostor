@@ -1,5 +1,5 @@
 {
-  "$comment": "ŚCIEŻKA NAGRÓD i dostępność wyglądu (public/js/rewards.js). starter - części dla każdego od razu (reszta zwykłych jest na ścieżce). shopOnly - tylko w sklepie (zestawy w payments.js). path - nagroda za poziom: {part: \"slot:id\"} wiadomo jaka, {random: rzadkość} losowa część bez powtórek, {kick|skin: id}, {hostTrial: true}. Po ostatnim poziomie z listy: co poziom losowa część (afterPath). Rzeczy id: part:<zestaw>:<slot>:<id>, kick:<id>, skin:<id>.",
+  "$comment": "ŚCIEŻKA NAGRÓD i dostępność wyglądu (public/js/rewards.js). starter - części dla każdego od razu (reszta zwykłych jest na ścieżce). shopOnly - tylko w sklepie (zestawy w payments.js). path - nagroda za poziom: {part: \"slot:id\"} wiadomo jaka, {random: rzadkość} losowa część bez powtórek, {kick|skin: id}, {hostTrial: true}. Po ostatnim poziomie z listy: co poziom losowa część (afterPath). Rzeczy id: part:<zestaw>:<slot>:<id>, kick:<id>, skin:<id>. chests - skrzynka = 5 kart: min. 3 o rzadkości skrzynki (base), 1 lepsza (bonus), z szansą extraBonus% druga lepsza, lepsza z szansą jackpot% o stopień wyżej (jackpotRarity). afterPath - nagrody po końcu ścieżki.",
   "style": "bottts",
   "names": {
     "eyes": {
@@ -36,7 +36,6 @@
       "goggles": "Gogle pilota",
       "binoculars": "Lornetka",
       "sus": "Podejrzliwe",
-      "blink": "Mrugające",
       "aviators": "Pilotki",
       "anime": "Błyszczące",
       "hearts": "Serca",
@@ -45,11 +44,14 @@
       "hal": "Czerwone oko",
       "nightvision": "Noktowizor",
       "lcdtears": "Łzy LCD",
-      "look": "Rozglądanie",
       "monocle": "Monokl",
       "cylon": "Patrol",
       "loading": "Ładowanie",
-      "laser": "Lasery"
+      "laser": "Lasery",
+      "alien": "Trzy oczy",
+      "shades": "Ciemne okulary",
+      "snowflake": "Płatki śniegu",
+      "ghost": "Oczy ducha"
     },
     "mouth": {
       "bite": "Zęby",
@@ -76,7 +78,6 @@
       "keypad": "Klawiatura",
       "barcode": "Kod kreskowy",
       "loading": "Pasek ładowania",
-      "cablestache": "Kablowe wąsy",
       "zipper": "Zamek",
       "mask": "Maseczka",
       "diagram": "EKG",
@@ -85,7 +86,10 @@
       "respirator": "Respirator",
       "talk": "Gadanie",
       "whistle": "Gwizd",
-      "bubblegum": "Guma balonowa"
+      "bubblegum": "Guma balonowa",
+      "wave": "Uśmiech kosmity",
+      "icicles": "Sople",
+      "stitches": "Szwy"
     },
     "pattern": {
       "camo01": "Moro",
@@ -121,7 +125,11 @@
       "snow": "Śnieg",
       "gears": "Zębatki",
       "matrix": "Kod",
-      "flames": "Płomienie"
+      "flames": "Płomienie",
+      "craters": "Kratery",
+      "frost": "Szron",
+      "cobweb": "Pajęczyna",
+      "plating": "Pancerz"
     }
   },
   "kicks": {
@@ -230,7 +238,18 @@
     "part:bottts:pattern:matrix",
     "part:bottts:pattern:sparkles",
     "kick:explosion",
-    "skin:noir"
+    "skin:noir",
+    "part:bottts:eyes:alien",
+    "part:bottts:eyes:shades",
+    "part:bottts:eyes:snowflake",
+    "part:bottts:eyes:ghost",
+    "part:bottts:mouth:wave",
+    "part:bottts:mouth:icicles",
+    "part:bottts:mouth:stitches",
+    "part:bottts:pattern:craters",
+    "part:bottts:pattern:frost",
+    "part:bottts:pattern:cobweb",
+    "part:bottts:pattern:plating"
   ],
   "path": {
     "2": {
@@ -240,61 +259,61 @@
       "random": "common"
     },
     "4": {
-      "part": "mouth:mustache"
+      "part": "mouth:zigzag"
     },
     "5": {
-      "part": "pattern:honeycomb"
+      "random": "common"
     },
     "6": {
-      "random": "rare"
+      "part": "pattern:waves"
     },
     "7": {
-      "part": "pattern:waves"
+      "random": "common"
     },
     "8": {
       "kick": "confetti"
     },
     "9": {
-      "random": "epic"
+      "random": "rare"
     },
     "10": {
-      "random": "legendary"
+      "hostTrial": true
     },
     "11": {
-      "skin": "pirate"
+      "random": "rare"
     },
     "12": {
-      "random": "common"
+      "part": "mouth:mustache"
     },
     "13": {
-      "part": "background:steel"
+      "skin": "pirate"
     },
     "14": {
-      "part": "eyes:look"
+      "random": "rare"
     },
     "15": {
-      "part": "eyes:spiral"
+      "part": "eyes:aviators"
     },
     "16": {
       "random": "rare"
     },
     "17": {
-      "part": "mouth:smirk"
+      "part": "background:steel"
     },
     "18": {
-      "part": "eyes:aviators"
+      "random": "rare"
     },
     "19": {
-      "random": "epic"
+      "part": "eyes:spiral"
     },
     "20": {
-      "random": "legendary"
+      "hostTrial": true
     },
     "21": {
-      "skin": "space"
+      "random": "epic"
     },
     "22": {
-      "random": "common"
+      "skin": "space"
     },
     "23": {
       "part": "pattern:tiger"
@@ -303,19 +322,19 @@
       "random": "rare"
     },
     "25": {
-      "part": "mouth:whistle"
+      "kick": "anvil"
     },
     "26": {
-      "part": "eyes:tired"
+      "random": "epic"
     },
     "27": {
-      "random": "rare"
+      "part": "mouth:whistle"
     },
     "28": {
-      "kick": "blackhole"
+      "random": "rare"
     },
     "29": {
-      "random": "epic"
+      "part": "pattern:rain"
     },
     "30": {
       "hostTrial": true
@@ -324,84 +343,91 @@
       "skin": "cyber"
     },
     "32": {
-      "random": "common"
+      "random": "epic"
     },
     "33": {
-      "part": "mouth:talk"
+      "part": "eyes:visor"
     },
     "34": {
-      "random": "rare"
+      "random": "epic"
     },
     "35": {
-      "part": "pattern:rain"
+      "random": "legendary"
     },
     "36": {
-      "part": "pattern:chevrons"
+      "part": "mouth:talk"
     },
     "37": {
-      "random": "rare"
+      "random": "epic"
     },
     "38": {
-      "kick": "anvil"
+      "part": "eyes:laser"
     },
     "39": {
       "random": "epic"
     },
     "40": {
-      "random": "legendary"
+      "hostTrial": true
     },
     "41": {
-      "part": "background:galaxy"
+      "random": "legendary"
     },
     "42": {
-      "random": "common"
+      "part": "pattern:flames"
     },
     "43": {
-      "part": "mouth:kiss"
-    },
-    "44": {
-      "random": "rare"
-    },
-    "45": {
-      "part": "eyes:laser"
-    },
-    "46": {
-      "random": "common"
-    },
-    "47": {
-      "random": "rare"
-    },
-    "48": {
-      "part": "pattern:snow"
-    },
-    "49": {
       "random": "epic"
     },
-    "50": {
+    "44": {
+      "kick": "blackhole"
+    },
+    "45": {
       "random": "legendary"
+    },
+    "46": {
+      "part": "mouth:diagram"
+    },
+    "47": {
+      "part": "background:galaxy"
+    },
+    "48": {
+      "part": "pattern:gears"
+    },
+    "49": {
+      "random": "legendary"
+    },
+    "50": {
+      "hostTrial": true
     }
   },
   "afterPath": {
-    "every10": [
-      "legendary",
-      "epic",
-      "rare",
-      "common"
-    ],
-    "every5": [
-      "epic",
-      "rare",
-      "common"
-    ],
-    "odd": [
-      "rare",
-      "common",
-      "epic"
-    ],
-    "even": [
-      "common",
-      "rare",
-      "epic"
-    ]
+    "every10": "hostTrial",
+    "every5": "legendary",
+    "odd": "epic",
+    "even": "rare"
+  },
+  "chests": {
+    "common": {
+      "base": "common",
+      "bonus": "rare",
+      "extraBonus": 15,
+      "jackpotRarity": "epic",
+      "jackpot": 5
+    },
+    "rare": {
+      "base": "rare",
+      "bonus": "epic",
+      "extraBonus": 15,
+      "jackpotRarity": "legendary",
+      "jackpot": 5
+    },
+    "epic": {
+      "base": "epic",
+      "bonus": "legendary",
+      "extraBonus": 15
+    },
+    "legendary": {
+      "base": "legendary"
+    }
   }
 }

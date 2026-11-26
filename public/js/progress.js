@@ -42,8 +42,9 @@
             unseenBadges: [],   // nowe odznaki, których gracz nie widział jeszcze w profilu
             history: [],        // ostatnie gry, najnowsza pierwsza
             // ścieżka nagród (rewards.js): poziom -> odebrana rzecz; extra - rzeczy z połączonego drugiego profilu;
-            // trialUntil - do kiedy trwa darmowy wieczór z Pakietem Hosta
-            path: { claimed: {}, extra: [], trialUntil: 0 }
+            // trialUntil - do kiedy trwa darmowy wieczór z Pakietem Hosta; trialsUsed - ile kuponów na wieczór już włączono
+            // deals - rozdane, jeszcze niewybrane karty skrzynki (poziom -> rzeczy)
+            path: { claimed: {}, extra: [], trialUntil: 0, trialsUsed: 0, deals: {} }
         };
     }
 
@@ -58,7 +59,9 @@
         merged.path = {
             claimed: path.claimed && typeof path.claimed === 'object' ? { ...path.claimed } : {},
             extra: Array.isArray(path.extra) ? path.extra : [],
-            trialUntil: Number(path.trialUntil) || 0
+            trialUntil: Number(path.trialUntil) || 0,
+            trialsUsed: Number(path.trialsUsed) || 0,
+            deals: path.deals && typeof path.deals === 'object' ? { ...path.deals } : {}
         };
         merged.version = PROFILE_VERSION;
         return merged;
@@ -216,6 +219,11 @@
         });
         clean.path.extra = raw.path.extra.slice(0, 500).map(item).filter(Boolean);
         clean.path.trialUntil = int(raw.path.trialUntil, 4102444800000);
+        clean.path.trialsUsed = int(raw.path.trialsUsed, 1000);
+        Object.entries(raw.path.deals || {}).slice(0, 200).forEach(([level, cards]) => {
+            const l = int(level, MAX_LEVEL);
+            if (l >= 2 && l <= clean.level && !clean.path.claimed[l] && Array.isArray(cards)) clean.path.deals[l] = cards.slice(0, 10).map(item).filter(Boolean);
+        });
         return clean;
     }
 
@@ -258,6 +266,9 @@
         });
         merged.path.extra = [...extra];
         merged.path.trialUntil = Math.max(a.path.trialUntil, b.path.trialUntil);
+        merged.path.trialsUsed = Math.max(a.path.trialsUsed, b.path.trialsUsed);
+        merged.path.deals = { ...b.path.deals, ...a.path.deals };
+        Object.keys(merged.path.deals).forEach(l => { if (Object.hasOwn(merged.path.claimed, l)) delete merged.path.deals[l]; });
         return merged;
     }
 

@@ -206,19 +206,25 @@ function renderSupporter(product) {
 
 // Zestaw wyglądu: obrazki rzeczy (części na Twoim awatarze, ramka, efekt, skórka) i cena
 // Kolor tła obrazków zestawu (jak na makiecie: części awatara na tle w kolorze zestawu)
-const BUNDLE_COLORS = { 'bundle-maszyna': '263238', 'bundle-slodziak': 'e91e63', 'bundle-detektyw': '795548' };
+const BUNDLE_COLORS = { 'bundle-maszyna': '263238', 'bundle-slodziak': 'e91e63', 'bundle-detektyw': '795548', 'bundle-kosmita': '4caf50', 'bundle-zima': '2196f3', 'bundle-upior': '9c27b0' };
 
 function renderLookBundle(id, product) {
     const card = createElement('div', 'shop-card shop-look-bundle');
     card.onclick = () => openProduct(id);
     const pics = createElement('div', 'bundle-pics');
-    // obrazki: same części awatara (bez ramek, efektów i skórek - te są w opisie)
-    product.items.filter(item => item.startsWith('part:')).forEach(item => {
+    // obrazki: części awatara, a za nimi efekt wyrzucenia i karta (te same miniatury co w panelu wyglądu)
+    product.items.forEach(item => {
         const info = Inventory.info(item);
-        const img = createElement('img');
-        img.src = avatarUrl({ style: avatarCatalog.rewards.style, [info.slot]: info.id, background: BUNDLE_COLORS[id] || '555555' });     // animowane się ruszają
-        img.alt = '';
-        pics.append(img);
+        if (item.startsWith('part:')) {
+            const img = createElement('img');
+            img.src = avatarUrl({ style: avatarCatalog.rewards.style, [info.slot]: info.id, background: BUNDLE_COLORS[id] || '555555' });     // animowane się ruszają
+            img.alt = '';
+            pics.append(img);
+        } else if (item.startsWith('kick:') || item.startsWith('skin:')) {
+            const box = createElement('span', 'bundle-pic-cos');
+            box.append(item.startsWith('kick:') ? Cosmetics.kickThumb(info.id) : Cosmetics.skinThumb(info.id));
+            pics.append(box);
+        }
     });
     const text = createElement('div', 'shop-row-text');
     text.append(createElement('b', '', product.name.replace('Zestaw ', '')));

@@ -249,12 +249,34 @@ function guestPathOnly(profile) {
     const allowed = item => item === 'none' || item === 'host-trial' || (rewards && rewards.rarityOf(item) && !rewards.isShopOnly(item));
     Object.entries(profile.path.claimed).forEach(([level, item]) => { if (!allowed(item)) delete profile.path.claimed[level]; });
     profile.path.extra = profile.path.extra.filter(allowed);
+    profile.path.deals = {};        // rozdania kart skrzynek tylko z serwera - z przeglądarki dałoby się je podrobić
     return profile;
 }
 
 // Odebranie nagrody poziomu - losuje serwer (gracz nie wybierze sobie wyniku)
 function claimReward(account, level) {
     const result = rewards.claim(account.profile, level, account.unlocks, () => crypto.randomInt(0, 1e9) / 1e9);
+    if (!result.error) scheduleSave(account);
+    return result;
+}
+
+// DEWELOPER: wyczyszczenie ścieżki (odebrane nagrody i kupony), żeby przetestować odbieranie od nowa
+function resetPath(account) {
+    if (!account.dev) return false;
+    account.profile.path = { claimed: {}, extra: [], trialUntil: 0, trialsUsed: 0, deals: {} };
+    scheduleSave(account);
+    return true;
+}
+
+// Skrzynka: rozdanie kart i wybór jednej - losuje serwer, przeglądarka dostaje zawartość kart dopiero po wyborze
+const serverRnd = () => crypto.randomInt(0, 1e9) / 1e9;
+function dealReward(account, level) {
+    const result = rewards.dealCards(account.profile, level, account.unlocks, serverRnd);
+    if (!result.error) scheduleSave(account);
+    return result;
+}
+function pickReward(account, level, index) {
+    const result = rewards.pickCard(account.profile, level, index, account.unlocks, serverRnd);
     if (!result.error) scheduleSave(account);
     return result;
 }
@@ -282,13 +304,19 @@ function grantDev(account) {
     DEV_ITEMS.forEach(item => account.unlocks.add(item));
 }
 
+// Ścieżka dla przeglądarki: rozdane karty skrzynek zakryte (sama liczba) - nie da się podejrzeć, co jest na kartach
+function publicPath(path) {
+    const deals = Object.fromEntries(Object.entries(path.deals || {}).map(([level, cards]) => [level, cards.map(() => 'hidden')]));
+    return { ...path, deals };
+}
+
 // Co przeglądarka dostaje po połączeniu z kontem
 function welcome(account) {
-    return { isAnonymous: account.isAnonymous, needsImport: !account.importedAt, profile: account.profile, unlocks: [...(account.unlocks || [])] };
+    return { isAnonymous: account.isAnonymous, needsImport: !account.importedAt, profile: { ...account.profile, path: publicPath(account.profile.path) }, unlocks: [...(account.unlocks || [])] };
 }
 
 module.exports = {
-    enabled, attach, detach, recordRound, importGuest, previewAnonymous, mergeAnonymous, markBadgesSeen, recordFeat, welcome, flushAll, refreshUnlocks, grantDev, setRewards, claimReward, startTrial,
+    enabled, attach, detach, recordRound, importGuest, previewAnonymous, mergeAnonymous, markBadgesSeen, recordFeat, welcome, flushAll, refreshUnlocks, grantDev, setRewards, publicPath, claimReward, dealReward, pickReward, startTrial, resetPath,
     // do testów
     verifyToken, loaded
 };

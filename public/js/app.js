@@ -1525,8 +1525,22 @@ function renderHostPackBar(room) {
     const bar = byId('host-pack-bar');
     const host = room.players.find(p => p.id === room.hostId);
     const perks = host && host.perks;
-    bar.classList.toggle('hidden', !(perks && perks.hostPack));
-    if (!perks || !perks.hostPack) return;
+    bar.classList.remove('offer');
+    // gospodarz bez Pakietu, a z kuponem ze ścieżki: propozycja włączenia darmowego wieczoru
+    if (!(perks && perks.hostPack)) {
+        const trial = typeof Inventory !== 'undefined' && Inventory.ready() ? Inventory.trial() : null;
+        const canOffer = room.hostId === myPlayerId && trial && trial.available && !Inventory.unlocks().has('host');
+        bar.classList.toggle('hidden', !canOffer);
+        if (!canOffer) return;
+        bar.classList.add('offer');
+        bar.innerHTML = PIX_CROWN_SVG;
+        const box = createElement('div');
+        box.append(createElement('b', '', 'Darmowy wieczór z Pakietem Hosta'), createElement('small', '', `Masz ${trialWord(trial.left)} · 24 h od włączenia`));
+        const button = createElement('button', 'path-voucher-btn', 'Włącz');
+        button.onclick = activateTrial;
+        bar.append(box, button);
+        return;
+    }
     bar.classList.toggle('trial', Boolean(perks.trialUntil));
     const text = perks.trialUntil
         ? ['Darmowy wieczór z Pakietem Hosta', `Nagroda ze ścieżki · zostało ${formatLeft(perks.trialUntil - Date.now())}`]

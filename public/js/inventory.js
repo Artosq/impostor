@@ -102,6 +102,33 @@ const Inventory = (() => {
         return ProfileStore.updateLocal(p => { result = R.claim(p, level, null); }).then(() => { notify(); return result; });
     }
 
+    // Skrzynka: rozdanie kart -> { count, chest } i wybór karty -> { item, cards, index }. Konto - serwer, gość - tutaj.
+    function askServer(event, reply, level, ...args) {
+        return new Promise(resolve => {
+            const done = data => {
+                if (data.level !== level) return;
+                socket.off(reply, done);
+                if (data.path) ProfileStore.applyAccount({ path: data.path });
+                notify();
+                resolve(data);
+            };
+            socket.on(reply, done);
+            socket.emit(event, level, ...args);
+        });
+    }
+    function deal(level) {
+        if (!R) return Promise.resolve({ error: 'Chwila - wczytuję nagrody' });
+        if (isAccount()) return askServer('path_deal', 'path_dealt', level);
+        let result;
+        return ProfileStore.updateLocal(p => { result = R.dealCards(p, level, null); }).then(() => result);
+    }
+    function pick(level, index) {
+        if (!R) return Promise.resolve({ error: 'Chwila - wczytuję nagrody' });
+        if (isAccount()) return askServer('path_pick', 'path_claimed', level, index);
+        let result;
+        return ProfileStore.updateLocal(p => { result = R.pickCard(p, level, index, null); }).then(() => { notify(); return result; });
+    }
+
     const trial = () => (R ? R.trialState(ProfileStore.get()) : { available: false, activeUntil: 0 });
     // Darmowy wieczór z Pakietem Hosta działa tylko na koncie (pokój sprawdza serwer)
     function startTrial() {
@@ -121,6 +148,15 @@ const Inventory = (() => {
 
     socket.on('shop_owned', list => setUnlocks(list));
     socket.on('path_trial_started', path => { ProfileStore.applyAccount({ path }); notify(); });
+    socket.on('path_reset', path => { ProfileStore.applyAccount({ path }); notify(); });
+
+    // DEWELOPER: ścieżka od nowa - konto przez serwer, gość u siebie
+    const isDev = () => unlocks.has('dev:all');
+    function devResetPath() {
+        if (!isDev()) return;
+        if (isAccount()) return socket.emit('dev_path_reset');
+        ProfileStore.updateLocal(p => { p.path = { claimed: {}, extra: [], trialUntil: 0, trialsUsed: 0, deals: {} }; }).then(notify);
+    }
     // wylogowanie: zakupy konta znikają z tej przeglądarki
     ProfileStore.onChange(() => {
         if (!ProfileStore.isAccount() && unlocks.size && !unlocks.has('dev:all')) unlocks = new Set();
@@ -130,9 +166,10 @@ const Inventory = (() => {
     return {
         init, ready, owned, has, canUsePart, partItem, source, info,
         getLook, setLook, lookToSend,
-        unclaimed, rewardAt, claimedAt, claim, trial, startTrial,
+        unclaimed, rewardAt, claimedAt, claim, deal, pick, trial, startTrial, isDev, devResetPath,
         setUnlocks, hasPack, unlocks: () => new Set(unlocks),
         kicks: () => (R ? R.kicks : {}), skins: () => (R ? R.skins : {}),
+        pools: () => (R ? R.pools : {}), chests: () => (R ? R.chests : {}),     // ruletka skrzynki (path.js)
         onChange: fn => listeners.add(fn)
     };
 })();
